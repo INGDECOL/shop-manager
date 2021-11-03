@@ -19,19 +19,21 @@
               <thead class="bg-gray-800 text-white">
                 <tr >
                   <th class="text-left py-3 px-4 uppercase font-semibold text-sm">#</th>
-                  <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Designation</th>
+                  <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Code famille</th>
+                  <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Famille</th>
                   <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Description</th>
                   <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Actions</th>
                 </tr>
               </thead>
               <tbody class="text-gray-700">
-                <tr class="border-b border-gray-400 max-h-2 overflow-y-scroll" :class="{ striped : n % 2 ===0}" v-for="(rayon, n) in filteredRayons" :key="rayon.id">
+                <tr class="border-b border-gray-400 max-h-2 overflow-y-scroll" :class="{ striped : n % 2 ===0}" v-for="(famille, n) in filteredFamilles" :key="famille.id">
                   <td class="text-left py-3 px-4 font-semibold uppercase">{{ n + 1 }} </td>
-                  <td class="text-left py-3 px-4">{{ rayon.rayon}}</td>
-                  <td class="text-left py-3 px-4">{{ rayon.description}}</td>
+                  <td class="text-left py-3 px-4">{{ famille.codeFamille}}</td>
+                  <td class="text-left py-3 px-4">{{ famille.nomFamille}}</td>
+                  <td class="text-left py-3 px-4">{{ famille.description}}</td>
                   <td class="text-left py-3 px-4 flex justify-between items-center">
-                    <span class="material-icons " title="Modifier " :class="{ disabled: !isAdmin }" @click="edit(rayon.id)">edit</span>
-                    <span class="material-icons strash text-red-300" title="Supprimer" :class="{ disabled: !isAdmin }" @click="destroy(rayon.id)">delete</span>
+                    <span class="material-icons " title="Modifier " :class="{ disabled: !isAdmin }" @click="edit(famille.id)">edit</span>
+                    <span class="material-icons strash text-red-300" title="Supprimer" :class="{ disabled: !isAdmin }" @click="destroy(famille.id)">delete</span>
                   </td>
                 </tr>
               </tbody>
@@ -63,7 +65,7 @@ export default {
     const searchQuery = ref("")
     const editrayonId = ref(null)
     // onMounted( async () => {
-      const l = async () => await load("rayons")
+      const l = async () => await load("familles")
       //console.log(" rayons : ", documents.value)
     // })
     l()
@@ -97,7 +99,7 @@ export default {
     const edit = (id) => {
       // console.log(" id :::: ",id)
       if( isAdmin) {
-        router.push( { name: "EditRayon", params: { token: auth.currentUser.accessToken, id: id}})
+        router.push( { name: "EditFamille", params: { token: auth.currentUser.accessToken, id: id}})
 
       }else {
         alert("Vous n'êtes pas autorisé à effectuer cette action")
@@ -118,9 +120,9 @@ export default {
         alert("Vous n'êtes pas autorisé à effectuer cette action")
       }
     }
-    const filteredRayons = computed( () =>{
-          return documents.value ? documents.value.filter( (rayon) => {
-            return rayon.rayon.toLowerCase().indexOf( searchQuery.value.toLowerCase()) != -1
+    const filteredFamilles = computed( () =>{
+          return documents.value ? documents.value.filter( (famille) => {
+            return famille.codeFamille.toLowerCase().indexOf( searchQuery.value.toLowerCase()) != -1
           }): []
 
     })
@@ -134,7 +136,7 @@ export default {
       documents,
       getError,
       searchQuery,
-      filteredRayons,
+      filteredFamilles,
       editrayonId,
     }
   }

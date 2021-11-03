@@ -64,7 +64,7 @@
             </DisclosurePanel>
           </Disclosure>
         </li>
-        <!-- RAYONS -->
+        <!-- FAMILLES -->
         <li>
           <Disclosure v-slot="{ open }" :default-open="isUserManagementActive">
             <DisclosureButton
@@ -75,7 +75,7 @@
                 spoke
               </span>
 
-              Rayons
+              Familles
               <span class="ml-auto material-icons"  :class="open ? 'transform rotate-90' : ''">
                 arrow_forward_ios
               </span>
@@ -84,7 +84,42 @@
               <ul>
                 <li>
                   <Disclosure v-slot="{ open }" :default-open="isUserActive">
-                        <router-link :to="{ name: 'Rayons', params: { token: auth.currentUser.accessToken}}">
+                        <router-link :to="{ name: 'Familles', params: { token: auth.currentUser.accessToken}}">
+                          <p
+                            class="pl-6 pr-4  flex items-center w-full hover:bg-gray-700"
+                            :class="open ? 'bg-gray-700' : ''"
+                          >
+                          <span class="material-icons w-5 mr-2">settings_suggest</span>Gerer
+                          </p>
+                        </router-link>
+
+                  </Disclosure>
+                </li>
+              </ul>
+            </DisclosurePanel>
+          </Disclosure>
+        </li>
+        <!-- BOUTIQUES -->
+        <li v-if="isAdmin">
+          <Disclosure v-slot="{ open }" :default-open="isUserManagementActive">
+            <DisclosureButton
+              class="px-4 py-3 flex items-center w-full hover:bg-gray-700"
+              :class="open ? 'bg-gray-700' : ''"
+            >
+              <span class="material-icons  w-5 mr-2">
+                store
+              </span>
+
+              Boutiques
+              <span class="ml-auto material-icons"  :class="open ? 'transform rotate-90' : ''">
+                arrow_forward_ios
+              </span>
+            </DisclosureButton>
+            <DisclosurePanel>
+              <ul>
+                <li>
+                  <Disclosure v-slot="{ open }" :default-open="isUserActive">
+                        <router-link :to="{ name: 'Boutiques', params: { token: auth.currentUser.accessToken}}">
                           <p
                             class="pl-6 pr-4  flex items-center w-full hover:bg-gray-700"
                             :class="open ? 'bg-gray-700' : ''"
@@ -323,10 +358,11 @@
 </template>
 
 <script>
-import { computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { computed, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue'
 import { auth } from "../../firebase/config";
+import getUser from '../../controllers/getUser';
 export default {
   components: {
     Disclosure,
@@ -336,6 +372,29 @@ export default {
 
   setup() {
     const route = useRoute()
+    const router = useRouter()
+
+      const isAdmin = ref(async () =>{
+        const { findUser, error, user } = getUser()
+        let _user = auth.currentUser
+        //console.log("userssss : ", _user.uid)
+        if(_user) {
+            await findUser(_user.uid)
+            //console.log("requireAuthAdmin : ", user.value.fonction)
+            if(user.value.fonction !== 'Administrateur'){
+              // alert("Vous n'êtes pas autorisé à aller sur cette page ")
+              return false
+
+            } else {
+              return true
+            }
+          }else {
+            router.push({ name: "Home"})
+          }
+
+    })
+
+
 
     const isUserManagementActive = computed(() => {
       const names = ['user-list', 'user-detail', 'roles', 'permissions']
@@ -351,6 +410,7 @@ export default {
 
     return {
       route,
+      isAdmin,
       isUserManagementActive,
       isUserActive,
       auth

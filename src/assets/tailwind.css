@@ -70,6 +70,9 @@
     form {
         @apply max-w-md m-auto p-7 rounded-lg drop-shadow-md border border-solid border-secondary bg-white
     }
+    form.produit {
+        @apply max-w-full 
+    }
 
     input, textarea, select {
         @apply block my-2 mx-0 py-2 px-0.5 border-b-2 w-full
@@ -106,9 +109,13 @@
       .navigation span {
         @apply cursor-pointer bg-secondary hover:bg-primary hover:text-secondary
       }
-      .modal {
+      .modal, .produit {
           @apply w-96 p-7 my-10 mx-auto rounded-xl bg-white shadow-lg text-center
       }
+      .produit {
+          @apply w-full
+      }
+
       .create .modal {
           @apply mx-40
       }

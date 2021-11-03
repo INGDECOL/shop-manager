@@ -8,13 +8,17 @@ import getUser from '../controllers/getUser'
   import ListeFournisseur from "../views/fournisseurs/ListeFournisseur.vue"
   import EditFournisseur from "../views/fournisseurs/EditFournisseur.vue"
 
-  import ListeRayon from "../views/rayons/ListeRayon.vue"
-  import EditRayon from "../views/rayons/EditRayon.vue"
+  import ListeRayon from "../views/familles/ListeRayon.vue"
+  import EditRayon from "../views/familles/EditRayon.vue"
 
   import ListeClient from "../views/clients/ListeClient.vue"
   import EditClient from "../views/clients/EditClient.vue"
 
+  import ListeBoutique from "../views/boutiques/ListeBoutique.vue"
+  import EditBoutique from "../views/boutiques/EditBoutique.vue"
+
   import ListeProduit from "../views/produits/ListeProduit.vue"
+  import NewProduit from "../views/produits/NewProduit.vue"
   import EditProduit from "../views/produits/EditProduit.vue"
   import Desintegration from "../views/produits/Desintegration.vue"
   import Reception from "../views/produits/Reception.vue"
@@ -75,15 +79,28 @@ const routes = [
   },
 
   {
-    path: "/rayons/:token",
-    name: "Rayons",
+    path: "/familles/:token",
+    name: "Familles",
     component: ListeRayon,
     beforEnter: requireAuth
   },
   {
-    path: "/rayons/edit/:token/:id",
-    name: "EditRayon",
+    path: "/familles/edit/:token/:id",
+    name: "EditFamille",
     component: EditRayon,
+    beforEnter: requireAuthAdmin
+  },
+
+  {
+    path: "/boutiques/:token",
+    name: "Boutiques",
+    component: ListeBoutique,
+    beforEnter: requireAuthAdmin
+  },
+  {
+    path: "/boutiques/edit/:token/:id",
+    name: "EditBoutique",
+    component: EditBoutique,
     beforEnter: requireAuthAdmin
   },
 
@@ -100,6 +117,12 @@ const routes = [
     beforEnter: requireAuthAdmin
   },
 
+  {
+    path: "/produits/create/:token",
+    name: "NewProduit",
+    component: NewProduit,
+    beforEnter: requireAuthAdmin
+  },
   {
     path: "/produits/:token",
     name: "Produits",

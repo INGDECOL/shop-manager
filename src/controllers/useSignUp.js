@@ -23,6 +23,7 @@ const signUp  = async (data) => {
             //updatePhoneNumber(user, data.phoneNumber)
         const userRef = doc(db, "users", user.uid)
         await setDoc(userRef, {
+                email: data.email,
                 fonction: data.fonction,
                 phoneNumber: data.phoneNumber,
                 createdAt: serverTimestamp()
