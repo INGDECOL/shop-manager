@@ -13,7 +13,7 @@ const signUp  = async (data) => {
     .then(async (userCredential) => {
         // Signed in
         const user = auth.currentUser
-        console.log("phoneNumber : ", data.phoneNumber, "userCredential : ", userCredential)
+        // console.log("phoneNumber : ", data.phoneNumber, "userCredential : ", userCredential)
         updateProfile(user,{
             displayName: data.displayName,
             phoneNumber: data.phoneNumber
@@ -32,7 +32,7 @@ const signUp  = async (data) => {
             console.log("Email sent to : ", user.email)
             }
 
-        console.log(" user signedUp: ", user)
+        // console.log(" user signedUp: ", user)
         //router.push({ name: 'Home'})
         return user
     })

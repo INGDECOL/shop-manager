@@ -9,7 +9,7 @@ const signError = ref(null)
 const signIn = async (email, password) => {
     signError.value = null
     try {
-        console.log(email,password)
+        // console.log(email,password)
         const res = await signInWithEmailAndPassword(auth, email, password)
             .then((userCredential) => {
                 // Signed in
@@ -22,7 +22,7 @@ const signIn = async (email, password) => {
             .catch((error) => {
                 const errorCode = error.code;
                 const errorMessage = error.message;
-                console.log("errorCode : ",errorCode, "error msg : ", error.message)
+                // console.log("errorCode : ",errorCode, "error msg : ", error.message)
                 signError.value = "Email et Mot de passe invalide !"
             })
     } catch (err) {

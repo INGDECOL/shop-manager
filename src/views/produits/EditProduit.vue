@@ -5,7 +5,7 @@
             <div class="flex justify-end -mr-5  ml-auto">
                 <span class="material-icons close row-auto mr-0 ml-auto pr-0" @click="goBack">close</span>
             </div>
-            <h2 class="-mb-6 font-bold text-center text-base">NOUVEL ARTICLE</h2>
+            <h2 class="-mb-6 font-bold text-center text-base">MODIFICATION ARTICLE</h2>
                 <!-- <input type="hidden" name="id" v-model="id"> -->
                 <div class="produit ">
                     <div class="border rounded mb-2 px-1">

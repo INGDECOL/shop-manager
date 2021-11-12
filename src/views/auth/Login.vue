@@ -40,12 +40,12 @@ export default {
         }
 
         const handleSubmit = async () => {
-            console.log("email : ",email.value,password.value)
+            // console.log("email : ",email.value,password.value) 
             await signIn(email.value, password.value)
 
             if(!signError.value) {
-                console.log( "user logged In ...")
-                console.log("auth : ", auth.currentUser)
+                // console.log( "user logged In ...")
+                // console.log("auth : ", auth.currentUser)
                  document.querySelectorAll(".auth form").forEach(form => form.reset())
                  document.querySelector(".auth").classList.remove("open")
                 // router.push( { name: 'Home'})

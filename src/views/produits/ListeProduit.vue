@@ -34,7 +34,7 @@
                     <td class="text-left py-3 px-4">{{ produit.codeFamille}}</td>
                     <td class="text-left py-3 px-4">{{ produit.quantite}}</td>
                     <td class="text-left py-3 px-4">{{ produit.pvu }}</td>
-                    <td class="text-left py-3 px-4 text-blue-400 underline cursor-pointer">{{ produit.fournisseurId }}</td>
+                    <td class="text-left py-3 px-4 text-blue-400 underline cursor-pointer" :title="getFournisseur(produit.fournisseurId)">{{ produit.fournisseurId }}</td>
                     <td class="text-left py-3 px-4 flex justify-between items-center">
                       <span class="material-icons " title="Modifier" :class="{ disabled: !isAdmin }" @click="edit(produit.id)">edit</span>
                       <span class="material-icons strash text-red-300" title="Supprimer" :class="{ disabled: !isAdmin }" @click="destroy(produit.id)">delete</span>
@@ -54,6 +54,7 @@
 import { computed, ref } from '@vue/reactivity';
 import { auth } from "../../firebase/config"
 import getUser from "../../controllers/getUser"
+import getDocument from "../../controllers/getDocument"
 import getDocuments from "../../controllers/getDocuments"
 import destroyDocument from "../../controllers/destroyDocument"
 import { useRouter } from 'vue-router'
@@ -69,8 +70,19 @@ export default {
     const editproduitId = ref(null)
     onMounted( async () => {
       await load("produits")
+      const id = "LjnaPPzud5qF8DZR1K0t"
+      // console.log("fournisseur with id : ", getFournisseur("LjnaPPzud5qF8DZR1K0t"))
       //console.log(" produits : ", documents.value)
     })
+
+    const getFournisseur =  (id) => {
+      const { document, getError, load } = getDocument()
+       load("fournisseurs", id)
+      //  if(document.value ){
+
+      return document.value.nom +" " + document.value.prenom
+      //  }
+    }
 
     const isAdmin = ref(async () =>{
       const { findUser, error, user } = getUser()
@@ -134,6 +146,7 @@ export default {
       auth,
       isAdmin,
       edit,
+      getFournisseur,
       destroy,
       toggleForm,
       documents,

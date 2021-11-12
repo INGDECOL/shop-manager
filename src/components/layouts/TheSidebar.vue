@@ -1,5 +1,5 @@
 <template>
-  <aside class="hidden w-64 bg-gray-800 sm:block">
+  <aside class="hidden w-60 bg-gray-800 sm:block">
     <div class="py-3 text-2xl uppercase text-center tracking-widest bg-gray-900 border-b-2 border-gray-800 mb-8">
       <router-link to="/" class="text-white">Ets N'NA HAWA</router-link>
     </div>
@@ -33,8 +33,8 @@
         <li>
           <Disclosure v-slot="{ open }" :default-open="isUserManagementActive">
             <DisclosureButton
-              class="px-4 py-3 flex items-center w-full hover:bg-gray-700"
-              :class="open ? 'bg-gray-700' : ''"
+              class="disclosure rounded-none px-4 py-1 flex items-center w-full hover:bg-gray-700 hover:rounded-2xl"
+              :class="open ? 'open' : ''"
             >
               <span class="material-icons  w-5 mr-2">
                 contacts
@@ -52,7 +52,7 @@
                         <router-link :to="{ name: 'Fournisseurs', params: { token: auth.currentUser.accessToken}}">
                           <p
                             class="pl-6 pr-4  flex items-center w-full hover:bg-gray-700"
-                            :class="open ? 'bg-gray-700' : ''"
+                            :class="open ? 'open': ''"
                           >
                           <span class="material-icons w-5 mr-2">manage_accounts</span>Gerer
                           </p>
@@ -65,11 +65,11 @@
           </Disclosure>
         </li>
         <!-- FAMILLES -->
-        <li>
+        <li v-if="isAdmin">
           <Disclosure v-slot="{ open }" :default-open="isUserManagementActive">
             <DisclosureButton
-              class="px-4 py-3 flex items-center w-full hover:bg-gray-700"
-              :class="open ? 'bg-gray-700' : ''"
+              class="disclosure rounded-none px-4 py-1 flex items-center w-full hover:bg-gray-700"
+              :class="open ? 'open': ''"
             >
               <span class="material-icons  w-5 mr-2">
                 spoke
@@ -87,7 +87,7 @@
                         <router-link :to="{ name: 'Familles', params: { token: auth.currentUser.accessToken}}">
                           <p
                             class="pl-6 pr-4  flex items-center w-full hover:bg-gray-700"
-                            :class="open ? 'bg-gray-700' : ''"
+                            :class="open ? 'open': ''"
                           >
                           <span class="material-icons w-5 mr-2">settings_suggest</span>Gerer
                           </p>
@@ -103,8 +103,8 @@
         <li v-if="isAdmin">
           <Disclosure v-slot="{ open }" :default-open="isUserManagementActive">
             <DisclosureButton
-              class="px-4 py-3 flex items-center w-full hover:bg-gray-700"
-              :class="open ? 'bg-gray-700' : ''"
+              class="disclosure rounded-none px-4 py-1 flex items-center w-full hover:bg-gray-700"
+              :class="open ? 'open': ''"
             >
               <span class="material-icons  w-5 mr-2">
                 store
@@ -122,7 +122,7 @@
                         <router-link :to="{ name: 'Boutiques', params: { token: auth.currentUser.accessToken}}">
                           <p
                             class="pl-6 pr-4  flex items-center w-full hover:bg-gray-700"
-                            :class="open ? 'bg-gray-700' : ''"
+                            :class="open ? 'open': ''"
                           >
                           <span class="material-icons w-5 mr-2">settings_suggest</span>Gerer
                           </p>
@@ -138,8 +138,8 @@
         <li>
           <Disclosure v-slot="{ open }" :default-open="isUserManagementActive">
             <DisclosureButton
-              class="px-4 py-3 flex items-center w-full hover:bg-gray-700"
-              :class="open ? 'bg-gray-700' : ''"
+              class="disclosure rounded-none px-4 py-1 flex items-center w-full hover:bg-gray-700"
+              :class="open ? 'open': ''"
             >
               <span class="material-icons  w-5 mr-2">
                 groups
@@ -157,7 +157,7 @@
                         <router-link :to="{ name: 'Clients', params: { token: auth.currentUser.accessToken}}">
                           <p
                             class="pl-6 pr-4  flex items-center w-full hover:bg-gray-700"
-                            :class="open ? 'bg-gray-700' : ''"
+                            :class="open ? 'open': ''"
                           >
                           <span class="material-icons w-5 mr-2">settings_suggest</span>Gerer
                           </p>
@@ -174,14 +174,14 @@
         <li>
           <Disclosure v-slot="{ open }" :default-open="isUserManagementActive">
             <DisclosureButton
-              class="px-4 py-3 flex items-center w-full hover:bg-gray-700"
-              :class="open ? 'bg-gray-700' : ''"
+              class="disclosure rounded-none px-4 py-1 flex items-center w-full hover:bg-gray-700"
+              :class="open ? 'open': ''"
             >
               <span class="material-icons  w-5 mr-2">
                 list
               </span>
 
-              Produits
+              Articles
               <span class="ml-auto material-icons"  :class="open ? 'transform rotate-90' : ''">
                 arrow_forward_ios
               </span>
@@ -194,7 +194,7 @@
                         <router-link :to="{ name: 'Produits', params: { token: auth.currentUser.accessToken}}">
                           <p
                             class="pl-6 pr-4  flex items-center w-full hover:bg-gray-700"
-                            :class="open ? 'bg-gray-700' : ''"
+                            :class="open ? 'open': ''"
                           >
                           <span class="material-icons w-5 mr-2">settings_suggest</span>Gerer
                           </p>
@@ -202,27 +202,14 @@
 
                   </Disclosure>
                 </li>
-                <!-- DESINTEGRER -->
-                <li>
-                  <Disclosure v-slot="{ open }" :default-open="isUserActive">
-                        <router-link :to="{ name: 'Desintegration', params: { token: auth.currentUser.accessToken}}">
-                          <p
-                            class="pl-6 pr-4  flex items-center w-full hover:bg-gray-700"
-                            :class="open ? 'bg-gray-700' : ''"
-                          >
-                          <span class="material-icons w-5 mr-2">content_cut</span>Désintégration
-                          </p>
-                        </router-link>
 
-                  </Disclosure>
-                </li>
                 <!-- RECEPTION -->
                 <li>
                   <Disclosure v-slot="{ open }" :default-open="isUserActive">
                         <router-link :to="{ name: 'Reception', params: { token: auth.currentUser.accessToken}}">
                           <p
                             class="pl-6 pr-4  flex items-center w-full hover:bg-gray-700"
-                            :class="open ? 'bg-gray-700' : ''"
+                            :class="open ? 'open': ''"
                           >
                           <span class="material-icons w-5 mr-2">call_received</span>Réception
                           </p>
@@ -231,6 +218,20 @@
                   </Disclosure>
                 </li>
 
+                <!-- DESINTEGRER -->
+                <li>
+                  <Disclosure v-slot="{ open }" :default-open="isUserActive">
+                        <router-link :to="{ name: 'Desintegration', params: { token: auth.currentUser.accessToken}}">
+                          <p
+                            class="pl-6 pr-4  flex items-center w-full hover:bg-gray-700"
+                            :class="open ? 'open': ''"
+                          >
+                          <span class="material-icons w-5 mr-2">content_cut</span>Désintégration
+                          </p>
+                        </router-link>
+
+                  </Disclosure>
+                </li>
               </ul>
             </DisclosurePanel>
           </Disclosure>

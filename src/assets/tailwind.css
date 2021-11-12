@@ -1,16 +1,18 @@
 @tailwind base;
-
 @tailwind components;
-
 @font-face {
     font-family: Tangerine;
     src: url('../fonts/Tangerine-Bold.ttf');
 }
-@tailwind utilities;
+@font-face {
+    font-family: Roboto;
+    src: url('../fonts/Roboto-Bold.ttf');
+}
 
+@tailwind utilities;
 @layer base {
     body {
-        @apply  my-0 mx-5 bg-gray-50 ;
+        @apply my-0 mx-5 bg-gray-50;
     }
     .title {
         @apply p-2.5 my-5 mx-auto text-4xl font-bold
@@ -28,7 +30,7 @@
         @apply bg-gray-300 font-bold
     }
     header.header h1 {
-        @apply text-gray-600 text-4xl  font-bold font-tangerine drop-shadow-1xl
+        @apply text-gray-600 text-4xl font-bold font-tangerine drop-shadow-1xl
     }
     header a {
         @apply ml-2.5 border-b-2 border-yellow-300 p-1 cursor-pointer border-solid
@@ -57,6 +59,20 @@
     button, .btn {
         @apply bg-yellow-400 rounded-xl border-0 py-2.5 px-3 mt-3 font-bold cursor-pointer inline-block
     }
+    button.disclosure, .btn.disclosure {
+        @apply bg-gray-800 font-bold cursor-pointer text-slategray
+    }
+    .disclosure.open {
+        @apply bg-blue-400 text-gray-200
+    }
+    .disclosure.open span{
+        @apply text-gray-200
+    }
+
+    button.disclosure span {
+        @apply text-slategray
+    }
+
     .button {
         @apply flex justify-end mt-4
     }
@@ -66,12 +82,12 @@
     button:disabled {
         @apply opacity-50 text-primary bg-secondary cursor-not-allowed
     }
-    /* forms */
+
     form {
         @apply max-w-md m-auto p-7 rounded-lg drop-shadow-md border border-solid border-secondary bg-white
     }
     form.produit {
-        @apply max-w-full 
+        @apply max-w-full
     }
 
     input, textarea, select {
@@ -83,63 +99,85 @@
     nav span {
         @apply font-bold cursor-pointer ml-2.5
     }
-
     .actions {
         @apply flex items-center justify-between
     }
      .material-icons {
-         @apply ml-2.5 cursor-pointer text-xl text-gray-400 hover:text-gray-500
-     }
-     .material-icons.close {
-         @apply    cursor-pointer text-xl text-gray-600 hover:bg-red-400
-     }
-     span.disabled {
-         @apply opacity-30 text-primary bg-secondary cursor-not-allowed
-     }
-      .material-icons.strash {
-          @apply hover:text-red-500
-      }
-
-      .spin {
-          @apply block w-11 h-11 my-11 mx-auto border-4 border-solid border-transparent rounded-3xl
-      }
-      .navigation {
-          @apply flex justify-around items-center font-bold text-base text-gray-500
-      }
-      .navigation span {
+        @apply ml-2.5 cursor-pointer text-xl text-gray-400 hover:text-gray-600
+    }
+    .material-icons.close {
+        @apply cursor-pointer text-xl text-gray-600 hover:bg-red-400
+    }
+    span.disabled {
+        @apply opacity-30 text-primary bg-secondary cursor-not-allowed
+    }
+    .material-icons.strash {
+        @apply hover:text-red-500
+    }
+    .spin {
+        @apply block w-11 h-11 my-11 mx-auto border-4 border-solid border-transparent rounded-3xl
+    }
+    .navigation {
+        @apply flex justify-around items-center font-bold text-base text-gray-500
+    }
+    .navigation span {
         @apply cursor-pointer bg-secondary hover:bg-primary hover:text-secondary
-      }
-      .modal, .produit {
-          @apply w-96 p-7 my-10 mx-auto rounded-xl bg-white shadow-lg text-center
-      }
-      .produit {
-          @apply w-full
-      }
-
-      .create .modal {
-          @apply mx-40
-      }
-      .auth, .create {
-          z-index: 1;
-          @apply w-full h-full fixed bg-gray-100 hidden
-      }
-      .auth.open, .create.open {
-          @apply block
-      }
-      .auth a {
-          @apply underline cursor-pointer
-      }
-      .auth .modal, .create .modal {
-          @apply hidden
-      }
-      .auth .modal.active, .create .modal.active {
-          @apply block
-      }
-      .striped {
-          @apply bg-gray-100
-      }
-      .error {
-          @apply text-warning text-sm text-center my-2 mx-0
-      }
+    }
+    .modal, .produit {
+        @apply w-96 p-7 my-10 mx-auto rounded-xl bg-white shadow-lg text-center
+    }
+    .produit {
+        @apply w-full
+    }
+    .create .modal {
+        @apply mx-40
+    }
+    .auth, .create {
+        z-index: 1;
+        @apply w-full h-full fixed bg-gray-100 hidden
+    }
+    .auth.open, .create.open {
+        @apply block
+    }
+    .auth a {
+        @apply underline cursor-pointer
+    }
+    .auth .modal, .create .modal {
+        @apply hidden
+    }
+    .auth .modal.active, .create .modal.active {
+        @apply block
+    }
+    .striped {
+        @apply bg-gray-100
+    }
+    .dropdown-wrapper {
+        @apply max-w-sm relative my-0 mx-auto
+    }
+    .dropdown-popover {
+        @apply absolute border-2 border-solid border-gray-300 bg-white  -mt-1.5 rounded-b w-auto hidden
+    }
+    .options {
+        @apply w-full
+    }
+    .dropdown-popover ul {
+        @apply text-left text-sm font-semibold px-2 max-h-32 overflow-y-auto overflow-x-hidden w-full
+    }
+    .dropdown-popover li {
+        @apply hover:bg-gray-400 cursor-pointer m-1
+    }
+    .dropdown-popover.active {
+        @apply block
+    }
+     .error {
+        @apply text-warning text-sm text-center my-2 mx-0
+    }
+    /* Scrolling text in the home template */
+    .wrapper {
+        @apply  font-tangerine text-yellow-500 bg-gray-500 flex h-full w-full my-0 mx-auto
+    }
+    .scroll-text {
+        @apply text-yellow-500 
+    }
 
 }

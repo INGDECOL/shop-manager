@@ -70,7 +70,7 @@ export default {
         const router = useRouter()
         //const email = ref('')
         const { createError, create } = createDocument()
-        
+
         const getFamilles = async () => {
             const docRef = collection(db, "familles")
             const res = onSnapshot(docRef, (snap)=>{
@@ -103,7 +103,7 @@ export default {
         const handleSubmit = async () => {
 
             const produit = {
-                designation: designation.value,
+                designation: designation.value.toUpperCase(),
                 pau: Number(pau.value),
                 pvu: Number(pvu.value),
                 fournisseurId: fournisseurId.value,

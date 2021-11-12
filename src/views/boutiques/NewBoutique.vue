@@ -66,6 +66,7 @@ export default {
             const boutique = {
                 designationBoutique: designationBoutique.value,
                 gerantBoutique: gerantBoutique.value,
+                //stock: [],
                 createdAt: serverTimestamp()
             }
             //console.log("client : ", client)
@@ -74,7 +75,7 @@ export default {
                 document.querySelector(".create form").reset()
                 designationBoutique.value=''
                 gerantBoutique.value = ''
-                
+
             }
         }
         return {

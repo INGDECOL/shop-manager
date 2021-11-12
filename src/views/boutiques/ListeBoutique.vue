@@ -53,7 +53,7 @@
 
 <script>
 import { computed, ref } from '@vue/reactivity';
-import { auth } from "../../firebase/config"
+import { auth, db } from "../../firebase/config"
 import getUser from "../../controllers/getUser"
 import getDocuments from "../../controllers/getDocuments"
 import destroyDocument from "../../controllers/destroyDocument"
@@ -61,15 +61,24 @@ import { useRouter } from 'vue-router'
 import { onMounted } from '@vue/runtime-core'
 import AddBoutique from "./NewBoutique.vue"
 import Spinner from "../../components/Spinner.vue"
+import { collection, onSnapshot } from '@firebase/firestore';
 export default {
   components: { AddBoutique, Spinner },
   setup() {
     const router = useRouter()
     const {documents, getError, load} = getDocuments()
     const searchQuery = ref("")
+    const listeBoutiques = ref(null)
     const editboutiqueId = ref(null)
     onMounted( async () => {
-      await load("boutiques")
+      //await load("boutiques")
+      const docRef = collection(db, "boutiques")
+            const res = onSnapshot(docRef, (snap)=>{
+                listeBoutiques.value = snap.docs.map(doc => {
+                    // console.log("snap doc : ", doc.data());
+                    return {...doc.data(), id: doc.id}
+                })
+            })
       //console.log(" clients : ", documents.value)
     })
 
@@ -124,8 +133,11 @@ export default {
         alert("Vous n'êtes pas autorisé à effectuer cette action")
       }
     }
-    const filteredBoutiques = computed( () =>{
-          return documents.value ? documents.value.filter( (boutique) => {
+
+    const filteredBoutiques = computed(  () =>{
+
+          return listeBoutiques.value ? listeBoutiques.value.filter( (boutique) => {
+              //console.log("dddddddddddd : ", boutique)
             return boutique.designationBoutique.toLowerCase().indexOf( searchQuery.value.toLowerCase()) != -1
           }) : []
     })

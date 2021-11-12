@@ -142,7 +142,7 @@ const routes = [
     beforEnter: requireAuthAdmin
   },
   {
-    path: "/vente/reception/:token/",
+    path: "/vente/reception/:token",
     name: "Reception",
     component: Reception,
     beforEnter: requireAuth

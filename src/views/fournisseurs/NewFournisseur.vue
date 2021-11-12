@@ -4,7 +4,10 @@
             <h2 class="mb-2">NOUVEAU FOURNISSEUR</h2>
             <form  @submit.prevent="handleSubmit">
                 <!-- <input type="hidden" name="id" v-model="id"> -->
-                <input type="text" name="nom"   class="uppercase" placeholder="Nom du fournisseur" required v-model="nom">
+                <!-- <div class="form-field__control"> -->
+                    <!-- <label for="nom" class="form-field__label" >Nom du fournisseur</label> -->
+                    <input type="text" name="nom" id="nom" class="form-field__input uppercase" placeholder="Nom du fournisseur" required v-model="nom">
+                <!-- </div> -->
                 <input type="text" name="prenom" placeholder="Prénom"   v-model="prenom">
                 <input type="tel" name="contact"  placeholder="Contact ex: 620 010 010"  v-model="contact" required>
                 <input type="text" name="adresse" placeholder="Adresse / Domicile"   v-model="adresse">
