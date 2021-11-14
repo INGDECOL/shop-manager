@@ -1,10 +1,15 @@
 <template>
   <aside class="hidden w-60 bg-gray-800 sm:block">
-    <div class="py-3 text-2xl uppercase text-center tracking-widest bg-gray-900 border-b-2 border-gray-800 mb-8">
+    <div class="py-3 text-2xl uppercase text-center tracking-widest bg-gray-900 border-b-2 border-gray-800 mb-3" id="enteteNav">
       <router-link to="/" class="text-white">Ets N'NA HAWA</router-link>
     </div>
+    <div class="flex justify-end pr-1 m-0">
 
-    <nav class="text-sm text-gray-300">
+    <span class="material-icons nav hidden" @click="toggleNav">view_headline</span>
+    <span class="material-icons nav " @click="toggleNav">close</span>
+    </div>
+
+    <nav class="text-sm text-gray-300" id="nav2">
       <ul class="flex flex-col">
         <li class="px-4 py-2 text-xs uppercase tracking-wider text-gray-500 font-bold">Menus</li>
 
@@ -409,8 +414,18 @@ export default {
       return names.includes(route.name)
     })
 
+    const toggleNav = () => {
+      let nav = document.querySelectorAll(".nav")
+      nav.forEach(element => {
+        element.classList.toggle("hidden")
+      });
+      document.querySelector("aside").classList.toggle("tog")
+        document.querySelector("#enteteNav").classList.toggle("hidden")
+        document.querySelector("#nav2 ul").classList.toggle("hidden")
+    }
     return {
       route,
+      toggleNav,
       isAdmin,
       isUserManagementActive,
       isUserActive,

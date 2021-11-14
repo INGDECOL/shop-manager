@@ -32,10 +32,10 @@
     header.header h1 {
         @apply text-gray-600 text-4xl font-bold font-tangerine drop-shadow-1xl
     }
-    header a {
+    header a.headerLink {
         @apply ml-2.5 border-b-2 border-yellow-300 p-1 cursor-pointer border-solid
     }
-    header a:hover {
+    header a.headerLink:hover {
         @apply bg-yellow-400 text-black
     }
     header span {
@@ -164,7 +164,7 @@
         @apply text-left text-sm font-semibold px-2 max-h-32 overflow-y-auto overflow-x-hidden w-full
     }
     .dropdown-popover li {
-        @apply hover:bg-gray-400 cursor-pointer m-1
+        @apply hover:bg-gray-400 cursor-pointer mx-1 my-3
     }
     .dropdown-popover.active {
         @apply block
@@ -177,7 +177,19 @@
         @apply  font-tangerine text-yellow-500 bg-gray-500 flex h-full w-full my-0 mx-auto
     }
     .scroll-text {
-        @apply text-yellow-500 
+        @apply text-yellow-500
     }
+    .menu:hover > span {
+        transform: rotate(90deg);
+    }
+    .menu:hover > .dropdown-popover {
+        @apply block
+    }
+    .tog {
+        max-width: 50px;
+        /* overflow: hidden; */
+    }
+
+
 
 }

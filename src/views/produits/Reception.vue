@@ -68,13 +68,7 @@
                             </tbody>
                         </table>
                       </div>
-                      <!-- <input type="text" name="pau" placeholder="Prix d'achat"   v-model="pau" required>
-                      <input type="text" name="pvu"  placeholder="Prix de vente"  v-model="pvu" required>
-                      <input type="text" name="seuil"  placeholder="Seuil minimum"  v-model="seuil" >
-                      <input type="date" name="expiration"  placeholder="Date d'expiration"  v-model="expiration" > -->
-
                     </div>
-                <!-- </div> -->
 
                 <button>Enregistrer</button>
                 <p class="error">{{ receptionError }}</p>

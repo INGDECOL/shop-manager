@@ -23,6 +23,8 @@ import getUser from '../controllers/getUser'
   import Desintegration from "../views/produits/Desintegration.vue"
   import Reception from "../views/produits/Reception.vue"
 
+  import NewVente from "../views/ventes/NewVente.vue"
+
 //End of Components import
 
 //auth guard
@@ -103,7 +105,7 @@ const routes = [
     component: EditBoutique,
     beforEnter: requireAuthAdmin
   },
-
+// clients
   {
     path: "/clients/:token",
     name: "Clients",
@@ -116,7 +118,7 @@ const routes = [
     component: EditClient,
     beforEnter: requireAuthAdmin
   },
-
+  // Articles
   {
     path: "/produits/create/:token",
     name: "NewProduit",
@@ -147,6 +149,14 @@ const routes = [
     component: Reception,
     beforEnter: requireAuth
   },
+
+  {
+    path: "/vente/newvente/:token",
+    name: "Vente",
+    component: NewVente,
+    beforEnter: requireAuth
+  }
+
 
 
 

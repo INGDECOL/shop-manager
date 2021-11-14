@@ -28,9 +28,9 @@
               <tbody class="text-gray-700">
                 <tr class="border-b border-gray-400 max-h-2 overflow-y-scroll" :class="{ striped : n % 2 ===0}" v-for="(famille, n) in filteredFamilles" :key="famille.id">
                   <td class="text-left py-3 px-4 font-semibold uppercase">{{ n + 1 }} </td>
-                  <td class="text-left py-3 px-4">{{ famille.codeFamille}}</td>
-                  <td class="text-left py-3 px-4">{{ famille.nomFamille}}</td>
-                  <td class="text-left py-3 px-4">{{ famille.description}}</td>
+                  <td class="text-left py-3 px-4 uppercase">{{ famille.codeFamille}}</td>
+                  <td class="text-left py-3 px-4 uppercase">{{ famille.nomFamille}}</td>
+                  <td class="text-left py-3 px-4 uppercase">{{ famille.description}}</td>
                   <td class="text-left py-3 px-4 flex justify-between items-center">
                     <span class="material-icons " title="Modifier " :class="{ disabled: !isAdmin }" @click="edit(famille.id)">edit</span>
                     <span class="material-icons strash text-red-300" title="Supprimer" :class="{ disabled: !isAdmin }" @click="destroy(famille.id)">delete</span>

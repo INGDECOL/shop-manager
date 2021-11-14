@@ -5,11 +5,27 @@
         <h1>Ets N'NAHAWA MS</h1>
       </div>
         <nav>
-            <router-link :to="{ name: 'Home' }">Accueil</router-link>
-            <router-link :to="{ name: 'Home' }" v-if="!user" @click="openLogin">Se connecter</router-link>
+            <router-link :to="{ name: 'Home' }" class="headerLink">Accueil</router-link>
+            <router-link :to="{ name: 'Home' }" v-if="!user" @click="openLogin" class="headerLink">Se connecter</router-link>
             <!-- <router-link :to="{ name: 'SignUp' }" v-else>Register</router-link> -->
-            <router-link :to="{ name: 'Home'}" v-if="user">Enquetes</router-link>
-            <span @click="signOut" v-if="user">Logout</span>
+            <router-link :to="{ name: 'Home'}" v-if="user" class="mr-0 menu headerLink">
+                Ventes
+                <span class="material-icons text-xs border-none ml-0">arrow_forward_ios</span>
+                <div class="dropdown-popover z-10 w-auto ml-8  mt-1.5">
+                    <div class="options">
+                        <ul>
+                            <router-link :to="{ name: 'Vente', params: { token: user.accessToken}}" >
+                            <li>Nouvelle vente</li>
+                            </router-link>
+
+                            <li>Gestion des ventes</li>
+                            <li>Liste des ventes</li>
+                        </ul>
+
+                    </div>
+                </div>
+            </router-link>
+            <span @click="signOut" v-if="user" class="pl-0"><span class="material-icons border-none -mb-8 mr-0  pb-0 text-sm">logout</span> Logout</span>
         </nav>
     </header>
 </template>
