@@ -10,10 +10,12 @@
                 <!-- <div class="produit "> -->
                     <div class="border rounded mb-2 px-1">
                       <div class="flex justify-between items-center">
+                        <!-- Date reception  -->
                           <div>
                             <label for="dateReception" class="-mb-5" >Date Reception</label>
                             <input type="date" name="dateReception" id="dateReception" class="mt-0" required v-model="dateReception">
                           </div>
+                          <!-- Boutique Reception -->
                           <div>
                               <label for="magasin" class="-mb-5">Boutique</label>
                               <select name="magasin" class="mt-0"  id="magasin" v-model="boutiqueReception" required>
@@ -21,6 +23,7 @@
                                   <option v-for="boutique in filteredBoutiques" :key="boutique.id" :value="boutique.id">{{ boutique.designationBoutique }}</option>
                               </select>
                           </div>
+                          <!-- Rechercher -->
                           <div class="w-1/3">
                               <label for="searchInput" class="-mb-5">Article</label>
                               <div class="input-field searchbar mx-1 mt-0  flex justify-start">
@@ -29,7 +32,7 @@
                                     search
                                 </span>
                                </div>
-                              <div class="dropdown-popover ">
+                              <div class="dropdown-popover searchList">
                                   <div class="options w-full">
                                       <ul>
                                           <li v-for="article in filteredArticles" :key="article.id" @click="selectedArticle(article)">{{ article.designation }} {{ article.codeFamille}}</li>
@@ -160,7 +163,7 @@ export default {
             }
         }
         const showPop = () =>{
-            document.querySelector(" .dropdown-popover").classList.toggle("active")
+            document.querySelector(" .searchList").classList.toggle("active")
         }
         const selectedArticle = (article) => {
             console.log("selectedArticle : ", article)
@@ -180,10 +183,12 @@ export default {
         })
 
         const handleSubmit = async () => {
+            receptionError.value = null
             const options = { year: 'numeric', month: 'long', day: 'numeric' }
             const receptionDate = new Date().toLocaleDateString(undefined, options)
             //console.log("date : ", receptionDate)
-            if(id.value =='' || quantiteRecu.value=='') {
+            if(id.value =='' || quantiteRecu.value=='' || boutiqueReception.value =='') {
+                receptionError.value = "Saisie incomplète, choisissez un produit, un magasin ou entrez une quantité correcte !"
                 return
             }
             const stock = {

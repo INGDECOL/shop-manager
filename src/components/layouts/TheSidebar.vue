@@ -3,10 +3,10 @@
     <div class="py-3 text-2xl uppercase text-center tracking-widest bg-gray-900 border-b-2 border-gray-800 mb-3" id="enteteNav">
       <router-link to="/" class="text-white">Ets N'NA HAWA</router-link>
     </div>
+    <!-- Close boutton -->
     <div class="flex justify-end pr-1 m-0">
-
-    <span class="material-icons nav hidden" @click="toggleNav">view_headline</span>
-    <span class="material-icons nav " @click="toggleNav">close</span>
+      <span class="material-icons nav hidden" title="Afficher le menu" @click="toggleNav">view_headline</span>
+      <span class="material-icons nav " title="Masquer le menu" @click="toggleNav">close</span>
     </div>
 
     <nav class="text-sm text-gray-300" id="nav2">
@@ -187,6 +187,72 @@
               </span>
 
               Articles
+              <span class="ml-auto material-icons"  :class="open ? 'transform rotate-90' : ''">
+                arrow_forward_ios
+              </span>
+            </DisclosureButton>
+            <DisclosurePanel>
+              <ul>
+                <!-- GERER -->
+                <li>
+                  <Disclosure v-slot="{ open }" :default-open="isUserActive">
+                        <router-link :to="{ name: 'Produits', params: { token: auth.currentUser.accessToken}}">
+                          <p
+                            class="pl-6 pr-4  flex items-center w-full hover:bg-gray-700"
+                            :class="open ? 'open': ''"
+                          >
+                          <span class="material-icons w-5 mr-2">settings_suggest</span>Gerer
+                          </p>
+                        </router-link>
+
+                  </Disclosure>
+                </li>
+
+                <!-- RECEPTION -->
+                <li>
+                  <Disclosure v-slot="{ open }" :default-open="isUserActive">
+                        <router-link :to="{ name: 'Reception', params: { token: auth.currentUser.accessToken}}">
+                          <p
+                            class="pl-6 pr-4  flex items-center w-full hover:bg-gray-700"
+                            :class="open ? 'open': ''"
+                          >
+                          <span class="material-icons w-5 mr-2">call_received</span>Réception
+                          </p>
+                        </router-link>
+
+                  </Disclosure>
+                </li>
+
+                <!-- DESINTEGRER -->
+                <li>
+                  <Disclosure v-slot="{ open }" :default-open="isUserActive">
+                        <router-link :to="{ name: 'Desintegration', params: { token: auth.currentUser.accessToken}}">
+                          <p
+                            class="pl-6 pr-4  flex items-center w-full hover:bg-gray-700"
+                            :class="open ? 'open': ''"
+                          >
+                          <span class="material-icons w-5 mr-2">content_cut</span>Désintégration
+                          </p>
+                        </router-link>
+
+                  </Disclosure>
+                </li>
+              </ul>
+            </DisclosurePanel>
+          </Disclosure>
+        </li>
+        <!-- STOCK -->
+        <li>
+          <Disclosure v-slot="{ open }" :default-open="isUserManagementActive">
+            <DisclosureButton
+              class="disclosure rounded-none px-4 py-1 flex items-center w-full hover:bg-gray-700"
+              :class="open ? 'open': ''"
+            >
+              <span class="material-icons  w-5 mr-2">
+                list
+              </span>
+
+              STOCK
               <span class="ml-auto material-icons"  :class="open ? 'transform rotate-90' : ''">
                 arrow_forward_ios
               </span>
