@@ -6,7 +6,7 @@
             <div class="flex justify-end -mr-5  ml-auto">
                 <span class="material-icons close row-auto mr-0 ml-auto pr-0" @click="goBack">close</span>
             </div>
-
+            <!-- INFO DATE Vendeur CLIENT -->
             <div class="flex justify-center items-center border rounded-md py-1.5 ">
               <!-- Date du jour -->
               <span class="flex justify-between items-center bg-blue-100 text-blue-600 text-sm font-bold mr-2 pr-2.5 py-0.5 rounded-md cursor-pointer hover:bg-blue-200" title="Aujourd'hui">
@@ -36,7 +36,14 @@
               </div>
             </div>
             <div class="error">{{ receptionError }}</div>
-            <div class="produit border flex justify-center  gap-0.5 mt-0">
+            <div class="produit border flex justify-center flex-col  gap-0.5 mt-0 p-2">
+                <div class="flex justify-end ">
+                    <span class="flex justify-center gap-4 bg-green-300 text-gray-600 text-base font-bold mr-8  rounded-md cursor-pointer hover:bg-green-200">
+                       <span class="mx-3 my-6"> Montant TTC</span>
+                        <span class="mx-3 my-6">{{ totalTTC ? (totalTTC).toLocaleString('fr-fr', {style: "currency", currency: "GNF", minimumFractionDigits: 0})  : 0 +"  GNF "}}</span>
+                    </span>
+                </div>
+                <div class="produit  flex justify-center  gap-0.5 m-0 shadow-none">
                   <!-- cote gauche -->
                   <div class="rounded border mb-2 px-1 mx-1 w-full ">
                     <!-- Rechercher -->
@@ -83,7 +90,9 @@
                                 </thead>
                                 <tbody class="text-gray-700 ">
                                     <tr class="border-b border-gray-400 " :class="{ striped : n % 2 ===0}" v-for="(cmd,n) in commandes" :key="cmd.id">
-                                        <td class="text-left py-3 px-4 font-semibold uppercase"><span class="bg-red-400 text-white rounded-sm p-1 cursor-pointer hover:bg-red-500" title="Supprimer la ligne">x</span></td>
+                                        <td class="text-left py-3 px-4 font-semibold uppercase">
+                                            <span class="bg-red-400 text-white rounded-sm p-1 cursor-pointer hover:bg-red-500" title="Supprimer la ligne" @click="removeCommande(cmd)">x</span>
+                                        </td>
                                         <td class="text-left py-3 px-4 text-xs  font-semibold uppercase">{{ cmd.designation }}</td>
                                         <td class="text-center py-3 px-4 text-xs  font-semibold uppercase">{{ cmd.pvu}}</td>
                                         <td class="text-center py-3 px-4 text-xs  font-semibold uppercase">{{ cmd.qtecmd }}</td>
@@ -106,24 +115,28 @@
                             </div>
                             <div class="input flex justify-between items-center m-1 gap-3">
                                 <label class="w-1/2">Montant Total TTC </label>
-                                <input type="text" name="montanttotalttc" id="montanttotalttc" class="h-1" disabled>
+                                <input type="text" name="montanttotalttc" id="montanttotalttc" class="h-1" v-model="totalTTC" disabled>
 
                             </div>
                             <div class="input flex justify-between items-center m-1 gap-3">
                                 <label class="w-1/2">Montant Total Règlé </label>
-                                <input type="text" name="montanttotal" id="montanttotal" class="h-1">
+                                <input type="text" name="montanttotal" id="montanttotal" class="h-1" v-model="montantRegle">
 
                             </div>
                         </div>
                         <button class="border-2 border-green-600 bg-transparent  text-sm hover:bg-green-700">Enregistrer</button>
                         <p class="error">{{ createError }}</p>
-
+                        <!-- Montant restant ou Montant à rendre -->
+                        <div class="flex justify-center ">
+                            <span class="flex justify-center gap-4 bg-green-300 text-gray-600 text-base font-bold  mb-2  rounded-md cursor-pointer hover:bg-green-200" :class="{ 'text-red-500' : (totalTTC - montantRegle)>0 }" >
+                            <span class="mx-3 my-4" :class="{'text-gray-600' : !montantRegle}"> {{ montantRegle ? (totalTTC - montantRegle)>0 ? "Reste dû " : "Monnaie à rendre" : "Monnaie à rendre"}}</span>
+                            <span class="mx-3 my-4" :class="{'text-gray-600' : !montantRegle}">{{montantRegle ? (totalTTC - montantRegle).toLocaleString('fr-fr', {style: "currency", currency: "GNF", minimumFractionDigits: 0})  : 0 +"  GNF "}}</span>
+                            </span>
+                        </div>
                     </div>
                 </div>
-
+                </div>
             </form>
-            <div>
-            </div>
         </div>
     </div>
 </template>
@@ -156,11 +169,8 @@ export default {
         const commandes = ref([])
         const clientVenteId = ref('')
         const seuil = ref('')
-        // const nomFournisseur = ref('')
-        // const prenomFournisseur = ref('')
-        // const contactFournisseur = ref('')
-        // const familles = ref(null)
-        // const fournisseurs = ref(null)
+        const totalTTC = ref('')
+        const montantRegle = ref('')
         const vendeur = ref(getAuth().currentUser)
         const router = useRouter()
         const options = { year: 'numeric', month: 'long', day: 'numeric' }
@@ -186,7 +196,7 @@ export default {
             quantiteStock.value = 0
             qtecmd.value = 1
             searchQuery.value = article.designation
-            console.log("selectedArticle : ", article, qtecmd.value)
+            // console.log("selectedArticle : ", article, qtecmd.value)
             bringStock(article.id)
             showPop()
         }
@@ -262,6 +272,14 @@ export default {
             await getStock(boutiqueVente.value)
         })
 
+        watch(commandes.value, () => {
+            // console.log("commande modified")
+            totalTTC.value = 0
+            commandes.value.map(cmd => {
+                totalTTC.value += cmd.pvu * cmd.qtecmd
+            })
+            console.log("Total TTC : ", (totalTTC.value).toLocaleString('fr-fr', {style: "currency", currency: "GNF", minimumFractionDigits: 0}))
+        })
         const filteredArticles = computed(()=>{
             return listeArticles.value && listeArticles.value.filter((article)=>{
                 return article.designation.toLowerCase().indexOf( searchQuery.value.toLowerCase()) != -1
@@ -294,16 +312,35 @@ export default {
             let commande = {
                 id : id.value,
                 designation : designation.value,
-                pvu : pvu.value,
-                qtecmd : qtecmd.value,
+                pvu : Number(pvu.value),
+                qtecmd : Number(qtecmd.value),
+                montantTotal: Number(qtecmd.value * pvu.value),
+
             }
             commandes.value.push(commande)
-            console.log("liste commande : ", commandes.value)
+            // console.log("liste commande : ", commandes.value)
             designation.value=""
             id.value=""
             pvu.value=""
             qtecmd.value=1
             codeFamille.value=""
+
+        }
+        const removeCommande = (cmd) => {
+            commandes.value.forEach(element => {
+                if(cmd === element) {
+                    commandes.value.splice(
+                        commandes.value.indexOf(element),1
+                    )
+                }
+                // console.log ("element : ", element , "cmd : ", cmd, "egalite ", cmd === element, "indexOf ", commandes.value.indexOf(cmd))
+            })
+            console.log("liste commande : ", commandes.value)
+            // designation.value = ""
+            // id.value = ""
+            // pvu.value = ""
+            // qtecmd.value = 1
+            // codeFamille.value = ""
 
         }
 
@@ -316,28 +353,26 @@ export default {
         })
 
         const handleSubmit = async () => {
+            console.log("count : ", commandes.value.length)
+            const factureId = (clientVenteId.value ? clientVenteId.value : "CltDiv") + new Date().getDate() + new Date().getMonth() + new Date().getFullYear() + new Date().getHours() + new Date().getMinutes() + "010" + new Date().getSeconds()
+            //console.log(factureId)
 
-            const produit = {
-                designation: designation.value.toUpperCase(),
-                pau: Number(pau.value),
-                pvu: Number(pvu.value),
-                fournisseurId: fournisseurId.value,
-                codeFamille: codeFamille.value,
-                expiration: expiration.value,
-                seuil: Number(seuil.value),
-                createdAt: serverTimestamp()
-            }
-            // console.log("fournisseur : ", fournisseur)
-            await create("produits", produit)
-            if(!createError.value){
-                document.querySelector(".active form").reset()
-                designation.value=''
-                pau.value = ''
-                pvu.value=''
-                seuil.value=''
-                fournisseurId.value=''
-                codeFamille.value= ''
-            }
+            commandes.value.forEach(vte => {
+                let vente = {
+                    articleId: vte.id,
+                    article: vte.designation,
+                    pvu: Number(vte.pvu),
+                    qtecmd: Number(vte.qtecmd),
+                    payer: Number(vte.montantTotal),
+                    clientId: clientVenteId.value,
+                    vendeur: vendeur.value.displayName,
+                    factureId: factureId,
+                    reste: 0,
+                    boutiqueId: boutiqueVente.value,
+                }
+                create("ventes", vente)
+                console.log("cmd : ", vente)
+            })
         }
         const goBack = () => {
             router.back()
@@ -365,8 +400,11 @@ export default {
             quantiteStock,
             bringStock,
             qtecmd,
+            totalTTC,
+            montantRegle,
             hideModal,
             addCommande,
+            removeCommande,
             commandes,
             createError,
             goBack,

@@ -172,6 +172,9 @@
      .error {
         @apply text-warning text-sm text-center my-2 mx-0
     }
+    .red {
+        @apply bg-red-300
+    }
     /* Scrolling text in the home template */
     .wrapper {
         @apply  font-tangerine text-yellow-500 bg-gray-500 flex h-full w-full my-0 mx-auto
