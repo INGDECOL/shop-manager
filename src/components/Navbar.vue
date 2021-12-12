@@ -15,11 +15,12 @@
                     <div class="options">
                         <ul>
                             <router-link :to="{ name: 'Vente', params: { token: user.accessToken}}" >
-                            <li>Nouvelle vente</li>
+                                <li>Nouvelle vente</li>
                             </router-link>
-
                             <li>Gestion des ventes</li>
-                            <li>Liste des ventes</li>
+                            <router-link :to="{ name: 'ListeVente', params: { token: user.accessToken}}">
+                                <li>Liste des ventes</li>
+                            </router-link>
                         </ul>
 
                     </div>

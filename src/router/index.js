@@ -24,6 +24,7 @@ import getUser from '../controllers/getUser'
   import Reception from "../views/produits/Reception.vue"
 
   import NewVente from "../views/ventes/NewVente.vue"
+  import ListeVente from "../views/ventes/ListeVente.vue"
 
 //End of Components import
 
@@ -120,40 +121,46 @@ const routes = [
   },
   // Articles
   {
-    path: "/produits/create/:token",
+    path: "/articles/create/:token",
     name: "NewProduit",
     component: NewProduit,
     beforEnter: requireAuthAdmin
   },
   {
-    path: "/produits/:token",
+    path: "/articles/:token",
     name: "Produits",
     component: ListeProduit,
     beforEnter: requireAuth
   },
   {
-    path: "/produits/edit/:token/:id",
+    path: "/articles/edit/:token/:id",
     name: "EditProduit",
     component: EditProduit,
     beforEnter: requireAuthAdmin
   },
   {
-    path: "/vente/detailplus/:token/",
+    path: "/article/detailplus/:token/",
     name: "Desintegration",
     component: Desintegration,
     beforEnter: requireAuthAdmin
   },
   {
-    path: "/vente/reception/:token",
+    path: "/article/reception/:token",
     name: "Reception",
     component: Reception,
     beforEnter: requireAuth
   },
-
+   // Ventes
   {
     path: "/vente/newvente/:token",
     name: "Vente",
     component: NewVente,
+    beforEnter: requireAuth
+  },
+  {
+    path: "/vente/listeVente/:token",
+    name: "ListeVente",
+    component: ListeVente,
     beforEnter: requireAuth
   }
 

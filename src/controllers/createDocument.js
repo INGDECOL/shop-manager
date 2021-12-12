@@ -4,11 +4,18 @@ import { db } from "../firebase/config"
 import { collection, addDoc, doc } from "firebase/firestore";
 
     const createError = ref(null)
-    const create = async (collectionName, document) =>{
+    const create = async (collectionName, document, id=null) =>{
         try {
             // using firebase
-            const docRef = collection( db, collectionName)
-            const res = await addDoc(docRef, document)
+            let docRef
+            if(id) {
+                docRef = doc( db, collectionName, id)
+            }else {
+                docRef = collection(db, collectionName)
+            }
+
+           const res = await addDoc(docRef, document)
+
 
             if(!res.id) {
                 throw Error("There is an error on submitting data to the server")

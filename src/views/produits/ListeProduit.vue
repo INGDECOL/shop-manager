@@ -70,7 +70,6 @@ export default {
     const editproduitId = ref(null)
     onMounted( async () => {
       await load("produits")
-      const id = "LjnaPPzud5qF8DZR1K0t"
       // console.log("fournisseur with id : ", getFournisseur("LjnaPPzud5qF8DZR1K0t"))
       //console.log(" produits : ", documents.value)
     })

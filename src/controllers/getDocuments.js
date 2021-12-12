@@ -11,7 +11,9 @@ import {  getDocs, collection, query, orderBy, onSnapshot } from 'firebase/fires
             // })
             const docRef =  collection(db, collectionName) // docs to fetch in firebase
             const q = query( docRef, orderBy("createdAt", "desc"))
+            // console.log("params : ", collectionName)
             const res = onSnapshot(q, ( snap ) =>{
+                // console.log("sanap ", snap)
                 documents.value = snap.docs.map(doc =>{
                     // console.log("Data : ", doc.data())
                     return {...doc.data(), id : doc.id}

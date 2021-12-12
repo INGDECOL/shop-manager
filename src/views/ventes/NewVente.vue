@@ -9,7 +9,7 @@
             <!-- INFO DATE Vendeur CLIENT -->
             <div class="flex justify-center items-center border rounded-md py-1.5 ">
               <!-- Date du jour -->
-              <span class="flex justify-between items-center bg-blue-100 text-blue-600 text-sm font-bold mr-2 pr-2.5 py-0.5 rounded-md cursor-pointer hover:bg-blue-200" title="Aujourd'hui">
+              <span class="flex justify-between items-center bg-blue-100 text-blue-600 text-sm font-bold mx-2 pr-2.5 py-0.5 rounded-md cursor-pointer hover:bg-blue-200" title="Aujourd'hui">
                 <span class="material-icons mr-1">date_range</span>
                 {{dateDuJour}}
 
@@ -31,7 +31,7 @@
               <div class="mr-2 pr-2.5">
                   <select name="magasin"  id="magasin" v-model="clientVenteId" class=" font-bold  cursor-pointer"  title="Client">
                       <option value="">CltDiv</option>
-                      <option v-for="client in filteredClients" :key="client.id" :value="client.id">{{client.nom +" "+client.prenom }}</option>
+                      <option v-for="client in filteredClients" :key="client.id" :value="client.nom +'_'+client.prenom">{{client.nom +" "+client.prenom }}</option>
                   </select>
               </div>
             </div>
@@ -73,11 +73,15 @@
                         <input type="text" name="pvu"  placeholder="Prix Unitaire"  v-model="pvu" required disabled>
                         <input type="number" name="qtecmd" id="qtecmd" min="1" v-model="qtecmd">
                     </div>
-                    <button class="mb-1" @click.prevent="addCommande">Valider</button>
+                    <!-- <button class="mb-1" @click.prevent="addCommande">Valider</button> -->
+                    <div class="mt-5 mb-2">
+                    <span class=" font-bold bg-yellow-400 rounded-lg p-2.5 cursor-pointer hover:text-gray-600 hover:bg-yellow-300" @click="addCommande">Valider</span>
+
+                    </div>
                   </div>
                   <!-- cote droit -->
-                    <div class="border rounded mb-2 px-1 w-full">
-                        <div class="border m-1 p-1 max-h-48 min-h-48 overflow-y-scroll">
+                    <div class="border rounded mb-2 px-1 mx-1 w-full">
+                        <div class="border m-1 p-1 max-h-48 overflow-y-scroll overflow-x-scroll">
                             <table class="min-w-full bg-white divider-y divide-gray-400 ">
                                 <thead class="bg-gray-800 text-white">
                                         <tr>
@@ -145,6 +149,7 @@
 import { computed, ref } from '@vue/reactivity'
 import { useRouter } from 'vue-router'
 import createDocument from '../../controllers/createDocument'
+import setDocument from '../../controllers/setDocument'
 import { collection, onSnapshot, serverTimestamp } from '@firebase/firestore'
 import { onMounted, watch } from '@vue/runtime-core'
 import { db, auth } from '../../firebase/config'
@@ -178,6 +183,7 @@ export default {
           const  dateDuJour = new Date().toLocaleDateString(undefined, options)
 
         const { createError, create } = createDocument()
+        const { setError, insert } = setDocument()
 
         const showPop = () =>{
           document.querySelector(" .searchList").classList.toggle("active")
@@ -261,7 +267,8 @@ export default {
 
         const filteredClients = computed(()=>{
           return listeClients.value && listeClients.value.filter((client)=>{
-              return client.nom.toLowerCase().indexOf( searchQuery.value.toLowerCase()) != -1
+              return listeClients.value
+            //   return client.nom.toLowerCase().indexOf( searchQuery.value.toLowerCase()) != -1
           })
         })
 
@@ -280,6 +287,7 @@ export default {
             })
             console.log("Total TTC : ", (totalTTC.value).toLocaleString('fr-fr', {style: "currency", currency: "GNF", minimumFractionDigits: 0}))
         })
+
         const filteredArticles = computed(()=>{
             return listeArticles.value && listeArticles.value.filter((article)=>{
                 return article.designation.toLowerCase().indexOf( searchQuery.value.toLowerCase()) != -1
@@ -300,10 +308,12 @@ export default {
 
             // return stock
         }
+
         const bringStock = (id) => {
              quantiteStock.value =  pullStock( id) ? pullStock( id) : 0
 
         }
+
         const addCommande = () => {
             if(qtecmd.value > quantiteStock.value) {
                 alert("La quantité demandée est supérieur au stock disponible !")
@@ -326,6 +336,7 @@ export default {
             codeFamille.value=""
 
         }
+
         const removeCommande = (cmd) => {
             commandes.value.forEach(element => {
                 if(cmd === element) {
@@ -356,7 +367,14 @@ export default {
             console.log("count : ", commandes.value.length)
             const factureId = (clientVenteId.value ? clientVenteId.value : "CltDiv") + new Date().getDate() + new Date().getMonth() + new Date().getFullYear() + new Date().getHours() + new Date().getMinutes() + "010" + new Date().getSeconds()
             //console.log(factureId)
-
+            if(clientVenteId.value =="CltDiv" || clientVenteId.value =='') {
+                if((totalTTC.value - montantRegle.value) > 0 ) {
+                    alert("Le montant Total de la facture est supérieur au montant règlé, or le client divers n'est pas autorisé à effectuer des ventes à crédit. \n Pensez à Enregistrer cet client !")
+                    return
+                }
+            }
+             createError.value = null
+            //  Save commande
             commandes.value.forEach(vte => {
                 let vente = {
                     articleId: vte.id,
@@ -364,15 +382,61 @@ export default {
                     pvu: Number(vte.pvu),
                     qtecmd: Number(vte.qtecmd),
                     payer: Number(vte.montantTotal),
-                    clientId: clientVenteId.value,
+                    clientId: clientVenteId.value ? clientVenteId.value: "CltDiv",
                     vendeur: vendeur.value.displayName,
                     factureId: factureId,
                     reste: 0,
                     boutiqueId: boutiqueVente.value,
+                    createdAt: serverTimestamp()
                 }
                 create("ventes", vente)
+                 if(createError.value) {
+                     return
+                 }
+
                 console.log("cmd : ", vente)
             })
+            // Save facture
+            let articleFacture = commandes.value.map(article => {
+                let data = {
+                    article: article.designation,
+                    pvu : article.pvu,
+                    qtecmd: article.qtecmd
+                }
+                return data
+            })
+
+            let facture = {
+                id: factureId,
+                articles: articleFacture,
+                boutiqueId: boutiqueVente,
+                createdAt: serverTimestamp()
+            }
+            insert("factures", facture, facture.id)
+            console.log("facture : ", facture)
+
+            // Save dette
+            if((totalTTC.value - montantRegle.value) > 0 ) {
+                let dette = {
+                    clientId: clientVenteId.value ? clientVenteId.value : "CltDiv",
+                    factureId: factureId,
+                    montantDette: Number(totalTTC.value - montantRegle.value),
+                    boutiqueVente: boutiqueVente.value,
+                    createdAt: serverTimestamp()
+                }
+                create("dettes", dette)
+            }
+            if(!createError.value) {
+                alert("Vente Enregistrer avec succès ! ")
+                designation.value=""
+                id.value=""
+                pvu.value=""
+                qtecmd.value=1
+                codeFamille.value=""
+                montantRegle.value =""
+                commandes.value.splice(0, commandes.value.length)
+            }
+
         }
         const goBack = () => {
             router.back()
