@@ -17,10 +17,10 @@
                             <router-link :to="{ name: 'Vente', params: { token: user.accessToken}}" >
                                 <li>Nouvelle vente</li>
                             </router-link>
-                            <li>Gestion des ventes</li>
                             <router-link :to="{ name: 'ListeVente', params: { token: user.accessToken}}">
                                 <li>Liste des ventes</li>
                             </router-link>
+                            <li>Compte Client</li>
                         </ul>
 
                     </div>

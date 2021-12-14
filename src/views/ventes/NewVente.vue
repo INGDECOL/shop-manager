@@ -29,9 +29,9 @@
               </div>
               <!-- CLIENT -->
               <div class="mr-2 pr-2.5">
-                  <select name="magasin"  id="magasin" v-model="clientVenteId" class=" font-bold  cursor-pointer"  title="Client">
+                  <select name="magasin"  id="magasin" v-model="clientVenteId" class=" font-bold  cursor-pointer"  title="Client" >
                       <option value="">CltDiv</option>
-                      <option v-for="client in filteredClients" :key="client.id" :value="client.nom +'_'+client.prenom">{{client.nom +" "+client.prenom }}</option>
+                      <option v-for="client in filteredClients" :key="client.id" :value="client.nom +'_'+client.prenom" @click="selectedClient(client)">{{client.nom +" "+client.prenom }}</option>
                   </select>
               </div>
             </div>
@@ -173,6 +173,7 @@ export default {
         const qtecmd = ref('')
         const commandes = ref([])
         const clientVenteId = ref('')
+        const clientId = ref('')
         const seuil = ref('')
         const totalTTC = ref('')
         const montantRegle = ref('')
@@ -188,6 +189,12 @@ export default {
         const showPop = () =>{
           document.querySelector(" .searchList").classList.toggle("active")
         }
+        const selectedClient = (client) => {
+            clientId.value = client.id
+            console.log("clien : ", clientId.value)
+
+        }
+
         const selectedArticle = (article) => {
             if(!boutiqueVente.value) {
                 alert("Veuillez Selectionner une boutique ! ")
@@ -409,16 +416,16 @@ export default {
             let facture = {
                 id: factureId,
                 articles: articleFacture,
-                boutiqueId: boutiqueVente,
+                boutiqueId: boutiqueVente.value,
                 createdAt: serverTimestamp()
             }
             insert("factures", facture, facture.id)
-            console.log("facture : ", facture)
+            console.log("facture vente : ", facture)
 
             // Save dette
             if((totalTTC.value - montantRegle.value) > 0 ) {
                 let dette = {
-                    clientId: clientVenteId.value ? clientVenteId.value : "CltDiv",
+                    clientId: clientVenteId.value ? clientId.value : "CltDiv",
                     factureId: factureId,
                     montantDette: Number(totalTTC.value - montantRegle.value),
                     boutiqueVente: boutiqueVente.value,
@@ -472,6 +479,7 @@ export default {
             commandes,
             createError,
             goBack,
+            selectedClient,
 
         }
   }

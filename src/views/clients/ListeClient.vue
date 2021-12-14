@@ -23,7 +23,7 @@
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Prénoms</th>
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Contact</th>
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Adresse</th>
-                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Email</th>
+                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Solvabilité</th>
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Actions</th>
                   </tr>
                 </thead>
@@ -34,10 +34,10 @@
                     <td class="text-left py-3 px-4">{{ client.prenom}}</td>
                     <td class="text-left py-3 px-4">{{ client.contact}}</td>
                     <td class="text-left py-3 px-4">{{ client.adresse }}</td>
-                    <td class="text-left py-3 px-4 text-blue-400 underline cursor-pointer">{{ client.email }}</td>
+                    <td class="text-left py-3 px-4 font-semibold underline text-blue-400 hover:text-blue-300 cursor-pointer" title="Montant Total dû">{{ formatedNumber(client.solvabilite) }}</td>
                     <td class="text-left py-3 px-4 flex justify-between items-center">
-                      <span class="material-icons " :class="{ disabled: !isAdmin }" @click="edit(client.id)">edit</span>
-                      <span class="material-icons strash text-red-300" :class="{ disabled: !isAdmin }" @click="destroy(client.id)">delete</span>
+                      <span class="material-icons " :class="{ disabled: !isAdmin }" @click="edit(client.id)" title="Modifier le client">edit</span>
+                      <span class="material-icons strash text-red-300" :class="{ disabled: !isAdmin }" @click="destroy(client.id)" title="Supprimer le client">delete</span>
                     </td>
                   </tr>
                 </tbody>
@@ -53,23 +53,78 @@
 
 <script>
 import { computed, ref } from '@vue/reactivity';
-import { auth } from "../../firebase/config"
+import { auth, db } from "../../firebase/config"
 import getUser from "../../controllers/getUser"
 import getDocuments from "../../controllers/getDocuments"
 import destroyDocument from "../../controllers/destroyDocument"
 import { useRouter } from 'vue-router'
-import { onMounted } from '@vue/runtime-core'
+import { onMounted, watch } from '@vue/runtime-core'
 import AddClient from "./NewClient.vue"
 import Spinner from "../../components/Spinner.vue"
+import { collection, onSnapshot, orderBy, query } from '@firebase/firestore';
 export default {
   components: { AddClient, Spinner },
   setup() {
     const router = useRouter()
-    const {documents, getError, load} = getDocuments()
+    const documents = ref([])
+    const soldeClients = ref([])
+    const getError = ref('')
     const searchQuery = ref("")
     const editclientId = ref(null)
+
+  const formatedNumber = (strNumber) => {
+    return strNumber.toLocaleString('fr-fr', {style: "currency", currency: "GNF", minimumFractionDigits: 0})
+  }
+
+  const getSolde = async () =>{
+    const docRef =  collection(db, "dettes")
+      const q = query( docRef, orderBy("createdAt", "desc"))
+      const res = onSnapshot(q, ( snap ) =>{
+          // console.log("snap vente", snap.docs)
+          soldeClients.value = snap.docs.map(doc =>{
+              //doc.data().createdAt = doc.data().createdAt.seconds
+              return {...doc.data(), id : doc.id}
+          })
+      console.log("solde : ", soldeClients.value)
+      })
+  }
+  const loadClients =async () => {
+      const docRef =  collection(db, "clients")
+      const q = query( docRef, orderBy("createdAt", "desc"))
+      const res = onSnapshot(q, ( snap ) =>{
+          // console.log("snap vente", snap.docs)
+          documents.value = snap.docs.map(doc =>{
+              //doc.data().createdAt = doc.data().createdAt.seconds
+                //console.log("Data : ", doc.id, " => ", doc.data().createdAt)
+
+              return {...doc.data(), id : doc.id}
+          })
+      })
+  }
+  // watch(soldeClients, () => {
+  //   console.log("watch solde : ", documents.value.length, soldeClients.value.length)
+  // })
+  watch(documents, () => {
+    console.log("watch doc : ", documents.value.length, soldeClients.value.length)
+    // Calculer le solde total par client
+    if(soldeClients.value.length ) {
+      documents.value.map(client => {
+        let soldeTotal =0
+        soldeClients.value.forEach(solde => {
+          if( solde.clientId == client.id ) {
+            console.log("corespondance")
+            soldeTotal += solde.montantDette
+          }
+        })
+        client.solvabilite = soldeTotal
+        console.log("Solde client : ", client)
+      })
+    }
+
+  })
     onMounted( async () => {
-      await load("clients")
+       await getSolde()
+      await loadClients()
       //console.log(" clients : ", documents.value)
     })
 
@@ -143,6 +198,8 @@ export default {
       searchQuery,
       filteredClients,
       editclientId,
+      soldeClients,
+      formatedNumber,
     }
   }
 }

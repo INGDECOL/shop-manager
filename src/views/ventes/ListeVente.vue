@@ -3,7 +3,7 @@
       <div class="shadow overflow-hidden rounded border-b border-gray-200">
         <div class="flex justify-between items-center">
           <!-- searchbar -->
-          <div class="searchbar mx-1 w-2/4 flex justify-start ">
+          <div class="searchbar mx-1  flex justify-start ">
             <input type="text" placeholder="Rechercher..." class="w-full h-10" v-model="searchQuery" >
             <span class="material-icons -mx-9 p-4">
                   search
@@ -108,6 +108,7 @@ export default {
     const listeBoutiques = ref(null)
     const searchQuery = ref("")
     const listeFactures = ref([])
+    const filteredFactures = ref([])
     const editproduitId = ref(null)
     const listeVentes = ref([])
     const filteredvente = ref([])
@@ -142,36 +143,40 @@ export default {
       })
     })
 
-  watch(boutiqueVente, async()=>{
-      if(boutiqueVente.value =='') {
-          return
-      }
-      await getStock(boutiqueVente.value)
-  })
+    watch(boutiqueVente, async()=>{
+        if(boutiqueVente.value =='') {
+            return
+        }
+        await getBoutiqueFactures()
+        await loadBoutiqueVentes()
+    })
 
     const getFactures =async () => {
         const docRef =  collection(db, "factures")
         const q = query( docRef, orderBy("createdAt", "desc"))
         const res = onSnapshot(q, ( snap ) =>{
-            console.log("sanap facture", snap.docs, new Date().getMonth())
+            // console.log("sanap facture", snap.docs, new Date().getMonth())
             listeFactures.value = snap.docs.map(doc =>{
                 // console.log("Data : ", doc.data())
-                let id = doc.id.length > 20 ? doc.id.substring(0,20) +"..." : doc.id
-
                 return {...doc.data(), id : doc.id}
             })
+        filteredFactures.value = listeFactures.value
         })
     }
     const getBoutiqueFactures =async () => {
         const docRef =  collection(db, "factures")
         const q = query( docRef, orderBy("createdAt", "desc"))
         const res = onSnapshot(q, ( snap ) =>{
-            console.log("sanap facture", snap.docs, new Date().getMonth())
+            // console.log("sanap facture", snap.docs)
+            listeFactures.value = []
             listeFactures.value = snap.docs.map(doc =>{
-                // console.log("Data : ", doc.data())
-
-                if(doc.data().boutiqueId == boutiqueVente) return {...doc.data(), id : doc.id}
+                    return {...doc.data(), id : doc.id}
             })
+            filteredFactures.value = listeFactures.value.filter (facture => {
+              console.log("verfi : ", boutiqueVente.value === facture.boutiqueId, facture.boutiqueId, "=>", boutiqueVente.value)
+              return facture.boutiqueId == boutiqueVente.value
+            })
+            // console.log("Liste boutique facture : ", listeFactures.value, boutiqueVente.value)
         })
     }
 
@@ -179,15 +184,18 @@ export default {
         const docRef =  collection(db, "ventes")
         const q = query( docRef, orderBy("createdAt", "desc"))
         const res = onSnapshot(q, ( snap ) =>{
-            console.log("snap vente", snap.docs)
+            // console.log("snap vente", snap.docs)
             listeVentes.value = snap.docs.map(doc =>{
                 //doc.data().createdAt = doc.data().createdAt.seconds
                  //console.log("Data : ", doc.id, " => ", doc.data().createdAt)
                 return {...doc.data(), id : doc.id}
             })
-            filteredvente.value = listeVentes.value
+            loadBoutiqueVentes()
+            getBoutiqueFactures()
+            // filteredvente.value = listeVentes.value
             getTotal()
         })
+        await getFactures()
     }
     const loadBoutiqueVentes =async () => {
         // const docRef =  collection(db, "ventes")
@@ -200,9 +208,13 @@ export default {
         //         return {...doc.data(), id : doc.id}
         //     })
         // })
+        // filteredvente.value = listeVentes.value.filter(vente => {
+        //   return vente.boutiqueId == boutiqueVente
+        // })
         filteredvente.value = listeVentes.value.filter(vente => {
-          return vente.boutiqueId == boutiqueVente
+          return vente.boutiqueId == boutiqueVente.value
         })
+        // filteredvente.value = listeVentes.value
         getTotal()
     }
 
@@ -214,15 +226,22 @@ export default {
     }
 
     const getVenteByFacture = (facture) => {
+      if(boutiqueVente.value ==''){
+        alert("Veuillez selectionner une boutique !")
+        return
+      }
       filteredvente.value = listeVentes.value.filter(vente => {
         return vente.factureId == facture
       })
       getTotal()
     }
     const getVenteByDate = (facture) => {
-
+       if(boutiqueVente.value ==''){
+        alert("Veuillez selectionner une boutique !")
+        return
+      }
       filteredvente.value = listeVentes.value.filter(vente => {
-        console.log("Date compar : ",  (new Date(vente.createdAt.seconds *1000).toLocaleDateString() >= new Date(dateDebut.value).toLocaleDateString() && new Date(vente.createdAt.seconds *1000).toLocaleDateString() <= new Date(dateFin.value).toLocaleDateString()))
+        // console.log("Date compar : ",  (new Date(vente.createdAt.seconds *1000).toLocaleDateString() >= new Date(dateDebut.value).toLocaleDateString() && new Date(vente.createdAt.seconds *1000).toLocaleDateString() <= new Date(dateFin.value).toLocaleDateString()))
 
         return new Date(vente.createdAt.seconds *1000).toLocaleDateString() >= new Date(dateDebut.value).toLocaleDateString() && new Date(vente.createdAt.seconds *1000).toLocaleDateString() <= new Date(dateFin.value).toLocaleDateString()
       })
@@ -230,7 +249,7 @@ export default {
       //  listeVentes.value.map(vente => {
       //   console.log("Date compar : ",  (new Date(vente.createdAt.seconds *1000).toLocaleDateString() >= new Date(dateDebut.value).toLocaleDateString() && new Date(vente.createdAt.seconds *1000).toLocaleDateString() <= new Date(dateFin.value).toLocaleDateString()), new Date(vente.createdAt.seconds *1000).toLocaleDateString())
       // })
-      console.log("Dates : ", new Date(dateDebut.value).toLocaleDateString() , dateFin.value)
+      // console.log("Dates : ", new Date(dateDebut.value).toLocaleDateString() , dateFin.value)
     }
 
     onMounted( async () => {
@@ -288,15 +307,16 @@ export default {
       }
     }
     const filteredfacture = computed( () =>{
+        // console.log("factures in filtered facture fx : ", listeFactures.value)
 
-          return listeFactures.value.length ? listeFactures.value.filter( (facture) => {
+          return filteredFactures.value.length ? filteredFactures.value.filter( (facture) => {
             return facture.id.toLowerCase().indexOf( searchQuery.value.toLowerCase()) != -1
           }): []
 
     })
 
     const formatedVentes = () => {
-      console.log("length : ", documents.value.length)
+      // console.log("length : ", documents.value.length)
       return listeVentes.value ?  listeVentes.value.map(vente => {
          vente.createdAt = new Date(vente.createdAt.seconds *1000).toLocaleString(undefined, options)
             vente.pvu = vente.pvu.toLocaleString('fr-fr', {style: "currency", currency: "GNF", minimumFractionDigits: 0})
