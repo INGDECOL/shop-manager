@@ -120,7 +120,6 @@
                             <div class="input flex justify-between items-center m-1 gap-3">
                                 <label class="w-1/2">Montant Total TTC </label>
                                 <input type="text" name="montanttotalttc" id="montanttotalttc" class="h-1" v-model="totalTTC" disabled>
-
                             </div>
                             <div class="input flex justify-between items-center m-1 gap-3">
                                 <label class="w-1/2">Montant Total Règlé </label>
@@ -147,10 +146,10 @@
 
 <script>
 import { computed, ref } from '@vue/reactivity'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import createDocument from '../../controllers/createDocument'
 import setDocument from '../../controllers/setDocument'
-import { collection, onSnapshot, serverTimestamp } from '@firebase/firestore'
+import { collection, doc, getDoc, onSnapshot, orderBy, query, serverTimestamp } from '@firebase/firestore'
 import { onMounted, watch } from '@vue/runtime-core'
 import { db, auth } from '../../firebase/config'
 import { getAuth } from '@firebase/auth'
@@ -177,8 +176,11 @@ export default {
         const seuil = ref('')
         const totalTTC = ref('')
         const montantRegle = ref('')
+        const facture = ref()
         const vendeur = ref(getAuth().currentUser)
+        const soldeClients = ref([])
         const router = useRouter()
+        const route = useRoute()
         const options = { year: 'numeric', month: 'long', day: 'numeric' }
          const { receptionError,stock, getStock, reception, updateStock } = receptionArticles()
           const  dateDuJour = new Date().toLocaleDateString(undefined, options)
@@ -214,16 +216,16 @@ export default {
             showPop()
         }
 
-        // const getFamilles = async () => {
-        //     const docRef = collection(db, "familles")
-        //     const res = onSnapshot(docRef, (snap)=>{
-        //         familles.value = snap.docs.map(doc => {
-        //             // console.log("snap doc : ", doc.data());
-        //             return {...doc.data(), id: doc.id}
-        //         })
-        //     })
+        const getFacture = async (id) => {
+            const docRef = doc( db, "factures", id)
+            const res =  await getDoc(docRef)
+            if(res.exists()){
+                //console.log("REs data : ", res.data())
+                facture.value = {...res.data(), id: id}
 
-        // }
+            }
+
+        }
         // const getFournisseurs = async () => {
         //     const docRef = collection(db, "fournisseurs")
         //     const res = onSnapshot(docRef, (snap)=>{
@@ -287,12 +289,23 @@ export default {
         })
 
         watch(commandes.value, () => {
-            // console.log("commande modified")
+            console.log("commande modified", commandes.value)
             totalTTC.value = 0
             commandes.value.map(cmd => {
+                if(cmd){
                 totalTTC.value += cmd.pvu * cmd.qtecmd
+
+                }
             })
             console.log("Total TTC : ", (totalTTC.value).toLocaleString('fr-fr', {style: "currency", currency: "GNF", minimumFractionDigits: 0}))
+            if(route.params.id) {
+                soldeClients.value.forEach(solde => {
+                    if(solde.factureId == route.params.id) {
+                        console.log("Dette : ", solde.montantDette, totalTTC.value)
+                        montantRegle.value = Number(totalTTC.value ) - Number(solde.montantDette)
+                    }
+                })
+            }
         })
 
         const filteredArticles = computed(()=>{
@@ -322,9 +335,11 @@ export default {
         }
 
         const addCommande = () => {
-            if(qtecmd.value > quantiteStock.value) {
-                alert("La quantité demandée est supérieur au stock disponible !")
-                return
+            if(!route.params.id) {
+                if(qtecmd.value > quantiteStock.value) {
+                    alert("La quantité demandée est supérieur au stock disponible !")
+                    return
+                }
             }
             let commande = {
                 id : id.value,
@@ -368,7 +383,44 @@ export default {
             getBoutiques()
             getArticles()
             getClients()
+            await getSolde()
+
+            if(route.params.id) {
+                console.log("Router params : ", route.params.id)
+                await getFacture(route.params.id)
+                console.log("route facture : ", facture.value)
+                retrieveCommande(facture.value.articles)
+            }
+
         })
+
+        const retrieveCommande = (articles) => {
+            // console.log("articles length :", articles.designation)
+            articles.forEach( article => {
+                // console.log("retrieve : ", article.article)
+                 id.value = article.id
+                designation.value = article.article
+                pvu.value = Number(article.pvu)
+                qtecmd.value = Number(article.qtecmd)
+                // montantTotal: Number(qtecmd.value * pvu.value),
+                addCommande()
+            })
+
+            // console.log("commandes : ", commandes.value)
+        }
+
+    const getSolde = async () =>{
+        const docRef =  collection(db, "dettes")
+        const q = query( docRef, orderBy("createdAt", "desc"))
+        const res = onSnapshot(q, ( snap ) =>{
+            // console.log("snap vente", snap.docs)
+            soldeClients.value = snap.docs.map(doc =>{
+                //doc.data().createdAt = doc.data().createdAt.seconds
+                return {...doc.data(), id : doc.id}
+            })
+        // console.log("solde : ", soldeClients.value)
+        })
+  }
 
         const handleSubmit = async () => {
             console.log("count : ", commandes.value.length)
@@ -406,6 +458,7 @@ export default {
             // Save facture
             let articleFacture = commandes.value.map(article => {
                 let data = {
+                    id: article.id,
                     article: article.designation,
                     pvu : article.pvu,
                     qtecmd: article.qtecmd
@@ -415,6 +468,7 @@ export default {
 
             let facture = {
                 id: factureId,
+                clientId: clientVenteId.value ? clientId.value : "CltDiv",
                 articles: articleFacture,
                 boutiqueId: boutiqueVente.value,
                 createdAt: serverTimestamp()

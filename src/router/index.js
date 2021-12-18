@@ -25,6 +25,8 @@ import getUser from '../controllers/getUser'
 
   import NewVente from "../views/ventes/NewVente.vue"
   import ListeVente from "../views/ventes/ListeVente.vue"
+  import DetailDette from "../views/ventes/DetailDetteClient.vue"
+  import CompteClient from "../views/ventes/CompteClient.vue"
 
 //End of Components import
 
@@ -152,7 +154,7 @@ const routes = [
   },
    // Ventes
   {
-    path: "/vente/newvente/:token",
+    path: "/vente/newvente/:token/:id?",
     name: "Vente",
     component: NewVente,
     beforEnter: requireAuth
@@ -161,6 +163,18 @@ const routes = [
     path: "/vente/listeVente/:token",
     name: "ListeVente",
     component: ListeVente,
+    beforEnter: requireAuth
+  },
+  {
+    path: "/vente/detailDetteClient/:id/:token",
+    name: "DetailDette",
+    component: DetailDette,
+    beforEnter: requireAuth
+  },
+  {
+    path: "/vente/listeCompteClient/:token",
+    name: "CompteClient",
+    component: CompteClient,
     beforEnter: requireAuth
   }
 

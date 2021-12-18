@@ -173,7 +173,7 @@ export default {
                     return {...doc.data(), id : doc.id}
             })
             filteredFactures.value = listeFactures.value.filter (facture => {
-              console.log("verfi : ", boutiqueVente.value === facture.boutiqueId, facture.boutiqueId, "=>", boutiqueVente.value)
+              // console.log("verfi : ", boutiqueVente.value === facture.boutiqueId, facture.boutiqueId, "=>", boutiqueVente.value)
               return facture.boutiqueId == boutiqueVente.value
             })
             // console.log("Liste boutique facture : ", listeFactures.value, boutiqueVente.value)

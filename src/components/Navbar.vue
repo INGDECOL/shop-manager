@@ -20,7 +20,9 @@
                             <router-link :to="{ name: 'ListeVente', params: { token: user.accessToken}}">
                                 <li>Liste des ventes</li>
                             </router-link>
-                            <li>Compte Client</li>
+                            <router-link :to="{ name: 'CompteClient', params: { token: user.accessToken }}">
+                                <li>Compte Client</li>
+                            </router-link>
                         </ul>
 
                     </div>

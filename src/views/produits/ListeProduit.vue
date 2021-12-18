@@ -52,7 +52,7 @@
 
 <script>
 import { computed, ref } from '@vue/reactivity';
-import { auth } from "../../firebase/config"
+import { auth, db } from "../../firebase/config"
 import getUser from "../../controllers/getUser"
 import getDocument from "../../controllers/getDocument"
 import getDocuments from "../../controllers/getDocuments"
@@ -61,6 +61,7 @@ import { useRouter } from 'vue-router'
 import NewProduit from "./NewProduit.vue"
 import Spinner from "../../components/Spinner.vue"
 import { onMounted } from '@vue/runtime-core';
+import { collection, doc, getDoc, onSnapshot, orderBy, query } from '@firebase/firestore';
 export default {
   components: { NewProduit, Spinner },
   setup() {
@@ -68,18 +69,35 @@ export default {
     const {documents, getError, load} = getDocuments()
     const searchQuery = ref("")
     const editproduitId = ref(null)
+    const listeFournisseurs = ref([])
     onMounted( async () => {
       await load("produits")
-      // console.log("fournisseur with id : ", getFournisseur("LjnaPPzud5qF8DZR1K0t"))
+      await loadFournisseur()
+      getFournisseur("hrFBd6hzdLQvUqFQaVDk")
+      // console.log("fournisseur with id : ", getFournisseur("hrFBd6hzdLQvUqFQaVDk"))
       //console.log(" produits : ", documents.value)
     })
+    const loadFournisseur =async () => {
+      const docRef =  collection(db, "fournisseurs") // docs to fetch in firebase
+            const q = query( docRef, orderBy("createdAt", "desc"))
+            const res = onSnapshot(q, ( snap ) =>{
+                listeFournisseurs.value = snap.docs.map(doc =>{
+                    // console.log("Data : ", doc.data())
+                    return {...doc.data(), id : doc.id}
+                })
+            })
+    }
 
     const getFournisseur =  (id) => {
-      const { document, getError, load } = getDocument()
-       load("fournisseurs", id)
-      //  if(document.value ){
-
-      return document.value.nom +" " + document.value.prenom
+      let info
+      if(id) {
+        listeFournisseurs.value.forEach(fournisseur => {
+          if(fournisseur.id === id) {
+            info = fournisseur.nom +" " + fournisseur.prenom
+          }
+        })
+        return info
+        } else return " Inconue"
       //  }
     }
 
