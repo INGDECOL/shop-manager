@@ -179,6 +179,7 @@ export default {
         const facture = ref()
         const vendeur = ref(getAuth().currentUser)
         const soldeClients = ref([])
+        const oldDette = ref()
         const router = useRouter()
         const route = useRoute()
         const options = { year: 'numeric', month: 'long', day: 'numeric' }
@@ -187,6 +188,10 @@ export default {
 
         const { createError, create } = createDocument()
         const { setError, insert } = setDocument()
+        const formatedNumber = (strNumber) => {
+            return strNumber.toLocaleString('fr-fr', {style: "currency", currency: "GNF", minimumFractionDigits: 0})
+        }
+
 
         const showPop = () =>{
           document.querySelector(" .searchList").classList.toggle("active")
@@ -293,16 +298,21 @@ export default {
             totalTTC.value = 0
             commandes.value.map(cmd => {
                 if(cmd){
-                totalTTC.value += cmd.pvu * cmd.qtecmd
-
+                    totalTTC.value += cmd.pvu * cmd.qtecmd
                 }
             })
             console.log("Total TTC : ", (totalTTC.value).toLocaleString('fr-fr', {style: "currency", currency: "GNF", minimumFractionDigits: 0}))
+            //Si c'est un Remboursement
             if(route.params.id) {
                 soldeClients.value.forEach(solde => {
                     if(solde.factureId == route.params.id) {
-                        console.log("Dette : ", solde.montantDette, totalTTC.value)
-                        montantRegle.value = Number(totalTTC.value ) - Number(solde.montantDette)
+                        // console.log("Dette : ", solde.montantDette, totalTTC.value)
+                        if(totalTTC.value > 0 ){
+                            montantRegle.value = Number(totalTTC.value ) - Number(solde.montantDette)
+
+                        }else montantRegle.value = 0
+                        oldDette.value = solde
+                        boutiqueVente.value = solde.boutiqueVente
                     }
                 })
             }
@@ -386,9 +396,10 @@ export default {
             await getSolde()
 
             if(route.params.id) {
-                console.log("Router params : ", route.params.id)
+
+                // console.log("Router params : ", route.params.id)
                 await getFacture(route.params.id)
-                console.log("route facture : ", facture.value)
+                // console.log("route facture : ", facture.value)
                 retrieveCommande(facture.value.articles)
             }
 
@@ -405,8 +416,10 @@ export default {
                 // montantTotal: Number(qtecmd.value * pvu.value),
                 addCommande()
             })
+            clientVenteId.value = facture.value.clientId
+            clientId.value = facture.value.clientId
 
-            // console.log("commandes : ", commandes.value)
+            // console.log("client  : ", clientVenteId.value)
         }
 
     const getSolde = async () =>{
@@ -423,7 +436,46 @@ export default {
   }
 
         const handleSubmit = async () => {
-            console.log("count : ", commandes.value.length)
+
+            // Remboursement
+            if(route.params.id) {
+                const factureId = route.params.id
+                // Save dette
+                if((totalTTC.value - montantRegle.value) > 0 ) {
+                    let dette = {
+                        clientId: clientVenteId.value ? clientId.value : "CltDiv",
+                        factureId: factureId,
+                        montantDette: Number(totalTTC.value - montantRegle.value),
+                        boutiqueVente: boutiqueVente.value,
+                        createdAt: serverTimestamp()
+                    }
+                    insert("dettes", dette, oldDette.value.id)
+                    // console.log("Data to send : ", dette, oldDette.value.id)
+
+                }
+                if(!setError.value) {
+                    if( (totalTTC.value - montantRegle.value) > 0 ) {
+                        let restant = (totalTTC.value - montantRegle.value)
+                        // console.log("restant ", restant)
+                        alert("Remboursemente effectué avec succès, \n mais le client doit toujours " + formatedNumber(restant))
+                    }else alert("Remboursement effectué avec succès ! ")
+
+                    commandes.value.splice(0, commandes.value.length)
+                    designation.value=""
+                    id.value=""
+                    pvu.value=""
+                    qtecmd.value=1
+                    codeFamille.value=""
+                    montantRegle.value =0
+                    montantRegle.value ="0"
+                    totalTTC.value =0
+                }
+                router.push({ name: 'Vente', params: { token: auth.currentUser.accessToken}})
+                return
+            }
+
+            // Nouvelle vente
+            // console.log("count : ", commandes.value.length)
             const factureId = (clientVenteId.value ? clientVenteId.value : "CltDiv") + new Date().getDate() + new Date().getMonth() + new Date().getFullYear() + new Date().getHours() + new Date().getMinutes() + "010" + new Date().getSeconds()
             //console.log(factureId)
             if(clientVenteId.value =="CltDiv" || clientVenteId.value =='') {
