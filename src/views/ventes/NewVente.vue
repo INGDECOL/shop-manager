@@ -37,6 +37,7 @@
             </div>
             <div class="error">{{ receptionError }}</div>
             <div class="produit border flex justify-center flex-col  gap-0.5 mt-0 p-2">
+                <!-- Total de la facture -->
                 <div class="flex justify-end ">
                     <span class="flex justify-center gap-4 bg-green-300 text-gray-600 text-base font-bold mr-8  rounded-md cursor-pointer hover:bg-green-200">
                        <span class="mx-3 my-6"> Montant TTC</span>
@@ -149,6 +150,7 @@ import { computed, ref } from '@vue/reactivity'
 import { useRoute, useRouter } from 'vue-router'
 import createDocument from '../../controllers/createDocument'
 import setDocument from '../../controllers/setDocument'
+import destroyDocument from '../../controllers/destroyDocument'
 import { collection, doc, getDoc, onSnapshot, orderBy, query, serverTimestamp } from '@firebase/firestore'
 import { onMounted, watch } from '@vue/runtime-core'
 import { db, auth } from '../../firebase/config'
@@ -183,11 +185,13 @@ export default {
         const router = useRouter()
         const route = useRoute()
         const options = { year: 'numeric', month: 'long', day: 'numeric' }
-         const { receptionError,stock, getStock, reception, updateStock } = receptionArticles()
+
+         const { receptionError,stock, getStock, venteStock, updateStock } = receptionArticles()
           const  dateDuJour = new Date().toLocaleDateString(undefined, options)
 
         const { createError, create } = createDocument()
         const { setError, insert } = setDocument()
+        const { destroy, error} = destroyDocument()
         const formatedNumber = (strNumber) => {
             return strNumber.toLocaleString('fr-fr', {style: "currency", currency: "GNF", minimumFractionDigits: 0})
         }
@@ -198,7 +202,7 @@ export default {
         }
         const selectedClient = (client) => {
             clientId.value = client.id
-            console.log("clien : ", clientId.value)
+            // console.log("clien : ", clientId.value)
 
         }
 
@@ -357,6 +361,7 @@ export default {
                 pvu : Number(pvu.value),
                 qtecmd : Number(qtecmd.value),
                 montantTotal: Number(qtecmd.value * pvu.value),
+                stockRestant: Number(quantiteStock.value - qtecmd.value)
 
             }
             commandes.value.push(commande)
@@ -396,8 +401,7 @@ export default {
             await getSolde()
 
             if(route.params.id) {
-
-                // console.log("Router params : ", route.params.id)
+                console.log("Router params : ", route.params.id)
                 await getFacture(route.params.id)
                 // console.log("route facture : ", facture.value)
                 retrieveCommande(facture.value.articles)
@@ -422,24 +426,25 @@ export default {
             // console.log("client  : ", clientVenteId.value)
         }
 
-    const getSolde = async () =>{
-        const docRef =  collection(db, "dettes")
-        const q = query( docRef, orderBy("createdAt", "desc"))
-        const res = onSnapshot(q, ( snap ) =>{
-            // console.log("snap vente", snap.docs)
-            soldeClients.value = snap.docs.map(doc =>{
-                //doc.data().createdAt = doc.data().createdAt.seconds
-                return {...doc.data(), id : doc.id}
+        const getSolde = async () =>{
+            const docRef =  collection(db, "dettes")
+            const q = query( docRef, orderBy("createdAt", "desc"))
+            const res = onSnapshot(q, ( snap ) =>{
+                // console.log("snap vente", snap.docs)
+                soldeClients.value = snap.docs.map(doc =>{
+                    //doc.data().createdAt = doc.data().createdAt.seconds
+                    return {...doc.data(), id : doc.id}
+                })
+            // console.log("solde : ", soldeClients.value)
             })
-        // console.log("solde : ", soldeClients.value)
-        })
-  }
+        }
 
         const handleSubmit = async () => {
 
             // Remboursement
             if(route.params.id) {
                 const factureId = route.params.id
+                console.log("Data to send : ", oldDette.value.id)
                 // Save dette
                 if((totalTTC.value - montantRegle.value) > 0 ) {
                     let dette = {
@@ -452,6 +457,8 @@ export default {
                     insert("dettes", dette, oldDette.value.id)
                     // console.log("Data to send : ", dette, oldDette.value.id)
 
+                }else {
+                    destroy("dettes", oldDette.value.id)
                 }
                 if(!setError.value) {
                     if( (totalTTC.value - montantRegle.value) > 0 ) {
@@ -502,10 +509,18 @@ export default {
                 }
                 create("ventes", vente)
                  if(createError.value) {
+                     alert("Impossible d'enregistrer cette vente !")
                      return
                  }
-
-                console.log("cmd : ", vente)
+                //  Diminuer le Stock
+                const stock = {
+                //boutiqueReception : boutiqueReception.value,
+                articleId : vte.id,
+                quantiteStock : Number(vte.stockRestant),
+                updatedAt: serverTimestamp()
+            }
+            venteStock(stock,boutiqueVente.value)
+            console.log("cmd : ", vente)
             })
             // Save facture
             let articleFacture = commandes.value.map(article => {
@@ -526,7 +541,7 @@ export default {
                 createdAt: serverTimestamp()
             }
             insert("factures", facture, facture.id)
-            console.log("facture vente : ", facture)
+            // console.log("facture vente : ", facture)
 
             // Save dette
             if((totalTTC.value - montantRegle.value) > 0 ) {

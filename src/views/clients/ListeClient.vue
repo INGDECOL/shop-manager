@@ -72,67 +72,70 @@ export default {
     const searchQuery = ref("")
     const editclientId = ref(null)
 
-
-  const formatedNumber = (strNumber) => {
-    return strNumber.toLocaleString('fr-fr', {style: "currency", currency: "GNF", minimumFractionDigits: 0})
-  }
-  const formatedDate = (strDate) => {
-    return new Date(strDate * 1000 ).toLocaleDateString(undefined, options)
-
-  }
-
-  const getSolde = async () =>{
-    const docRef =  collection(db, "dettes")
-      const q = query( docRef, orderBy("createdAt", "desc"))
-      const res = onSnapshot(q, ( snap ) =>{
-          // console.log("snap vente", snap.docs)
-          soldeClients.value = snap.docs.map(doc =>{
-              //doc.data().createdAt = doc.data().createdAt.seconds
-              return {...doc.data(), id : doc.id}
-          })
-      // console.log("solde : ", soldeClients.value)
-      })
-  }
-  const loadClients =async () => {
-      const docRef =  collection(db, "clients")
-      const q = query( docRef, orderBy("createdAt", "desc"))
-      const res = onSnapshot(q, ( snap ) =>{
-          // console.log("snap vente", snap.docs)
-          documents.value = snap.docs.map(doc =>{
-              //doc.data().createdAt = doc.data().createdAt.seconds
-                //console.log("Data : ", doc.id, " => ", doc.data().createdAt)
-
-              return {...doc.data(), id : doc.id}
-          })
-      })
-  }
-  const detailDette = (client) => {
-    if( client.solvabilite <= 0 ) {
-      alert("Aucun detail à afficher le solde vaut 0 ")
-      return
+    const formatedNumber = (strNumber) => {
+      return strNumber.toLocaleString('fr-fr', {style: "currency", currency: "GNF", minimumFractionDigits: 0})
     }
-    // console.log("Detail id : ", client.id)
-    router.push( { name: "DetailDette", params: { token: auth.currentUser.accessToken, id: client.id }})
-  }
+    const formatedDate = (strDate) => {
+      return new Date(strDate * 1000 ).toLocaleDateString(undefined, options)
 
-  watch(documents, () => {
-    console.log("watch doc : ", documents.value.length, soldeClients.value.length)
-    // Calculer le solde total par client
-    if(soldeClients.value.length ) {
-      documents.value.map(client => {
-        let soldeTotal =0
-        soldeClients.value.forEach(solde => {
-          if( solde.clientId == client.id ) {
-            console.log("corespondance")
-            soldeTotal += solde.montantDette
-          }
+    }
+
+    const getSolde = async () =>{
+      const docRef =  collection(db, "dettes")
+        const q = query( docRef, orderBy("createdAt", "desc"))
+        const res = onSnapshot(q, ( snap ) =>{
+            // console.log("snap vente", snap.docs)
+            soldeClients.value = snap.docs.map(doc =>{
+                //doc.data().createdAt = doc.data().createdAt.seconds
+                return {...doc.data(), id : doc.id}
+            })
+        // console.log("solde : ", soldeClients.value)
         })
-        client.solvabilite = soldeTotal
-        console.log("Solde client : ", client)
-      })
+    }
+    const loadClients =async () => {
+        const docRef =  collection(db, "clients")
+        const q = query( docRef, orderBy("createdAt", "desc"))
+        const res = onSnapshot(q, ( snap ) =>{
+            // console.log("snap vente", snap.docs)
+            documents.value = snap.docs.map(doc =>{
+                //doc.data().createdAt = doc.data().createdAt.seconds
+                  //console.log("Data : ", doc.id, " => ", doc.data().createdAt)
+
+                return {...doc.data(), id : doc.id}
+            })
+        })
+    }
+    const detailDette = (client) => {
+      if( client.solvabilite <= 0 ) {
+        alert("Aucun detail à afficher le solde crédit vaut 0 ")
+        return
+      }
+      // console.log("Detail id : ", client.id)
+      router.push( { name: "DetailDette", params: { token: auth.currentUser.accessToken, id: client.id }})
     }
 
-  })
+    watch(documents, () => {
+      console.log("watch doc : ", documents.value.length, soldeClients.value.length)
+      // Calculer le solde total par client
+      if(soldeClients.value.length ) {
+        soldeClients.value.forEach(solde => {
+          console.log("liste solde : ", solde.id, "=>", solde.clientId, solde.montantDette)
+        })
+        documents.value.map(client => {
+          let soldeTotal =0
+          soldeClients.value.forEach(solde => {
+            if( solde.clientId == client.id ) {
+              console.log("corespondance")
+              soldeTotal += solde.montantDette
+            }
+          })
+          client.solvabilite = soldeTotal
+          console.log("Solde client : ", client)
+        })
+      }
+
+    })
+
     onMounted( async () => {
        await getSolde()
       await loadClients()
@@ -160,11 +163,11 @@ export default {
     })
 
     const toggleForm = () => {
-            document.querySelector(".create").classList.toggle("open")
-            // document.querySelectorAll(".create .modal").forEach(form => {
-            //     form.classList.add("active")
-            // })
-        }
+        document.querySelector(".create").classList.toggle("open")
+        // document.querySelectorAll(".create .modal").forEach(form => {
+        //     form.classList.add("active")
+        // })
+    }
 
     const edit = (id) => {
       //console.log(" id :::: ",id)
@@ -195,8 +198,6 @@ export default {
             return client.nom.toLowerCase().indexOf( searchQuery.value.toLowerCase()) != -1
           }) : []
     })
-
-
 
     return {
       auth,

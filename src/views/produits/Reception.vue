@@ -212,7 +212,7 @@ export default {
                 pvu.value=''
                 quantiteRecu.value=''
                 codeFamille.value= ''
-                console.log("listeArticles : ", articleRecu.value)
+                // console.log("listeArticles : ", articleRecu.value)
                 // goBack()
             }
         }

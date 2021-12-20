@@ -23,7 +23,7 @@
                     <td class="text-left py-3 px-4 font-semibold uppercase text-xs">{{ formatedDate(facture.createdAt.seconds)}} </td>
                     <td class="text-left py-3 px-4 text-xs">{{ facture.id}}</td>
                     <td class="text-left py-3 px-4 text-xs">{{ formatedNumber(facture.total) }}</td>
-                    <td class="text-left py-3 px-4 text-xs font-semibold text-pink-400 hover:text-pink-300 cursor-pointer" title="Montant restant">{{ formatedNumber(facture.impayer) }}</td>
+                    <td class="text-left py-3 px-4 text-xs font-semibold text-pink-400 hover:text-pink-300 cursor-pointer" title="Montant restant">{{ facture.impayer ? formatedNumber(facture.impayer) : formatedNumber(0) }}</td>
                     <!-- <td class="text-left py-3 px-4 text-xs font-semibold underline text-blue-400 hover:text-blue-300 cursor-pointer" title="Montant Total dû" >0</td> -->
                     <td class="text-left py-3 px-4 flex justify-between items-center">
                       <span class="material-icons " :class="{ disabled: !isAdmin }" >edit</span>
