@@ -18,16 +18,14 @@ const signUp  = async (data) => {
             displayName: data.displayName,
             phoneNumber: data.phoneNumber
             })
-            //auth.currentUser.updatePhoneNumber(data.phoneNumber)
-            // updatePhoneNumberCredential(user, data.phoneNumber)
-            //updatePhoneNumber(user, data.phoneNumber)
         const userRef = doc(db, "users", user.uid)
         await setDoc(userRef, {
-                email: data.email,
-                fonction: data.fonction,
-                phoneNumber: data.phoneNumber,
-                createdAt: serverTimestamp()
-            })
+            nom: data.displayName,
+            email: data.email,
+            fonction: data.fonction,
+            phoneNumber: data.phoneNumber,
+            createdAt: serverTimestamp()
+        })
         const sendMail = () =>{
             console.log("Email sent to : ", user.email)
             }

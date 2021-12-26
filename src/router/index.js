@@ -28,6 +28,11 @@ import getUser from '../controllers/getUser'
   import DetailDette from "../views/ventes/DetailDetteClient.vue"
   import CompteClient from "../views/ventes/CompteClient.vue"
 
+  import ListePersonnel from "../views/personnels/ListePersonnel.vue"
+  import Indemnite from "../views/personnels/Indemnite.vue"
+  import Bon from "../views/personnels/Bon.vue"
+  import EditPersonnel from "../views/personnels/EditPersonnel.vue"
+
 //End of Components import
 
 //auth guard
@@ -176,7 +181,40 @@ const routes = [
     name: "CompteClient",
     component: CompteClient,
     beforEnter: requireAuth
-  }
+  },
+
+  // Admin Routes
+  // Personnel
+  {
+    path: "/admin/:token?",
+    name: "Admin",
+    component: Home,
+    beforEnter: requireAuthAdmin
+  },
+  {
+    path: "/personnels/listePersonnel/:token",
+    name: "ListePersonnel",
+    component: ListePersonnel,
+    beforEnter: requireAuthAdmin
+  },
+  {
+    path: "/personnels/Indemnites/:token",
+    name: "Indemnite",
+    component: Indemnite,
+    beforEnter: requireAuthAdmin
+  },
+  {
+    path: "/personnels/Bon/:token",
+    name: "Bon",
+    component: Bon,
+    beforEnter: requireAuthAdmin
+  },
+  {
+    path: "/personnels/editInfo/:token/:id",
+    name: "EditPersonnel",
+    component: EditPersonnel,
+    beforEnter: requireAuthAdmin
+  },
 
 
 

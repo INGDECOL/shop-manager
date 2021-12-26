@@ -34,13 +34,14 @@ export default {
 
 
         const toggleForm = () => {
-            document.querySelectorAll(".auth .modal").forEach(form => {
-                form.classList.toggle("active")
-            })
+            // document.querySelectorAll(".auth .modal").forEach(form => {
+            //     form.classList.toggle("active")
+            // })
+            alert("Pour avoir un nouveau compte, veuillez contacter l'administrateur au : \n Tel : 622 22 91 14 \n Email : admin@shopmanager.com")
         }
 
         const handleSubmit = async () => {
-            // console.log("email : ",email.value,password.value) 
+            // console.log("email : ",email.value,password.value)
             await signIn(email.value, password.value)
 
             if(!signError.value) {

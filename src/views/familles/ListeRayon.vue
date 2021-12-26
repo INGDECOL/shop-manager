@@ -64,11 +64,11 @@ export default {
     const {documents, getError, load} = getDocuments()
     const searchQuery = ref("")
     const editrayonId = ref(null)
-    // onMounted( async () => {
-      const l = async () => await load("familles")
-      //console.log(" rayons : ", documents.value)
-    // })
-    l()
+    /onMounted( async () => {
+      await load("familles")
+      console.log(" rayons : ", documents.value)
+     })
+
     const isAdmin = ref(async () =>{
       const { findUser, error, user } = getUser()
       let _user = auth.currentUser
@@ -110,7 +110,7 @@ export default {
       if( isAdmin) {
           const { destroy, error } = destroyDocument()
           if( confirm("Voulez-vous supprimer cet rayon et tous les sous documents liés ?? Cette action est definitive et irreversible !!") ) {
-            await destroy("rayons", id)
+            await destroy("familles", id)
 
         }
         if(error.value){
@@ -122,7 +122,7 @@ export default {
     }
     const filteredFamilles = computed( () =>{
           return documents.value ? documents.value.filter( (famille) => {
-            return famille.codeFamille.toLowerCase().indexOf( searchQuery.value.toLowerCase()) != -1
+            return famille.nomFamille.toLowerCase().indexOf( searchQuery.value.toLowerCase()) != -1
           }): []
 
     })

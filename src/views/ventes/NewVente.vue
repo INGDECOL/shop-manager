@@ -186,7 +186,7 @@ export default {
         const route = useRoute()
         const options = { year: 'numeric', month: 'long', day: 'numeric' }
 
-         const { receptionError,stock, getStock, venteStock, updateStock } = receptionArticles()
+         const { receptionError,stock, getStock, updateStock } = receptionArticles()
           const  dateDuJour = new Date().toLocaleDateString(undefined, options)
 
         const { createError, create } = createDocument()
@@ -519,7 +519,7 @@ export default {
                 quantiteStock : Number(vte.stockRestant),
                 updatedAt: serverTimestamp()
             }
-            venteStock(stock,boutiqueVente.value)
+            updateStock(stock,boutiqueVente.value)
             console.log("cmd : ", vente)
             })
             // Save facture

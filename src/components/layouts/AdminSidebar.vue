@@ -1,7 +1,7 @@
 <template>
   <aside class="hidden w-60 bg-gray-800 sm:block">
     <div class="py-3 text-2xl uppercase text-center tracking-widest bg-gray-900 border-b-2 border-gray-800 mb-3" id="enteteNav">
-      <router-link to="/" class="text-white">Ets N'NA HAWA</router-link>
+      <router-link to="/" class="text-white">Administration</router-link>
     </div>
     <!-- Close boutton -->
     <div class="flex justify-end pr-1 m-0">
@@ -30,11 +30,11 @@
                   d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
                 />
               </svg>
-              Accueil
+              Retour a l'appli
             </a>
           </li>
         </router-link>
-        <!-- FOURNISSEURS -->
+        <!-- Personnel -->
         <li>
           <Disclosure v-slot="{ open }" :default-open="isUserManagementActive">
             <DisclosureButton
@@ -45,7 +45,7 @@
                 contacts
               </span>
 
-              Fournisseurs
+              Personnel
               <span class="ml-auto material-icons"  :class="open ? 'transform rotate-90' : ''">
                 arrow_forward_ios
               </span>
@@ -54,12 +54,38 @@
               <ul>
                 <li>
                   <Disclosure v-slot="{ open }" :default-open="isUserActive">
-                        <router-link :to="{ name: 'Fournisseurs', params: { token: auth.currentUser.accessToken}}">
+                        <router-link :to="{ name: 'ListePersonnel', params: { token: auth.currentUser.accessToken}}">
                           <p
                             class="pl-6 pr-4  flex items-center w-full hover:bg-gray-700"
                             :class="open ? 'open': ''"
                           >
                           <span class="material-icons w-5 mr-2">manage_accounts</span>Gerer
+                          </p>
+                        </router-link>
+
+                  </Disclosure>
+                </li>
+                <li>
+                  <Disclosure v-slot="{ open }" :default-open="isUserActive">
+                        <router-link :to="{ name: 'Indemnite', params: { token: auth.currentUser.accessToken }}">
+                          <p
+                            class="pl-6 pr-4  flex items-center w-full hover:bg-gray-700"
+                            :class="open ? 'open': ''"
+                          >
+                          <span class="material-icons w-5 mr-2">monetization_on</span>Indemnites
+                          </p>
+                        </router-link>
+
+                  </Disclosure>
+                </li>
+                <li>
+                  <Disclosure v-slot="{ open }" :default-open="isUserActive">
+                        <router-link :to="{ name: 'Bon', params: { token: auth.currentUser.accessToken}}">
+                          <p
+                            class="pl-6 pr-4  flex items-center w-full hover:bg-gray-700"
+                            :class="open ? 'open': ''"
+                          >
+                          <span class="material-icons w-5 mr-2">credit_card</span>Faire un Bon
                           </p>
                         </router-link>
 
@@ -139,175 +165,6 @@
             </DisclosurePanel>
           </Disclosure>
         </li>
-        <!-- CLIENTS -->
-        <li>
-          <Disclosure v-slot="{ open }" :default-open="isUserManagementActive">
-            <DisclosureButton
-              class="disclosure rounded-none px-4 py-1 flex items-center w-full hover:bg-gray-700"
-              :class="open ? 'open': ''"
-            >
-              <span class="material-icons  w-5 mr-2">
-                groups
-              </span>
-
-              Clients
-              <span class="ml-auto material-icons"  :class="open ? 'transform rotate-90' : ''">
-                arrow_forward_ios
-              </span>
-            </DisclosureButton>
-            <DisclosurePanel>
-              <ul>
-                <li>
-                  <Disclosure v-slot="{ open }" :default-open="isUserActive">
-                        <router-link :to="{ name: 'Clients', params: { token: auth.currentUser.accessToken}}">
-                          <p
-                            class="pl-6 pr-4  flex items-center w-full hover:bg-gray-700"
-                            :class="open ? 'open': ''"
-                          >
-                          <span class="material-icons w-5 mr-2">settings_suggest</span>Gerer
-                          </p>
-                        </router-link>
-
-                  </Disclosure>
-                </li>
-
-              </ul>
-            </DisclosurePanel>
-          </Disclosure>
-        </li>
-        <!-- PRODUITS -->
-        <li>
-          <Disclosure v-slot="{ open }" :default-open="isUserManagementActive">
-            <DisclosureButton
-              class="disclosure rounded-none px-4 py-1 flex items-center w-full hover:bg-gray-700"
-              :class="open ? 'open': ''"
-            >
-              <span class="material-icons  w-5 mr-2">
-                list
-              </span>
-
-              Articles
-              <span class="ml-auto material-icons"  :class="open ? 'transform rotate-90' : ''">
-                arrow_forward_ios
-              </span>
-            </DisclosureButton>
-            <DisclosurePanel>
-              <ul>
-                <!-- GERER -->
-                <li>
-                  <Disclosure v-slot="{ open }" :default-open="isUserActive">
-                        <router-link :to="{ name: 'Produits', params: { token: auth.currentUser.accessToken}}">
-                          <p
-                            class="pl-6 pr-4  flex items-center w-full hover:bg-gray-700"
-                            :class="open ? 'open': ''"
-                          >
-                          <span class="material-icons w-5 mr-2">settings_suggest</span>Gerer
-                          </p>
-                        </router-link>
-
-                  </Disclosure>
-                </li>
-
-                <!-- RECEPTION -->
-                <li>
-                  <Disclosure v-slot="{ open }" :default-open="isUserActive">
-                        <router-link :to="{ name: 'Reception', params: { token: auth.currentUser.accessToken}}">
-                          <p
-                            class="pl-6 pr-4  flex items-center w-full hover:bg-gray-700"
-                            :class="open ? 'open': ''"
-                          >
-                          <span class="material-icons w-5 mr-2">call_received</span>Réception
-                          </p>
-                        </router-link>
-
-                  </Disclosure>
-                </li>
-
-                <!-- DESINTEGRER -->
-                <li>
-                  <Disclosure v-slot="{ open }" :default-open="isUserActive">
-                        <router-link :to="{ name: 'Desintegration', params: { token: auth.currentUser.accessToken}}">
-                          <p
-                            class="pl-6 pr-4  flex items-center w-full hover:bg-gray-700"
-                            :class="open ? 'open': ''"
-                          >
-                          <span class="material-icons w-5 mr-2">content_cut</span>Désintégration
-                          </p>
-                        </router-link>
-
-                  </Disclosure>
-                </li>
-              </ul>
-            </DisclosurePanel>
-          </Disclosure>
-        </li>
-        <!-- STOCK -->
-        <li>
-          <Disclosure v-slot="{ open }" :default-open="isUserManagementActive">
-            <DisclosureButton
-              class="disclosure rounded-none px-4 py-1 flex items-center w-full hover:bg-gray-700"
-              :class="open ? 'open': ''"
-            >
-              <span class="material-icons  w-5 mr-2">
-                list
-              </span>
-
-              STOCK
-              <span class="ml-auto material-icons"  :class="open ? 'transform rotate-90' : ''">
-                arrow_forward_ios
-              </span>
-            </DisclosureButton>
-            <DisclosurePanel>
-              <ul>
-                <!-- GERER -->
-                <li>
-                  <Disclosure v-slot="{ open }" :default-open="isUserActive">
-                        <router-link :to="{ name: 'Produits', params: { token: auth.currentUser.accessToken}}">
-                          <p
-                            class="pl-6 pr-4  flex items-center w-full hover:bg-gray-700"
-                            :class="open ? 'open': ''"
-                          >
-                          <span class="material-icons w-5 mr-2">settings_suggest</span>Gerer
-                          </p>
-                        </router-link>
-
-                  </Disclosure>
-                </li>
-
-                <!-- RECEPTION -->
-                <li>
-                  <Disclosure v-slot="{ open }" :default-open="isUserActive">
-                        <router-link :to="{ name: 'Reception', params: { token: auth.currentUser.accessToken}}">
-                          <p
-                            class="pl-6 pr-4  flex items-center w-full hover:bg-gray-700"
-                            :class="open ? 'open': ''"
-                          >
-                          <span class="material-icons w-5 mr-2">call_received</span>Réception
-                          </p>
-                        </router-link>
-
-                  </Disclosure>
-                </li>
-
-                <!-- DESINTEGRER -->
-                <li>
-                  <Disclosure v-slot="{ open }" :default-open="isUserActive">
-                        <router-link :to="{ name: 'Desintegration', params: { token: auth.currentUser.accessToken}}">
-                          <p
-                            class="pl-6 pr-4  flex items-center w-full hover:bg-gray-700"
-                            :class="open ? 'open': ''"
-                          >
-                          <span class="material-icons w-5 mr-2">content_cut</span>Désintégration
-                          </p>
-                        </router-link>
-
-                  </Disclosure>
-                </li>
-              </ul>
-            </DisclosurePanel>
-          </Disclosure>
-        </li>
-
       <!-- Reports -->
         <!-- <li class="px-4 hover:bg-gray-700">
           <a href="#" class="py-3 flex items-center">
@@ -333,11 +190,11 @@
             </svg>
             Reports
           </a>
-        </li>
+        </li> -->
 
-        <li class="px-4 py-2 mt-2 text-xs uppercase tracking-wider text-gray-500 font-bold">Apps</li>
+        <!-- <li class="px-4 py-2 mt-2 text-xs uppercase tracking-wider text-gray-500 font-bold">Apps</li> -->
 
-        <li class="px-4 cursor-pointer hover:bg-gray-700">
+        <!-- <li class="px-4 cursor-pointer hover:bg-gray-700">
           <a href="#" class="py-2 flex items-center">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -356,7 +213,7 @@
             Messages
             <span class="ml-auto text-xs bg-gray-500 px-2 py-1 rounded-sm">16</span>
           </a>
-        </li>
+        </li> -->
 
         <li class="px-4 cursor-pointer hover:bg-gray-700">
           <a href="#" class="py-2 flex items-center">
@@ -376,11 +233,11 @@
             </svg>
             Calendar
           </a>
-        </li> -->
+        </li>
 
-        <!-- <li class="px-4 py-2 mt-2 text-xs uppercase tracking-wider text-gray-500 font-bold">UI Elements</li>
+        <!-- <li class="px-4 py-2 mt-2 text-xs uppercase tracking-wider text-gray-500 font-bold">UI Elements</li> -->
 
-        <li class="px-4 cursor-pointer hover:bg-gray-700">
+        <!-- <li class="px-4 cursor-pointer hover:bg-gray-700">
           <router-link :to="{ name: 'Home' }" class="py-2 flex items-center">
             <svg class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path
