@@ -1,5 +1,5 @@
 <template>
-    <div class="create" @click="hideModal">
+    <div class="create -mt-8" @click="hideModal">
         <div class="modal active">
             <h2>Nouveau Personnel</h2>
             <form class="register" @submit.prevent="handleSignUp">
@@ -14,6 +14,9 @@
                 <option value="Commercial" selected>Commercial</option>
                 <option value="Utilisateur" selected>Utilisateur</option>
             </select>
+            <hr>
+            <input type="text" name="salaireBase" placeholder="Salaire de Base" v-model="salaireBase">
+            <input type="text" name="indemnites" placeholder="Indemnites" v-model="indemnites">
             <button>Register</button>
             <p class="error">{{ signUpError }}</p>
             </form>
@@ -39,6 +42,9 @@ import { ref } from '@vue/reactivity'
             const fonction = ref('')
             const phone = ref('')
             const confirmPassword  = ref('')
+            const salaireBase = ref()
+            const indemnites = ref()
+            const salaireNet = ref()
 
         const hideModal = (e) => {
             if(e.target.classList.contains("create")){
@@ -62,6 +68,8 @@ import { ref } from '@vue/reactivity'
                     password: password.value,
                     fonction: fonction.value,
                     phoneNumber: phone.value,
+                    salaireBase : salaireBase.value,
+                    indemnites : indemnites.value
                 }
                 const res = await signUp(data)
 
@@ -77,7 +85,22 @@ import { ref } from '@vue/reactivity'
                 }else  console.log(" SignUp Error :" , signUpError.value)
             }
 
-            return {  handleSignUp, email, password, name, phone, fonction, confirmPassword, signUpError, toggleForm, hideModal }
+            return {
+                handleSignUp,
+                email,
+                password,
+                name,
+                phone,
+                fonction,
+                confirmPassword,
+                signUpError,
+                toggleForm,
+                hideModal,
+                salaireBase,
+                indemnites,
+                salaireNet,
+
+            }
 
 
         }

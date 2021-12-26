@@ -26,6 +26,12 @@ const signUp  = async (data) => {
             phoneNumber: data.phoneNumber,
             createdAt: serverTimestamp()
         })
+        const salaireRef = doc(db, "salaires", user.uid)
+        await setDoc(salaireRef, {
+            salaireBase: data.salaireBase,
+            indemnites: data.indemnites,
+            createdAt: serverTimestamp()
+        })
         const sendMail = () =>{
             console.log("Email sent to : ", user.email)
             }
