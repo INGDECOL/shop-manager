@@ -16,7 +16,7 @@ const findUser = async (id) =>{
         catch (err) {
         error.value = err.message
         }
-        console.log("User from getUser : ", user.value.fonction)
+        // console.log("User from getUser : ", user.value.fonction)
 }
 const getUser = () =>{
     return {findUser, error, user}

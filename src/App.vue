@@ -13,6 +13,7 @@
   import AdminSidebar from "./components/layouts/AdminSidebar.vue"
 import { useRoute, useRouter } from 'vue-router'
 import { onMounted, ref, watch } from '@vue/runtime-core'
+import { auth } from './firebase/config'
   export default {
     components: { Navbar, Sidebar, AdminSidebar },
     setup() {
@@ -23,14 +24,18 @@ import { onMounted, ref, watch } from '@vue/runtime-core'
       const loginForm = document.querySelector(".auth")
       loginForm.classList.toggle("open")
     }
-    onMounted(() => {
-      console.log("chemin ", route.name)
-    })
+    // onMounted(() => {
+    //   console.log("chemin ", route.name)
+    // })
     watch(route, () => {
-      if(route.name == "Admin" || route.name == "ListePersonnel" || route.name == "Boutiques" || route.name == "Indemnite") {
+      // if(!auth.currentUser !=null ) {
+      //   alert("Vous devez vous connecter d'abord ! ")
+      //   return
+      // }
+      if(route.name == "Admin" || route.name == "ListePersonnel" || route.name == "Boutiques" || route.name == "Indemnite" ) {
         adminRoute.value = true
+      // console.log("route changed to : ", route.name , adminRoute.value)
       } else adminRoute.value = false
-      console.log("route changed to : ", route.name , adminRoute.value, route.redirectedFrom)
 
     })
 

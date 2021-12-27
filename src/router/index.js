@@ -37,6 +37,7 @@ import getUser from '../controllers/getUser'
 
 //auth guard
   const requireAuth = ( to, from, next) =>{
+    // console.log("reequireAuth");
     let user = auth.currentUser
     if(!user){
       next({ name: 'Home'})
@@ -49,20 +50,19 @@ import getUser from '../controllers/getUser'
   const requireAuthAdmin = async ( to, from, next) =>{
     const { findUser, error, user } = getUser()
     let _user = auth.currentUser
-    //console.log("userssss : ", _user.uid)
     if(_user) {
         await findUser(_user.uid)
-
-          console.log("requireAuthAdmin : ", user.value.fonction)
+        // console.log("requireAuthAdmin : ", user.value.fonction)
         if(user.value.fonction != 'Administrateur'){
           alert("Vous n'êtes pas autorisé à aller sur cette page ")
           next({ name: 'Home'})
         } else {
           next()
         }
-      }else {
-        next({ name: 'SignIn'})
-      }
+    }else {
+      alert("Vous devriez vous connecter d'abord !")
+      next({ name: 'Home'})
+    }
 
   }
 
@@ -79,108 +79,108 @@ const routes = [
     path: "/fournisseurs/:token",
     name: "Fournisseurs",
     component: ListeFournisseur,
-    beforEnter: requireAuth
+    beforeEnter: requireAuth
   },
   {
     path: "/fournisseur/edit/:token/:id",
     name: "EditFournisseur",
     component: EditFournisseur,
-    beforEnter: requireAuthAdmin
+    beforeEnter: requireAuthAdmin
   },
 
   {
     path: "/familles/:token",
     name: "Familles",
     component: ListeRayon,
-    beforEnter: requireAuth
+    beforeEnter: requireAuth
   },
   {
     path: "/familles/edit/:token/:id",
     name: "EditFamille",
     component: EditRayon,
-    beforEnter: requireAuthAdmin
+    beforeEnter: requireAuth
   },
 
   {
     path: "/boutiques/:token",
     name: "Boutiques",
     component: ListeBoutique,
-    beforEnter: requireAuthAdmin
+    beforeEnter: requireAuthAdmin
   },
   {
     path: "/boutiques/edit/:token/:id",
     name: "EditBoutique",
     component: EditBoutique,
-    beforEnter: requireAuthAdmin
+    beforeEnter: requireAuthAdmin
   },
 // clients
   {
     path: "/clients/:token",
     name: "Clients",
     component: ListeClient,
-    beforEnter: requireAuth
+    beforeEnter: requireAuth
   },
   {
     path: "/clients/edit/:token/:id",
     name: "EditClient",
     component: EditClient,
-    beforEnter: requireAuthAdmin
+    beforeEnter: requireAuthAdmin
   },
   // Articles
   {
     path: "/articles/create/:token",
     name: "NewProduit",
     component: NewProduit,
-    beforEnter: requireAuthAdmin
+    beforeEnter: requireAuthAdmin
   },
   {
     path: "/articles/:token",
     name: "Produits",
     component: ListeProduit,
-    beforEnter: requireAuth
+    beforeEnter: requireAuth
   },
   {
     path: "/articles/edit/:token/:id",
     name: "EditProduit",
     component: EditProduit,
-    beforEnter: requireAuthAdmin
+    beforeEnter: requireAuthAdmin
   },
   {
     path: "/article/detailplus/:token/",
     name: "Desintegration",
     component: Desintegration,
-    beforEnter: requireAuthAdmin
+    beforeEnter: requireAuthAdmin
   },
   {
     path: "/article/reception/:token",
     name: "Reception",
     component: Reception,
-    beforEnter: requireAuth
+    beforeEnter: requireAuth
   },
    // Ventes
   {
     path: "/vente/newvente/:token/:id?",
     name: "Vente",
     component: NewVente,
-    beforEnter: requireAuth
+    beforeEnter: requireAuth
   },
   {
     path: "/vente/listeVente/:token",
     name: "ListeVente",
     component: ListeVente,
-    beforEnter: requireAuth
+    beforeEnter: requireAuth
   },
   {
     path: "/vente/detailDetteClient/:id/:token",
     name: "DetailDette",
     component: DetailDette,
-    beforEnter: requireAuth
+    beforeEnter: requireAuth
   },
   {
     path: "/vente/listeCompteClient/:token",
     name: "CompteClient",
     component: CompteClient,
-    beforEnter: requireAuth
+    beforeEnter: requireAuth
   },
 
   // Admin Routes
@@ -189,31 +189,31 @@ const routes = [
     path: "/admin/:token?",
     name: "Admin",
     component: Home,
-    beforEnter: requireAuthAdmin
+    beforeEnter: requireAuthAdmin
   },
   {
     path: "/personnels/listePersonnel/:token",
     name: "ListePersonnel",
     component: ListePersonnel,
-    beforEnter: requireAuthAdmin
+    beforeEnter: requireAuthAdmin
   },
   {
     path: "/personnels/Indemnites/:token",
     name: "Indemnite",
     component: Indemnite,
-    beforEnter: requireAuthAdmin
+    beforeEnter: requireAuthAdmin
   },
   {
     path: "/personnels/Bon/:token",
     name: "Bon",
     component: Bon,
-    beforEnter: requireAuthAdmin
+    beforeEnter: requireAuthAdmin
   },
   {
     path: "/personnels/editInfo/:token/:id",
     name: "EditPersonnel",
     component: EditPersonnel,
-    beforEnter: requireAuthAdmin
+    beforeEnter: requireAuthAdmin
   },
 
 

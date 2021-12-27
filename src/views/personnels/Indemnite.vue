@@ -162,6 +162,7 @@ import { collection, onSnapshot, orderBy, query } from '@firebase/firestore'
               return personnel.nom.toLowerCase().indexOf( searchQuery.value.toLowerCase()) != -1
             }): []
       })
+      
       const getBons = () => {
         const docRef = collection(db, "bons")
         const q = query(docRef, orderBy("createdAt", "desc"))
