@@ -60,7 +60,7 @@ import getUser from '../controllers/getUser'
           next()
         }
     }else {
-      alert("Vous devriez vous connecter d'abord !")
+      alert("Vous devriez vous connecter pour accéder à cette page !")
       next({ name: 'Home'})
     }
 
@@ -204,9 +204,10 @@ const routes = [
     beforeEnter: requireAuthAdmin
   },
   {
-    path: "/personnels/Bon/:token",
+    path: "/personnels/Bon/:token/:id",
     name: "Bon",
     component: Bon,
+    props: true,
     beforeEnter: requireAuthAdmin
   },
   {

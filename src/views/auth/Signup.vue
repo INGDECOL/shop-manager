@@ -62,6 +62,10 @@ import { ref } from '@vue/reactivity'
                     signUpError.value = "Les deux mots de passe ne sont pas identiques"
                     return
                 }
+                if(isNaN(salaireBase.value) || isNaN(indemnites.value)) {
+                    alert("Saisie des valeur du salaire incorrect ! ")
+                    return
+                }
                 let data = {
                     displayName: name.value,
                     email: email.value,

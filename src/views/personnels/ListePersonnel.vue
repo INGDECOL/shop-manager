@@ -1,7 +1,7 @@
 <template>
   <div class="md:px-2 py-8 w-full">
       <NewPersonnel />
-      <Bon />
+      <!-- <Bon /> -->
       <div class="shadow overflow-hidden rounded border-b border-gray-200">
         <div class="flex justify-between items-center">
           <div class="searchbar mx-1 w-2/4 flex justify-start ">
@@ -137,7 +137,7 @@ export default {
       }
 
       const getSalaire = (id) => {
-        let objSalaire = {}
+        let objSalaire
         listeSalaires.value.map(salaire => {
           // console.log("salaire : ", salaire)
           if(salaire.id == id) {
@@ -165,20 +165,29 @@ export default {
     }
 
     const faireUnBon = (personnel) => {
-      toggleForm('bon')
+      // toggleForm('bon')
       // console.log("frm bon :" , personnel)
       let salaire = getSalaire(personnel.id)
-      let form = document.querySelector(".bon")
-      form.querySelector('#name').value = personnel.nom
-      form.querySelector('#phone').value = personnel.phoneNumber
-      // form.querySelector('#email').value = personnel.email
-      form.querySelector('#fonction').value = personnel.fonction
-      form.querySelector('#salaireBase').value = salaire.salaireBase
-      form.querySelector('#indemnites').value = salaire.indemnites
-      form.querySelector('#salaireNet').value = salaire.salaireNet
-      form.querySelector('#antecedant').value = getAntecedants(personnel.id)
+      if(salaire ) {
+        personnel.salaire = salaire
+        //goto route
+      }else {
+        alert("Ce personnel n'a auqu'un Salaire de Base defini !")
+        return
+      }
+      // console.log("perso : ", personnel)
+      router.push( { name: 'Bon', params : { token: auth.currentUser.accessToken, id : personnel.id }})
+      // let form = document.querySelector(".bon")
+      // form.querySelector('#name').value = personnel.nom
+      // form.querySelector('#phone').value = personnel.phoneNumber
+      // // form.querySelector('#email').value = personnel.email
+      // form.querySelector('#fonction').value = personnel.fonction
+      // form.querySelector('#salaireBase').value = salaire.salaireBase
+      // form.querySelector('#indemnites').value = salaire.indemnites
+      // form.querySelector('#salaireNet').value = salaire.salaireNet
+      // form.querySelector('#antecedant').value = getAntecedants(personnel.id)
 
-      // console.log("form : ", salaire.salaireBase)
+      // console.log("personnel  : ", personnel, salaire)
 
     }
 

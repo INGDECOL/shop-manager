@@ -32,11 +32,10 @@ import { auth } from './firebase/config'
       //   alert("Vous devez vous connecter d'abord ! ")
       //   return
       // }
-      if(route.name == "Admin" || route.name == "ListePersonnel" || route.name == "Boutiques" || route.name == "Indemnite" ) {
+      if(route.name == "Admin" || route.name == "ListePersonnel" || route.name == "Boutiques" || route.name == "Indemnite" || route.name == "Bon" ) {
         adminRoute.value = true
       // console.log("route changed to : ", route.name , adminRoute.value)
       } else adminRoute.value = false
-
     })
 
 
