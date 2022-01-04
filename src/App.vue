@@ -28,10 +28,7 @@ import { auth } from './firebase/config'
     //   console.log("chemin ", route.name)
     // })
     watch(route, () => {
-      // if(!auth.currentUser !=null ) {
-      //   alert("Vous devez vous connecter d'abord ! ")
-      //   return
-      // }
+     
       if(route.name == "Admin" || route.name == "ListePersonnel" || route.name == "Boutiques" || route.name == "Indemnite" || route.name == "Bon" ) {
         adminRoute.value = true
       // console.log("route changed to : ", route.name , adminRoute.value)

@@ -5,7 +5,7 @@
                 <div class="flex justify-end -mr-5  ml-auto">
                     <span class="material-icons close row-auto mr-0 ml-auto pr-0" @click="goBack">close</span>
                 </div>
-                <h2 class="mb-6 font-bold text-center text-base">DESINTEGRATION D'ARTICLES</h2>
+                <h2 class="mb-6 font-bold text-center text-base">TRANSFERT D'ARTICLES</h2>
                     <div class="flex justify-between  gap-2 border rounded my-2 px-1">
                       <div class="border rounded p-2 m-1 w-2/4">
                           <div >
@@ -44,7 +44,7 @@
                         </table>
                       </div>
                       <div class=" w-2/4 pt-1 -mt-3">
-                            <h2 class="my-4 font-bold text-center text-base">ARTICLE A DESINTEGRER</h2>
+                            <h2 class="my-4 font-bold text-center text-base">ARTICLE A TRANSFERER</h2>
                         <div class="border rounded p-2 m-1" >
                             <div class="flex justify-between items-center gap-2">
                                 <label for="designation" class="w-1/3">Article</label>
@@ -63,14 +63,21 @@
                                 <input type="text" name="qteStock" id="qteStock" class="uppercase text-xs text-center font-bold"  placeholder="Stock restant"  v-model="quantiteStockRestant" disabled>
                             </div>
                             <div class="flex justify-between items-center gap-2">
-                                <label for="qtedesintegre" class="w-1/3">Qté à désintegrer</label>
-                                <input type="text" id="qtedesintegre" class="uppercase text-xs text-center " :class="{ 'border-red-400 error': calcError}" placeholder="Qté à desintegrer"  v-model="quantiteDesintegrer" required @input="operation">
+                                <label for="qtedesintegre" class="w-1/3">Qté à transferer</label>
+                                <input type="text" id="qtedesintegre" class="uppercase text-xs text-center " :class="{ 'border-red-400 error': calcError}" placeholder="Qté à transferer"  v-model="quantiteTransfert" required @input="operation">
                             </div>
                             <div class="error">{{ calcError }}</div>
                         </div>
-                        <h2 class="my-4 font-bold text-center text-base">NOUVEL ARTICLE CORRESPONDANT</h2>
+                        <h2 class="my-4 font-bold text-center text-base">MAGASIN DE DESTINATION</h2>
                         <div class="border rounded p-2 m-1" >
-                            <div class="flex justify-between items-center gap-2">
+                            <div class="mx-1 mt-0">
+                                  <select name="magasin" class="mt-0"  id="magasin" v-model="boutiqueDestination" required>
+                                      <option value="">Selectionner la boutique</option>
+                                      <option v-for="boutique in filteredBoutiques" :key="boutique.id" :value="boutique.id">{{ boutique.designationBoutique }}</option>
+                                  </select>
+                              </div>
+
+                            <!-- <div class="flex justify-between items-center gap-2">
                                 <label for="designation" class="w-1/3">Nouvel Article</label>
                                 <input type="text" name="designation" id="designation"  class="uppercase text-xs font-bold w-full text-center" placeholder="Désignation de l'article" required  v-model="newdesignation" >
                             </div>
@@ -92,7 +99,7 @@
                                 <label for="qteStock" class="w-1/3">Prix de vente</label>
                                 <input type="text" name="qteStock" id="qteStock" class="uppercase text-xs text-center font-bold"  :class="{ 'border-red-400 error': saisiepvuError}" placeholder="Prix de vente"  v-model="newpvu" @input="saisiepvu">
                             </div>
-                            <div class="error">{{ saisiepvuError}}</div>
+                            <div class="error">{{ saisiepvuError}}</div> -->
 
                         </div>
                         <button>Enregistrer</button>
@@ -124,6 +131,7 @@ export default {
         const id = ref('')
         const dateReception = ref('')
         const boutiqueReception = ref('')
+        const boutiqueDestination = ref('')
         const designation = ref('')
         const pau = ref('')
         const newpau = ref('')
@@ -137,7 +145,7 @@ export default {
         const newdesignation = ref('')
         const newquantiteStock = ref('')
         const quantiteStockRestant = ref('')
-        const quantiteDesintegrer = ref('')
+        const quantiteTransfert = ref('')
         const quantiteStock = ref('')
         const calcError = ref(null)
         const saisiepauError = ref(null)
@@ -168,6 +176,13 @@ export default {
             }
             await getStock(boutiqueReception.value)
         })
+        watch(boutiqueDestination, async()=>{
+            if(boutiqueDestination.value ==boutiqueReception.value) {
+                alert("La boutique de depart et la boutique de destination sont identiques !")
+                boutiqueDestination.value = "Selectionner une autre"
+            }
+
+        })
 
         const getArticles = async () => {
             const docRef = collection(db, "produits")
@@ -188,7 +203,6 @@ export default {
                 return stock.value[element].quantiteStock
               }
             }
-
             }
 
             // return stock
@@ -199,7 +213,7 @@ export default {
         }
         const filteredBoutiques = computed(()=>{
             return listeBoutiques.value && listeBoutiques.value.filter((boutique)=>{
-                return boutique.gerantBoutique == auth.currentUser.email
+                return boutique.gerantBoutique == auth.currentUser.email || boutique.designationBoutique == "Boutique principale"
             })
         })
 
@@ -245,44 +259,46 @@ export default {
         onMounted( async () => {
             getBoutiques()
             getArticles()
-            //getFournisseurs()
-            //console.log("boutiquessssssss : ", listeBoutiques.value, auth.currentUser.email)
         })
 
         const handleSubmit = async () => {
             const { createError, create } = createDocument()
-            const newArticle = {
-                designation: newdesignation.value.toUpperCase(),
-                pau: Number(newpau.value),
-                pvu: Number(newpvu.value),
-                fournisseurId: fournisseurId.value,
-                codeFamille: codeFamille.value,
-                expiration: expiration.value,
-                seuil: Number(seuil.value),
-                createdAt: serverTimestamp()
-            }
-            // console.log("produit : ", newArticle);
-             const res = await create("produits", newArticle)
-             if(createError.value){
-                 getError.value = createError.value
-                 return
-             }
-            //  id.value = res.id
-            //  console.log("idddd : ", id.value)
-
-              if(res.id =='' || res.id == null) {
-                  receptionError.value = "L'article est enregistré mais impossible de mettre à jour le stock, essayer avec le formulaire de reception"
+            if(!boutiqueDestination.value) {
+                alert("Selectionnez la boutique de destination ! ")
                 return
-             }
+            }
+            // const newArticle = {
+            //     designation: newdesignation.value.toUpperCase(),
+            //     pau: Number(newpau.value),
+            //     pvu: Number(newpvu.value),
+            //     fournisseurId: fournisseurId.value,
+            //     codeFamille: codeFamille.value,
+            //     expiration: expiration.value,
+            //     seuil: Number(seuil.value),
+            //     createdAt: serverTimestamp()
+            // }
+            // console.log("produit : ", newArticle);
+            //  const res = await create("produits", newArticle)
+            //  if(createError.value){
+            //      getError.value = createError.value
+            //      return
+            //  }
+            // //  id.value = res.id
+            // //  console.log("idddd : ", id.value)
+
+            //   if(res.id =='' || res.id == null) {
+            //       receptionError.value = "L'article est enregistré mais impossible de mettre à jour le stock, essayer avec le formulaire de reception"
+            //     return
+            //  }
 
             const stock = {
                 //boutiqueReception : boutiqueReception.value,
-                articleId : res.id,
-                quantiteStock : Number(newquantiteStock.value),
+                articleId : id.value,
+                quantiteStock : Number(quantiteTransfert.value),
                 updatedAt: serverTimestamp()
             }
-            // console.log("fournisseur : ", fournisseur)
-            await reception(stock, boutiqueReception.value )
+             console.log("boutique destination : ", boutiqueDestination.value, stock)
+            await reception(stock, boutiqueDestination.value )
 
             const oldStok = {
                 articleId : id.value,
@@ -290,7 +306,6 @@ export default {
                 updatedAt: serverTimestamp()
             }
             await updateStock(oldStok, boutiqueReception.value)
-
 
             if(!receptionError.value){
                 designation.value =''
@@ -304,16 +319,13 @@ export default {
                 quantiteRecu.value = ''
                 quantiteStock.value = ''
                 quantiteStockRestant.value = ''
-                quantiteDesintegrer.value = ''
+                quantiteTransfert.value = ''
                 newdesignation.value = ''
                 newquantiteStock.value = ''
                 newpau.value = ''
                 newpvu.value = ''
 
             }
-
-
-
         }
 
         const saisiepau = () => {
@@ -353,12 +365,12 @@ export default {
         const operation = (e) => {
             calcError.value = null
             try {
-                if(quantiteDesintegrer.value !='' || !quantiteDesintegrer.value ==null) {
-                quantiteStockRestant.value = Number(quantiteStock.value) - Number(quantiteDesintegrer.value)
-                // console.log("Qt : ", isNaN(quantiteStockRestant.value), quantiteStockRestant.value)
-                if(isNaN(quantiteStockRestant.value) || quantiteStockRestant.value < 0) {
-                    throw Error("Saisie invalid")
-                }
+                if(quantiteTransfert.value !='' || !quantiteTransfert.value ==null) {
+                    quantiteStockRestant.value = Number(quantiteStock.value) - Number(quantiteTransfert.value)
+                    // console.log("Qt : ", isNaN(quantiteStockRestant.value), quantiteStockRestant.value)
+                    if(isNaN(quantiteStockRestant.value) || quantiteStockRestant.value < 0) {
+                        throw Error("Saisie invalid")
+                    }
                 }
 
             } catch (error) {
@@ -373,6 +385,7 @@ export default {
             handleSubmit,
             dateReception,
             boutiqueReception,
+            boutiqueDestination,
             bringStock,
             pullStock,
             listeArticles,
@@ -393,7 +406,7 @@ export default {
             newquantiteStock,
             quantiteStock,
             quantiteStockRestant,
-            quantiteDesintegrer,
+            quantiteTransfert,
             operation,
             calcError,
             saisiepauError,

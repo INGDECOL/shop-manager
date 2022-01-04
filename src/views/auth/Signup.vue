@@ -72,8 +72,8 @@ import { ref } from '@vue/reactivity'
                     password: password.value,
                     fonction: fonction.value,
                     phoneNumber: phone.value,
-                    salaireBase : salaireBase.value,
-                    indemnites : indemnites.value
+                    salaireBase : Number(salaireBase.value),
+                    indemnites : Number(indemnites.value)
                 }
                 const res = await signUp(data)
 

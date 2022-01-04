@@ -78,35 +78,18 @@
                             <input type="text" name="antecedant" id="antecedant" placeholder="antecedant" v-model="antecedant" disabled>
                           </div>
                           <div class="input flex justify-between items-center m-1 gap-3">
+                            <label for="nom">Mois à payer</label>
+                            <select name="moisApayer" id="moisApayer" v-model="moisApayer" required>
+                              <option value="" selected>Selectionner le mois</option>
+                              <option :value="mois" v-for="mois in listeMois" :key="mois">{{ mois }}</option>
+                            </select>
+                          </div>
+                          <div class="input flex justify-between items-center m-1 gap-3">
                             <label for="nom">Montant Net</label>
                             <input type="text" name="salaireNet" id="salaireNet" placeholder="salaireNet" v-model="salaireNet" disabled>
                           </div>
-                            <!-- <table class="min-w-full bg-white divider-y divide-gray-400 ">
-                                <thead class="bg-gray-800 text-white">
-                                        <tr>
-                                            <th class="text-left py-3 px-4 uppercase font-semibold text-sm">#</th>
-                                            <th class="text-left py-3 px-4 uppercase font-semibold text-xs">Désignation</th>
-                                            <th class="text-left py-3 px-4 uppercase font-semibold text-xs">P. Unitaire</th>
-                                            <th class="text-left py-3 px-4 uppercase font-semibold text-xs">Qté</th>
-                                            <th class="text-left py-3 px-4 uppercase font-semibold text-xs">Total</th>
-                                        </tr>
-                                </thead>
-                                <tbody class="text-gray-700 ">
-                                    <tr class="border-b border-gray-400 " :class="{ striped : n % 2 ===0}" v-for="(cmd,n) in commandes" :key="cmd.id">
-                                        <td class="text-left py-3 px-4 font-semibold uppercase">
-                                            <span class="bg-red-400 text-white rounded-sm p-1 cursor-pointer hover:bg-red-500" title="Supprimer la ligne" @click="removeCommande(cmd)">x</span>
-                                        </td>
-                                        <td class="text-left py-3 px-4 text-xs  font-semibold uppercase">{{ cmd.designation }}</td>
-                                        <td class="text-center py-3 px-4 text-xs  font-semibold uppercase">{{ cmd.pvu}}</td>
-                                        <td class="text-center py-3 px-4 text-xs  font-semibold uppercase">{{ cmd.qtecmd }}</td>
-                                        <td class="text-center py-3 px-4 text-xs  font-semibold uppercase">{{ cmd.pvu * cmd.qtecmd }}</td>
-
-                                    </tr>
-
-                                </tbody>
-                            </table> -->
                         <button class="border-2 border-green-600 bg-transparent  text-sm hover:bg-green-600 hover:text-gray-800">Payer</button>
-                        <p class="error">{{  }}</p>
+                        <p class="error">{{ createError }}</p>
                         </div>
                     </div>
                 </div>
@@ -123,23 +106,32 @@
   import getDocuments from '../../controllers/getDocuments'
   import { onMounted } from '@vue/runtime-core'
   import { auth, db } from "../../firebase/config"
-  import getUser from "../../controllers/getUser"
-import { collection, onSnapshot, orderBy, query } from '@firebase/firestore'
+  import createDocument from "../../controllers/createDocument"
+import { collection, onSnapshot, orderBy, query, serverTimestamp } from '@firebase/firestore'
   export default {
     setup() {
       const router = useRouter()
       const {documents, getError, load} = getDocuments()
+      const { createError, create} = createDocument()
       const searchQuery = ref("")
       const editPersonnelId = ref(null)
+      const id = ref('')
       const nom = ref('')
       const contact = ref('')
       const fonction = ref('')
       const antecedant = ref()
+      const ante = ref()
       const salaireBase = ref()
+      const salaireB = ref()
       const indemnites = ref()
+      const indem = ref()
       const salaireNet = ref()
+      const salaireN = ref()
+      const moisApayer = ref()
       const listeBons = ref([])
       const listeSalaires = ref([])
+      const listeMois = ref([])
+      const listeBulletins = ref([])
       const options = { year: 'numeric', month: 'short', day: 'numeric', timeZone:'UTC' }
 
       const formatedDate = (strDate) => {
@@ -150,10 +142,21 @@ import { collection, onSnapshot, orderBy, query } from '@firebase/firestore'
         return strNumber.toLocaleString('fr-fr', {style: "currency", currency: "GNF", minimumFractionDigits: 0})
       }
 
+      const getMois = () => {
+        let months = ['Janv', 'Fevr', 'Mars', 'Avril', 'Mai', 'Juin', 'Juil', 'Aout', 'Sept', 'Oct', 'Nov', 'Dec']
+        let year = new Date().getFullYear()
+        listeMois.value = months.map (month => {
+          return month + " " + year
+        })
+      }
+
       onMounted( async () => {
         await load("users")
         getBons()
         getSalaires()
+        getMois()
+        moisApayer.value = listeMois.value[new Date().getMonth()]
+        getBulletins()
         //console.log(" fournisseurs : ", documents.value)
       })
 
@@ -162,12 +165,21 @@ import { collection, onSnapshot, orderBy, query } from '@firebase/firestore'
               return personnel.nom.toLowerCase().indexOf( searchQuery.value.toLowerCase()) != -1
             }): []
       })
-      
+
       const getBons = () => {
         const docRef = collection(db, "bons")
         const q = query(docRef, orderBy("createdAt", "desc"))
         const res = onSnapshot(q, snap => {
           listeBons.value = snap.docs.map(doc =>{
+            return {...doc.data(), id:doc.id}
+          })
+        })
+      }
+      const getBulletins = () => {
+        const docRef = collection(db, "bulletins")
+        const q = query(docRef, orderBy("createdAt", "desc"))
+        const res = onSnapshot(q, snap => {
+          listeBulletins.value = snap.docs.map(doc =>{
             return {...doc.data(), id:doc.id}
           })
         })
@@ -193,26 +205,76 @@ import { collection, onSnapshot, orderBy, query } from '@firebase/firestore'
 
       }
       const getSalaire = (id) => {
-        let montanAntecedant =0
         listeSalaires.value.map(salaire => {
-          console.log("salaire : ", salaire)
+          // console.log("antecedant : ", antecedant.value)
           if(salaire.id == id) {
-            salaireBase.value = formatedNumber(Number(salaire.salaireBase))
-            indemnites.value =formatedNumber( Number(salaire.indemnites))
-            salaireNet.value =formatedNumber( Number(salaire.salaireBase) + Number(salaire.indemnites) - antecedant.value)
+            salaireB.value = Number(salaire.salaireBase)
+            indem.value =Number(salaire.indemnites)
+            salaireN.value = ((salaire.salaireBase) + (salaire.indemnites)) - (antecedant.value ? antecedant.value : 0)
+
+            salaireBase.value = formatedNumber(salaireB.value)
+            indemnites.value = formatedNumber(indem.value)
+            salaireNet.value = formatedNumber(salaireN.value)
           }
         })
-
-
       }
 
       const personnelSelected = (personnel) => {
-        console.log("Personnel ", personnel)
+        // console.log("Personnel ", personnel)
+        getSalaire(personnel.id)
+        if(salaireBase.value == null) alert("Ce personnel n'a aucun salaire de base defini !")
+        id.value = personnel.id
         nom.value = personnel.nom
         contact.value = personnel.phoneNumber
         fonction.value = personnel.fonction
         antecedant.value = getAntecedants(personnel.id) ? getAntecedants(personnel.id) : 0
-        getSalaire(personnel.id)
+
+      }
+
+      const handleSubmit = async () => {
+        if(salaireB.value == null || isNaN(salaireB.value)) {
+          alert("Ce personnel n'a aucun salaire de base defini !")
+          return
+        }
+        const bulletin = {
+          personnelId : id.value,
+          nom: nom.value,
+          fonction: fonction.value,
+          salaireBase: salaireB.value,
+          indemnites: indem.value,
+          antecedant: Number(ante.value ? ante.value : 0),
+          montantNet: salaireN.value,
+          mois: moisApayer.value,
+          createdAt: serverTimestamp()
+        }
+        let percu = false
+        listeBulletins.value.forEach(salaire => {
+          // console.log(salaire.personnelId, salaire.mois, "=>", bulletin.personnelId, bulletin.mois, salaire.mois == bulletin.mois)
+
+          if(salaire.personnelId == bulletin.personnelId && salaire.mois == bulletin.mois) {
+            percu = true
+            return
+          }
+        })
+        if (percu) {
+          alert("Ce personnel a déjà perçu son salaire du mois selectionné !")
+          return
+        }
+        console.log("bulletin : ", bulletin)
+        await create("bulletins", bulletin)
+        if(!createError.value) {
+          alert("Payement effectué avec succès !")
+          id.value =null
+          nom.value = null
+          fonction.value = null
+          contact.value = null
+          salaireB.value = salaireBase.value = null
+          indemnites.value = indem.value = null
+          salaireN.value = salaireBase.value = null
+          ante.value = antecedant.value = null
+          salaireN.value = salaireNet.value = null
+        }
+
       }
 
 
@@ -220,6 +282,7 @@ import { collection, onSnapshot, orderBy, query } from '@firebase/firestore'
         auth,
         documents,
         getError,
+        createError,
         searchQuery,
         filteredPersonnels,
         editPersonnelId,
@@ -231,6 +294,9 @@ import { collection, onSnapshot, orderBy, query } from '@firebase/firestore'
         contact,
         fonction,
         antecedant,
+        listeMois,
+        moisApayer,
+        handleSubmit,
 
       }
     }

@@ -23,7 +23,7 @@ const signIn = async (email, password) => {
                 const errorCode = error.code;
                 const errorMessage = error.message;
                 // console.log("errorCode : ",errorCode, "error msg : ", error.message)
-                signError.value = "Email et Mot de passe invalide !"
+                signError.value = "Email ou Mot de passe invalide ! \n Verifier votre connexion et réessayez"
             })
     } catch (err) {
         console.log(err.message)

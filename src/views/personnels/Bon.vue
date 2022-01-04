@@ -111,7 +111,7 @@
             onMounted( async ()=>{
                 const { document, getError, load } = getDocument()
                  await load("users", route.params.id)
-                getBons()
+                getBons() 
                 await getSalaires(route.params.id)
                 // console.log("route: ",route.params.id)
                 if (document.value) {

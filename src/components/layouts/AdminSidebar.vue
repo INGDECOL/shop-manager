@@ -80,7 +80,7 @@
                 </li>
                 <li>
                   <Disclosure v-slot="{ open }" :default-open="isUserActive">
-                        <router-link :to="{ name: 'Bon', params: { token: auth.currentUser.accessToken}}">
+                        <router-link :to="{ name: 'ListePersonnel', params: { token: auth.currentUser.accessToken}}">
                           <p
                             class="pl-6 pr-4  flex items-center w-full hover:bg-gray-700"
                             :class="open ? 'open': ''"
@@ -165,55 +165,80 @@
             </DisclosurePanel>
           </Disclosure>
         </li>
-      <!-- Reports -->
-        <!-- <li class="px-4 hover:bg-gray-700">
-          <a href="#" class="py-3 flex items-center">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-5 w-5 mr-2"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
+        <!-- ETATS -->
+        <li v-if="isAdmin">
+          <Disclosure v-slot="{ open }" :default-open="isUserManagementActive">
+            <DisclosureButton
+              class="disclosure rounded-none px-4 py-1 flex items-center w-full hover:bg-gray-700"
+              :class="open ? 'open': ''"
             >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"
-              />
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"
-              />
-            </svg>
-            Reports
-          </a>
-        </li> -->
+              <span class="material-icons  w-5 mr-2">
+                store
+              </span>
 
-        <!-- <li class="px-4 py-2 mt-2 text-xs uppercase tracking-wider text-gray-500 font-bold">Apps</li> -->
+              Etats
+              <span class="ml-auto material-icons"  :class="open ? 'transform rotate-90' : ''">
+                arrow_forward_ios
+              </span>
+            </DisclosureButton>
+            <DisclosurePanel>
+              <ul>
+                <li>
+                  <Disclosure v-slot="{ open }" :default-open="isUserActive">
+                        <!-- <router-link :to="{ name: 'Boutiques', params: { token: auth.currentUser.accessToken}}"> -->
+                          <p
+                            class="pl-6 pr-4  flex items-center w-full hover:bg-gray-700"
+                            :class="open ? 'open': ''"
+                          >
+                          <span class="material-icons w-5 mr-2">settings_suggest</span>Liste des ventes
+                          </p>
+                        <!-- </router-link> -->
 
-        <!-- <li class="px-4 cursor-pointer hover:bg-gray-700">
-          <a href="#" class="py-2 flex items-center">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-5 w-5 mr-2"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-              />
-            </svg>
-            Messages
-            <span class="ml-auto text-xs bg-gray-500 px-2 py-1 rounded-sm">16</span>
-          </a>
-        </li> -->
+                  </Disclosure>
+                </li>
+                <li>
+                  <Disclosure v-slot="{ open }" :default-open="isUserActive">
+                        <!-- <router-link :to="{ name: 'Boutiques', params: { token: auth.currentUser.accessToken}}"> -->
+                          <p
+                            class="pl-6 pr-4  flex items-center w-full hover:bg-gray-700"
+                            :class="open ? 'open': ''"
+                          >
+                          <span class="material-icons w-5 mr-2">settings_suggest</span>Rapport boutique
+                          </p>
+                        <!-- </router-link> -->
+
+                  </Disclosure>
+                </li>
+                <li>
+                  <Disclosure v-slot="{ open }" :default-open="isUserActive">
+                        <!-- <router-link :to="{ name: 'Boutiques', params: { token: auth.currentUser.accessToken}}"> -->
+                          <p
+                            class="pl-6 pr-4  flex items-center w-full hover:bg-gray-700"
+                            :class="open ? 'open': ''"
+                          >
+                          <span class="material-icons w-5 mr-2">settings_suggest</span>Inventaire
+                          </p>
+                        <!-- </router-link> -->
+
+                  </Disclosure>
+                </li>
+                <li>
+                  <Disclosure v-slot="{ open }" :default-open="isUserActive">
+                        <!-- <router-link :to="{ name: 'Boutiques', params: { token: auth.currentUser.accessToken}}"> -->
+                          <p
+                            class="pl-6 pr-4  flex items-center w-full hover:bg-gray-700"
+                            :class="open ? 'open': ''"
+                          >
+                          <span class="material-icons w-5 mr-2">settings_suggest</span>Etats client
+                          </p>
+                        <!-- </router-link> -->
+
+                  </Disclosure>
+                </li>
+              </ul>
+            </DisclosurePanel>
+          </Disclosure>
+        </li>
 
         <li class="px-4 cursor-pointer hover:bg-gray-700">
           <a href="#" class="py-2 flex items-center">
@@ -306,11 +331,11 @@ export default {
       const isAdmin = ref(async () =>{
         const { findUser, error, user } = getUser()
         let _user = auth.currentUser
-        //console.log("userssss : ", _user.uid)
+        console.log("current user uid : ", _user.uid)
         if(_user) {
             await findUser(_user.uid)
-            //console.log("requireAuthAdmin : ", user.value.fonction)
-            if(user.value.fonction !== 'Administrateur'){
+            // console.log("requireAuthAdmin : ", user)
+            if(user.value.fonction != 'Administrateur'){
               // alert("Vous n'êtes pas autorisé à aller sur cette page ")
               return false
 

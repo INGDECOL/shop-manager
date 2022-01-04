@@ -257,7 +257,7 @@ export default {
       await getFactures()
       await loadVentes()
 
-       console.log("Date : ", new Date().toLocaleDateString(undefined, options), documents.value.length)
+      //  console.log("Date : ", new Date().toLocaleDateString(undefined, options), documents.value.length)
 
     })
 

@@ -71,7 +71,7 @@
                         <input type="text" name="designation"   class="uppercase m-1 ml-0" placeholder="Désignation de l'article" required disabled v-model="designation" >
                         <input type="text" name="codeFamille"
                         placeholder="Famille article " v-model="codeFamille" required disabled>
-                        <input type="text" name="pvu"  placeholder="Prix Unitaire"  v-model="pvu" required disabled>
+                        <input type="text" name="pvu"  placeholder="Prix Unitaire"  v-model="pvu">
                         <input type="number" name="qtecmd" id="qtecmd" min="1" v-model="qtecmd">
                     </div>
                     <!-- <button class="mb-1" @click.prevent="addCommande">Valider</button> -->

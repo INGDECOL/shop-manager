@@ -23,6 +23,9 @@ import getUser from '../controllers/getUser'
   import Desintegration from "../views/produits/Desintegration.vue"
   import Reception from "../views/produits/Reception.vue"
 
+  import Transfert from "../views/stocks/TransfertStock.vue"
+  import ReceptionStock from "../views/stocks/ReceptionStock.vue"
+
   import NewVente from "../views/ventes/NewVente.vue"
   import ListeVente from "../views/ventes/ListeVente.vue"
   import DetailDette from "../views/ventes/DetailDetteClient.vue"
@@ -149,12 +152,25 @@ const routes = [
     path: "/article/detailplus/:token/",
     name: "Desintegration",
     component: Desintegration,
-    beforeEnter: requireAuthAdmin
+    beforeEnter: requireAuth
   },
   {
     path: "/article/reception/:token",
     name: "Reception",
     component: Reception,
+    beforeEnter: requireAuth
+  },
+  // stocks
+  {
+    path: "/article/stock/transfert_stock/:token",
+    name: "Transfert",
+    component: Transfert,
+    beforeEnter: requireAuth
+  },
+  {
+    path: "/article/stock/reception_stock/:token",
+    name: "Stockage",
+    component: ReceptionStock,
     beforeEnter: requireAuth
   },
    // Ventes

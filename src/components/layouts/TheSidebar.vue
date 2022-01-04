@@ -70,7 +70,7 @@
           </Disclosure>
         </li>
         <!-- FAMILLES -->
-        <li v-if="isAdmin">
+        <li v-if="admin">
           <Disclosure v-slot="{ open }" :default-open="isUserManagementActive">
             <DisclosureButton
               class="disclosure rounded-none px-4 py-1 flex items-center w-full hover:bg-gray-700"
@@ -105,7 +105,7 @@
           </Disclosure>
         </li>
         <!-- BOUTIQUES -->
-        <li v-if="isAdmin">
+        <li v-if="admin">
           <Disclosure v-slot="{ open }" :default-open="isUserManagementActive">
             <DisclosureButton
               class="disclosure rounded-none px-4 py-1 flex items-center w-full hover:bg-gray-700"
@@ -259,10 +259,10 @@
             </DisclosureButton>
             <DisclosurePanel>
               <ul>
-                <!-- GERER -->
+                <!-- TRANSFERT -->
                 <li>
                   <Disclosure v-slot="{ open }" :default-open="isUserActive">
-                        <router-link :to="{ name: 'Produits', params: { token: auth.currentUser.accessToken}}">
+                        <router-link :to="{ name: 'Transfert', params: { token: auth.currentUser.accessToken}}">
                           <p
                             class="pl-6 pr-4  flex items-center w-full hover:bg-gray-700"
                             :class="open ? 'open': ''"
@@ -274,10 +274,10 @@
                   </Disclosure>
                 </li>
 
-                <!-- RECEPTION -->
+                <!-- STOCKAGE -->
                 <li>
                   <Disclosure v-slot="{ open }" :default-open="isUserActive">
-                        <router-link :to="{ name: 'Reception', params: { token: auth.currentUser.accessToken}}">
+                        <router-link :to="{ name: 'Stockage', params: { token: auth.currentUser.accessToken}}">
                           <p
                             class="pl-6 pr-4  flex items-center w-full hover:bg-gray-700"
                             :class="open ? 'open': ''"
@@ -290,7 +290,7 @@
                 </li>
 
                 <!-- DESINTEGRER -->
-                <li>
+                <!-- <li>
                   <Disclosure v-slot="{ open }" :default-open="isUserActive">
                         <router-link :to="{ name: 'Desintegration', params: { token: auth.currentUser.accessToken}}">
                           <p
@@ -302,7 +302,7 @@
                         </router-link>
 
                   </Disclosure>
-                </li>
+                </li> -->
               </ul>
             </DisclosurePanel>
           </Disclosure>
@@ -430,7 +430,7 @@
 </template>
 
 <script>
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { Disclosure, DisclosureButton, DisclosurePanel } from '@headlessui/vue'
 import { auth } from "../../firebase/config";
@@ -445,25 +445,30 @@ export default {
   setup() {
     const route = useRoute()
     const router = useRouter()
+    const admin = ref(false)
 
-      const isAdmin = ref(async () =>{
+    const isAdmin =(async () =>{
+
         const { findUser, error, user } = getUser()
         let _user = auth.currentUser
-        //console.log("userssss : ", _user.uid)
+        // console.log("userssss : ", _user.uid)
         if(_user) {
             await findUser(_user.uid)
             //console.log("requireAuthAdmin : ", user.value.fonction)
             if(user.value.fonction !== 'Administrateur'){
-              // alert("Vous n'êtes pas autorisé à aller sur cette page ")
-              return false
+              admin.value = false
 
             } else {
-              return true
+              admin.value= true
             }
           }else {
             router.push({ name: "Home"})
           }
 
+    })
+
+    onMounted(() => {
+      isAdmin()
     })
 
 
@@ -492,7 +497,7 @@ export default {
     return {
       route,
       toggleNav,
-      isAdmin,
+      admin,
       isUserManagementActive,
       isUserActive,
       auth
