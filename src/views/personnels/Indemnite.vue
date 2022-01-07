@@ -197,7 +197,7 @@ import { collection, onSnapshot, orderBy, query, serverTimestamp } from '@fireba
       const getAntecedants = (id) => {
         let montanAntecedant =0
         listeBons.value.map(bon => {
-          if(bon.id == id) {
+          if(bon.personnelId == id) {
             montanAntecedant += bon.montant
           }
         })
@@ -206,8 +206,8 @@ import { collection, onSnapshot, orderBy, query, serverTimestamp } from '@fireba
       }
       const getSalaire = (id) => {
         listeSalaires.value.map(salaire => {
-          // console.log("antecedant : ", antecedant.value)
           if(salaire.id == id) {
+            // console.log("getSalaire compar : ", salaire.id , "=>", id)
             salaireB.value = Number(salaire.salaireBase)
             indem.value =Number(salaire.indemnites)
             salaireN.value = ((salaire.salaireBase) + (salaire.indemnites)) - (antecedant.value ? antecedant.value : 0)
@@ -221,13 +221,20 @@ import { collection, onSnapshot, orderBy, query, serverTimestamp } from '@fireba
 
       const personnelSelected = (personnel) => {
         // console.log("Personnel ", personnel)
+        salaireB.value = salaireBase.value = null
+        indem.value = indemnites.value = null
+        salaireNet.value = null
         getSalaire(personnel.id)
         if(salaireBase.value == null) alert("Ce personnel n'a aucun salaire de base defini !")
         id.value = personnel.id
         nom.value = personnel.nom
         contact.value = personnel.phoneNumber
         fonction.value = personnel.fonction
-        antecedant.value = getAntecedants(personnel.id) ? getAntecedants(personnel.id) : 0
+        ante.value = getAntecedants(personnel.id) ? getAntecedants(personnel.id) : 0
+        antecedant.value = formatedNumber(ante.value)
+
+         salaireN.value = ((salaireB.value) + (indem.value)) - (ante.value ? ante.value : 0)
+        salaireNet.value = formatedNumber(salaireN.value)
 
       }
 

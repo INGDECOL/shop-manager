@@ -18,6 +18,9 @@
                     <option value="Commercial" selected>Commercial</option>
                     <option value="Utilisateur" selected>Utilisateur</option>
                 </select>
+                <hr>
+                <input type="text" name="salaireBase" placeholder="Salaire de Base" v-model="salaireBase" title="Salaire de base">
+                <input type="text" name="indemnites" placeholder="Indemnites" v-model="indemnites" title="Indemnités">
                 <button>Modifier</button>
                 <p class="error">{{ geterror }}</p>
                 <p class="error">{{ updateError }}</p>
@@ -33,9 +36,9 @@
 import { computed, ref } from '@vue/reactivity'
 import updateDocument from "../../controllers/updateDocument"
 import { onMounted, onUnmounted } from '@vue/runtime-core'
-import { serverTimestamp } from '@firebase/firestore'
+import { collection, doc, getDoc, onSnapshot, orderBy, query, serverTimestamp, setDoc } from '@firebase/firestore'
 import { useRoute, useRouter } from 'vue-router'
-import { auth } from '../../firebase/config'
+import { auth, db } from '../../firebase/config'
 import getDocument from '../../controllers/getDocument'
 export default {
     props: [ 'editFournisseurId'],
@@ -46,15 +49,39 @@ export default {
         const contact = ref('')
         const fonction = ref('')
         const email = ref('')
+        const salaireBase = ref()
+        const indemnites = ref()
+        const salaireNet = ref()
         const geterror = ref('')
+        const listeSalaires = ref()
         const route = useRoute()
         const router = useRouter()
         const { updateError, update } = updateDocument()
+
         const hideModal = (e) => {
             if(e.target.classList.contains("create")){
                 document.querySelector(".create").classList.toggle("open")
             }
         }
+        const getSalaires = async(id) => {
+            const docRef = doc(db, "salaires", id)
+            const q = await getDoc(docRef)//, orderBy("createdAt", "desc"))
+            if(q.exists()){
+                console.log("q : ", q.data())
+                salaireBase.value = q.data().salaireBase
+                indemnites.value = q.data().indemnites
+
+            }else {
+                indemnites.value = "Indefinies"
+                salaireBase.value ="Indefini"
+            }
+            // const res = onSnapshot(q, snap => {
+            // listeSalaires.value = snap.docs.map(doc =>{
+            //     return {...doc.data(), id:doc.id}
+            // })
+            // })
+      }
+
         onMounted( async () => {
             //console.log("onMounted ")
 
@@ -66,17 +93,19 @@ export default {
                 if( getError.value ) {geterror.value = "Enregistrement non trouvé ! "}
 
                 if( document.value) {
-                    console.log("found : ", document.value)
+                    // console.log("found : ", document.value)
                     id.value = document.value.id
                     nom.value = document.value.nom
                     // prenom.value = document.value.prenom
                     fonction.value = document.value.fonction
                     contact.value = document.value.phoneNumber
                     email.value = document.value.email
+                    getSalaires(id.value)
 
                 }
             }
         })
+
         const handleSubmit = async () => {
 
             const personnel = {
@@ -85,11 +114,36 @@ export default {
                 // prenom: prenom.value,
                 phoneNumber: contact.value,
                 fonction: fonction.value,
-                email: email.value,
+                // email: email.value,
                 updatedAt: serverTimestamp()
             }
-            //console.log("fournisseur : ", fournisseur)
+            //MODIFICATION DES INFOS
             await update("users", personnel, id.value)
+            if(isNaN(salaireBase.value) || isNaN(indemnites.value)) {
+                alert("Saisie incorrecte salaire de base ou indemnités incorrect")
+                console.log("salaire : ", salaireBase.value, "indem : ", indemnites.value)
+                return
+            }
+            // MODIFICATION OU CREATION DU SALAIRE
+            const salaire = {
+                salaireBase : Number(salaireBase.value),
+                indemnites : Number(indemnites.value),
+                createdAt: serverTimestamp(),
+                updatedAt: serverTimestamp()
+
+            }
+            try {
+                await update("salaires", salaire, id.value)
+                if(updateError.value) throw new Error(updateError.value)
+            } catch (error) {
+                if(error.toString().indexOf("No document") !== -1) {
+                    updateError.value=null
+                    const salaireRef = doc(db, "salaires", id.value)
+                    await setDoc(salaireRef, salaire)
+                }
+
+            }
+
             if(!updateError.value){
                 id.value =''
                 nom.value=''
@@ -101,6 +155,7 @@ export default {
 
             }
         }
+
         const goBack = () => {
             router.back()
         }
@@ -113,6 +168,8 @@ export default {
             fonction,
             contact,
             email,
+            indemnites,
+            salaireBase,
             hideModal,
             geterror,
             updateError,
