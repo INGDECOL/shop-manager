@@ -11,10 +11,13 @@
           </div>
           <!-- Boutique -->
           <div class="mr-2 pr-2.5">
-              <select name="magasin"  id="magasin" v-model="boutiqueVente" class=" font-bold mr-2 pr-2.5 cursor-pointer"  required title="Magasin">
+              <span class="flex justify-center gap-4 bg-blue-300 text-gray-600 text-base font-bold  mb-2  rounded-md cursor-pointer hover:bg-green-200 p-3"  >
+                {{ selectedBoutique }}
+                </span>
+              <!-- <select name="magasin"  id="magasin" v-model="boutiqueVente" class=" font-bold mr-2 pr-2.5 cursor-pointer"  required title="Magasin">
                   <option value="">Selectionner la boutique</option>
                   <option v-for="boutique in filteredBoutiques" :key="boutique.id" :value="boutique.id">{{ boutique.designationBoutique }}</option>
-              </select>
+              </select> -->
           </div>
           <!-- Dates -->
           <div class="flex justify-start gap-2 mr-1">
@@ -27,45 +30,46 @@
               <input type="date" name="dateFin" id="dateFin" v-model="dateFin" @change="getVenteByDate">
             </div>
           </div>
-          <!-- <div>
-            <button class="my-0 mx-2 py-0 flex justify-between items-center" @click="toggleForm"><span class="material-icons text-center py-1 m-0">add</span>Ajouter</button>
-
-          </div> -->
         </div>
         <div  class="flex justify-start gap-2">
-          <!-- Liste des factures -->
-          <div class=" border rounded border-gray-300 text-xs p-0.5">
+          <!-- Liste des boutiques -->
+          <div class=" border rounded border-gray-300 text-sm p-0.5 w-1/3">
             <ul>
-              <li class="m-1 font-semibold cursor-pointer hover:underline hover:text-gray-400" @click="loadVentes">Tous</li>
-              <li class="m-1 font-semibold cursor-pointer hover:underline hover:text-gray-400" v-for="facture in filteredfacture" :key="facture.id" @click="getVenteByFacture(facture.id)">{{ formatedFacture(facture.id)}}</li>
+              <li class="m-1 font-bold cursor-pointer hover:underline hover:text-gray-400" @click="loadVentes">Tous</li>
+              <li class="m-1 font-bold cursor-pointer hover:underline hover:text-gray-400 bg-gray-200 pl-1 py-1.5 rounded" v-for="boutique in filteredfacture" :key="boutique.id" @click="boutiqueSelected(boutique)">{{ boutique.designationBoutique}}</li>
+
             </ul>
           </div>
           <!-- Liste des ventes -->
-          <div v-if="listeVentes.length" class="border border-gray-300 rounded overflow-scroll p-0.5 w-full">
+          <div v-if="listeVentes.length" class="border border-gray-300 rounded p-0.5 ">
             <table class="min-w-full bg-white divider-y divide-gray-400">
                 <thead class="bg-gray-800 text-white">
                   <tr >
-                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">#</th>
-                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Date</th>
-                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Article</th>
-                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">PVU</th>
-                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Qté cmd</th>
-                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Montant</th>
-                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Actions</th>
+                    <th class="text-left py-3 px-4 uppercase font-bold text-base">#</th>
+                    <th class="text-left py-3 px-4 uppercase font-bold text-base">Libelle</th>
+                    <th class="text-left py-3 px-4 uppercase font-bold text-base">Montant</th>
                   </tr>
                 </thead>
                 <tbody class="text-gray-700">
-                  <tr class="border-b border-gray-400 max-h-2 overflow-y-scroll" :class="{ striped : n % 2 ===0}" v-for="(vente, n) in filteredvente " :key="vente.id">
-                    <td class="text-left text-xs py-2 px-3 font-semibold uppercase">{{ n + 1 }} </td>
-                    <td class="text-left text-xs py-2 px-3 ">{{ formatedDate(vente.createdAt.seconds ) }}</td>
-                    <td class="text-left text-xs py-2 px-3 uppercase">{{vente.article}}</td>
-                    <td class="text-left text-xs py-2 px-3">{{ formatedNumber(vente.pvu) }}</td>
-                    <td class="text-center text-xs py-2 px-3">{{ vente.qtecmd}}</td>
-                    <td class="text-center text-xs py-2 px-3 " title="Montant Total">{{ formatedNumber(vente.payer) }}</td>
-                    <td class="text-left text-xs py-2 px-3 flex justify-between items-center">
-                      <span class="material-icons disabled" title="Modifier"  @click="edit(vente.id)" >edit</span>
-                      <span class="material-icons strash text-red-300 disabled" title="Supprimer" @click="destroy(vente.id)">delete</span>
-                    </td>
+                  <tr class="border-b border-gray-400 max-h-2 overflow-y-scroll"  >
+                    <td class="text-left text-base py-2 px-3 font-bold uppercase">1 </td>
+                    <td class="text-left text-base font-bold py-2 px-3 ">Total des ventes</td>
+                    <td class="text-left text-base font-bold py-2 px-3 uppercase">{{ formatedNumber(100000000)}}</td>
+                  </tr>
+                  <tr class="border-b border-gray-400 max-h-2 overflow-y-scroll striped">
+                    <td class="text-left text-base py-2 px-3 font-bold uppercase">2 </td>
+                    <td class="text-left text-base font-bold py-2 px-3">Total montant en dette</td>
+                    <td class="text-center text-base font-bold py-2 px-3">{{ formatedNumber(5000000)}}</td>
+                  </tr>
+                  <tr class="border-b border-gray-400 max-h-2 overflow-y-scroll">
+                    <td class="text-left text-base py-2 px-3 font-bold uppercase">2 </td>
+                    <td class="text-left text-base font-bold py-2 px-3">Total PAU des articles en Stock</td>
+                    <td class="text-center text-base font-bold py-2 px-3">{{ formatedNumber(500000000)}}</td>
+                  </tr>
+                  <tr class="border-b border-gray-400 max-h-2 overflow-y-scroll striped">
+                    <td class="text-left text-base py-2 px-3 font-bold uppercase">2 </td>
+                    <td class="text-left text-base font-bold py-2 px-3">Total PVU des articles en Stock</td>
+                    <td class="text-center text-base font-bold py-2 px-3">{{ formatedNumber(900000000)}}</td>
                   </tr>
                 </tbody>
             </table>
@@ -105,6 +109,7 @@ export default {
     // const getError = ref("")
     const {documents, getError, load} = getDocuments()
     const boutiqueVente = ref('')
+    const selectedBoutique = ref('')
     const listeBoutiques = ref(null)
     const searchQuery = ref("")
     const listeFactures = ref([])
@@ -217,15 +222,13 @@ export default {
       })
     }
 
-    const getVenteByFacture = (facture) => {
-      if(boutiqueVente.value ==''){
-        alert("Veuillez selectionner une boutique !")
-        return
-      }
-      filteredvente.value = listeVentes.value.filter(vente => {
-        return vente.factureId == facture
-      })
-      getTotal()
+    const boutiqueSelected = (boutique) => {
+      boutiqueVente.value = boutique.id
+      selectedBoutique.value = boutique.designationBoutique
+    //   filteredvente.value = listeVentes.value.filter(vente => {
+    //     return vente.factureId == facture
+    //   })
+    //   getTotal()
     }
 
     const getVenteByDate = (facture) => {
@@ -298,8 +301,8 @@ export default {
     const filteredfacture = computed( () =>{
         // console.log("factures in filtered facture fx : ", listeFactures.value)
 
-          return filteredFactures.value.length ? filteredFactures.value.filter( (facture) => {
-            return facture.id.toLowerCase().indexOf( searchQuery.value.toLowerCase()) != -1
+          return listeBoutiques.value ? listeBoutiques.value.filter( (boutique) => {
+            return boutique.designationBoutique.toLowerCase().indexOf( searchQuery.value.toLowerCase()) != -1
           }): []
 
     })
@@ -314,7 +317,7 @@ export default {
             return vente
       }): []
     }
-    
+
     return {
       boutiqueVente,
       filteredBoutiques,
@@ -336,7 +339,8 @@ export default {
       listeVentes,
       filteredvente,
       getVenteByDate,
-      getVenteByFacture,
+      boutiqueSelected,
+      selectedBoutique,
       loadVentes,
       dateDebut,
       dateFin,

@@ -38,6 +38,7 @@ import getUser from '../controllers/getUser'
   import EditPersonnel from "../views/personnels/EditPersonnel.vue"
 
   import AdminListeVente from "../views/etats/AdminListeVente.vue"
+  import AdminRapportBoutique from "../views/etats/AdminRapportBoutique.vue"
 
 //End of Components import
 
@@ -241,11 +242,18 @@ const routes = [
     component: EditPersonnel,
     beforeEnter: requireAuthAdmin
   },
+
   // Etats
   {
     path: "/rapports/etats/liste_ventes/:token/",
     name: "AdminListeVente",
     component: AdminListeVente,
+    beforeEnter: requireAuthAdmin
+  },
+  {
+    path: "/rapports/etats/Rapport_boutique/:token/",
+    name: "AdminRapportBoutique",
+    component: AdminRapportBoutique,
     beforeEnter: requireAuthAdmin
   },
 
