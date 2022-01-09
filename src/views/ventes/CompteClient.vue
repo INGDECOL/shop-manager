@@ -98,7 +98,7 @@ export default {
 
   const filteredBoutiques = computed(()=>{
     return listeBoutiques.value && listeBoutiques.value.filter((boutique)=>{
-        return boutique.gerantBoutique == auth.currentUser.email
+        return boutique.gerantBoutique.toString().includes(auth.currentUser.email)// == auth.currentUser.email
     })
   })
 
@@ -174,7 +174,7 @@ export default {
       if(boutiqueVente.value =='') {
           return
       }
-      console.log("boutique : ", listeFactures.value.length, listeFactures.value)
+      // console.log("boutique : ", listeFactures.value.length, listeFactures.value)
       listeFacturesBoutique.value = listeFactures.value.filter(facture => {
         // console.log("facture :: ", facture.boutiqueId, boutiqueVente.value)
         return facture.boutiqueId == boutiqueVente.value

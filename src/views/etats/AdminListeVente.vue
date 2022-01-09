@@ -271,29 +271,29 @@ export default {
       //console.log(" id :::: ",id)
       alert("Vous ne pouvez pas modifier ou supprimer sur cette page")
       return
-      if( isAdmin) {
-        router.push( { name: "EditProduit", params: { token: auth.currentUser.accessToken, id: id}})
+      // if( isAdmin) {
+      //   router.push( { name: "EditProduit", params: { token: auth.currentUser.accessToken, id: id}})
 
-      }else {
-        alert("Vous n'êtes pas autorisé à effectuer cette action")
-      }
+      // }else {
+      //   alert("Vous n'êtes pas autorisé à effectuer cette action")
+      // }
     }
     const destroy = async (id) => {
       //console.log(" destroy id :::: ",id)
        alert("Vous ne pouvez pas supprimer ou modifier sur cette page")
       return
-      if( isAdmin) {
-          const { destroy, error } = destroyDocument()
-          if( confirm("Voulez-vous retourner cette vente et redefinir tous le montants vendus ?? \n Cette action est definitive et irreversible !!") ) {
-            await destroy("produits", id)
+      // if( isAdmin) {
+      //     const { destroy, error } = destroyDocument()
+      //     if( confirm("Voulez-vous retourner cette vente et redefinir tous le montants vendus ?? \n Cette action est definitive et irreversible !!") ) {
+      //       await destroy("produits", id)
 
-        }
-        if(error.value){
-          alert(error.value)
-        }
-      }else {
-        alert("Vous n'êtes pas autorisé à effectuer cette action")
-      }
+      //   }
+      //   if(error.value){
+      //     alert(error.value)
+      //   }
+      // }else {
+      //   alert("Vous n'êtes pas autorisé à effectuer cette action")
+      // }
     }
     const filteredfacture = computed( () =>{
         // console.log("factures in filtered facture fx : ", listeFactures.value)
@@ -314,7 +314,7 @@ export default {
             return vente
       }): []
     }
-    
+
     return {
       boutiqueVente,
       filteredBoutiques,

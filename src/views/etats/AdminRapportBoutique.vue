@@ -1,7 +1,7 @@
 <template>
-  <div class="md:px-2 py-8 w-full">
+  <div class="md:px-2 py-8 items-center w-full">
       <div class="shadow overflow-hidden rounded border-b border-gray-200">
-        <div class="flex justify-between items-center">
+        <div class="flex justify-center items-center gap-3">
           <!-- searchbar -->
           <div class="searchbar mx-1  flex justify-start ">
             <input type="text" placeholder="Rechercher..." class="w-full h-10" v-model="searchQuery" >
@@ -31,7 +31,7 @@
             </div>
           </div>
         </div>
-        <div  class="flex justify-start gap-2">
+        <div  class="flex justify-center gap-2">
           <!-- Liste des boutiques -->
           <div class=" border rounded border-gray-300 text-sm p-0.5 w-1/3">
             <ul>
@@ -40,7 +40,7 @@
 
             </ul>
           </div>
-          <!-- Liste des ventes -->
+          <!-- Liste des operation -->
           <div v-if="listeVentes.length" class="border border-gray-300 rounded p-0.5 ">
             <table class="min-w-full bg-white divider-y divide-gray-400">
                 <thead class="bg-gray-800 text-white">
@@ -54,36 +54,37 @@
                   <tr class="border-b border-gray-400 max-h-2 overflow-y-scroll"  >
                     <td class="text-left text-base py-2 px-3 font-bold uppercase">1 </td>
                     <td class="text-left text-base font-bold py-2 px-3 ">Total des ventes</td>
-                    <td class="text-left text-base font-bold py-2 px-3 uppercase">{{ formatedNumber(100000000)}}</td>
+                    <td class="text-center text-base font-bold py-2 px-3 uppercase">{{ formatedNumber(totalTTC ? totalTTC : 0 )}}</td>
                   </tr>
                   <tr class="border-b border-gray-400 max-h-2 overflow-y-scroll striped">
                     <td class="text-left text-base py-2 px-3 font-bold uppercase">2 </td>
                     <td class="text-left text-base font-bold py-2 px-3">Total montant en dette</td>
-                    <td class="text-center text-base font-bold py-2 px-3">{{ formatedNumber(5000000)}}</td>
+                    <td class="text-center text-base font-bold py-2 px-3 cursor-pointer" title="Montant total non recouvré">{{ formatedNumber(montantTotalDettes ? montantTotalDettes : 0)}}</td>
                   </tr>
                   <tr class="border-b border-gray-400 max-h-2 overflow-y-scroll">
-                    <td class="text-left text-base py-2 px-3 font-bold uppercase">2 </td>
+                    <td class="text-left text-base py-2 px-3 font-bold uppercase">3 </td>
                     <td class="text-left text-base font-bold py-2 px-3">Total PAU des articles en Stock</td>
-                    <td class="text-center text-base font-bold py-2 px-3">{{ formatedNumber(500000000)}}</td>
+                    <td class="text-center text-base font-bold py-2 px-3 cursor-pointer" title="Prix d'achat total des articles dans la boutique">{{ formatedNumber(500000000)}}</td>
                   </tr>
                   <tr class="border-b border-gray-400 max-h-2 overflow-y-scroll striped">
-                    <td class="text-left text-base py-2 px-3 font-bold uppercase">2 </td>
+                    <td class="text-left text-base py-2 px-3 font-bold uppercase">4 </td>
                     <td class="text-left text-base font-bold py-2 px-3">Total PVU des articles en Stock</td>
-                    <td class="text-center text-base font-bold py-2 px-3">{{ formatedNumber(900000000)}}</td>
+                    <td class="text-center text-base font-bold py-2 px-3 cursor-pointer" title="Prix de vente total des articles dans la boutique">{{ formatedNumber(900000000)}}</td>
                   </tr>
                 </tbody>
             </table>
             <!-- Total de la liste -->
             <div class="flex justify-center mt-2 mr-0">
-                <span class="flex justify-center gap-4 bg-green-300 text-gray-600 text-base font-bold  mb-2  rounded-md cursor-pointer hover:bg-green-200"  >
-                <span class="mx-3 my-4" >  Montant Total</span>
-                <span class="mx-3 my-4">{{totalTTC ? (totalTTC ).toLocaleString('fr-fr', {style: "currency", currency: "GNF", minimumFractionDigits: 0})  : 0 }}</span>
-                </span>
+                <!-- <span class="flex justify-center gap-4 bg-green-300 text-gray-600 text-base font-bold  mb-2  rounded-md cursor-pointer hover:bg-green-200"  > -->
+                    <button class=" border-2 border-green-300 bg-transparent hover:bg-green-400">Imprimer</button>
+                <!-- <span class="mx-3 my-4" >  Montant Total</span>
+                <span class="mx-3 my-4">{{totalTTC ? (totalTTC ).toLocaleString('fr-fr', {style: "currency", currency: "GNF", minimumFractionDigits: 0})  : 0 }}</span> -->
+                <!-- </span> -->
             </div>
           </div>
-        <div v-else class="flex justify-center w-full">
-          <Spinner />
-        </div>
+          <div v-else class="flex justify-center w-full">
+            <Spinner />
+          </div>
         </div>
       </div>
   </div>
@@ -114,9 +115,12 @@ export default {
     const searchQuery = ref("")
     const listeFactures = ref([])
     const filteredFactures = ref([])
+    const listeDettes = ref([])
+    const filteredDettes = ref([])
     const editproduitId = ref(null)
     const listeVentes = ref([])
     const filteredvente = ref([])
+    const montantTotalDettes = ref()
     const dateDebut = ref("")
     const dateFin = ref("")
     const totalTTC = ref("")
@@ -157,8 +161,11 @@ export default {
         if(boutiqueVente.value =='') {
             return
         }
-        await getBoutiqueFactures()
+        // await getBoutiqueFactures()
         await loadBoutiqueVentes()
+        console.log("dettes : ", listeDettes.value)
+        getDetteBoutique()
+        // console.log("Dette boutiques : ", filteredDettes.value)
     })
 
     const getFactures =async () => {
@@ -174,21 +181,44 @@ export default {
         })
     }
 
-    const getBoutiqueFactures =async () => {
-        const docRef =  collection(db, "factures")
+    const getDettes = async () =>{
+        const docRef =  collection(db, "dettes")
         const q = query( docRef, orderBy("createdAt", "desc"))
         const res = onSnapshot(q, ( snap ) =>{
-            // console.log("sanap facture", snap.docs)
-            listeFactures.value = []
-            listeFactures.value = snap.docs.map(doc =>{
-                    return {...doc.data(), id : doc.id}
+            // console.log("snap vente", snap.docs)
+            listeDettes.value = snap.docs.map(doc =>{
+                //doc.data().createdAt = doc.data().createdAt.seconds
+                return {...doc.data(), id : doc.id}
             })
-            filteredFactures.value = listeFactures.value.filter (facture => {
-              return facture.boutiqueId == boutiqueVente.value
-            })
-            // console.log("Liste boutique facture : ", listeFactures.value, boutiqueVente.value)
+        // console.log("solde : ", listeDettes.value)
         })
     }
+
+    const getDetteBoutique = () => {
+        montantTotalDettes.value = 0
+        filteredDettes.value = listeDettes.value.filter(dette => {
+            return dette.boutiqueVente == boutiqueVente.value
+        })
+        filteredDettes.value.map(dette => {
+            montantTotalDettes.value +=  Number(dette.montantDette)
+        })
+    }
+
+    // const getBoutiqueFactures =async () => {
+    //     const docRef =  collection(db, "factures")
+    //     const q = query( docRef, orderBy("createdAt", "desc"))
+    //     const res = onSnapshot(q, ( snap ) =>{
+    //         // console.log("sanap facture", snap.docs)
+    //         listeFactures.value = []
+    //         listeFactures.value = snap.docs.map(doc =>{
+    //                 return {...doc.data(), id : doc.id}
+    //         })
+    //         filteredFactures.value = listeFactures.value.filter (facture => {
+    //           return facture.boutiqueId == boutiqueVente.value
+    //         })
+    //         // console.log("Liste boutique facture : ", listeFactures.value, boutiqueVente.value)
+    //     })
+    // }
 
     const loadVentes =async () => {
         const docRef =  collection(db, "ventes")
@@ -199,7 +229,7 @@ export default {
                 return {...doc.data(), id : doc.id}
             })
             loadBoutiqueVentes()
-            getBoutiqueFactures()
+            // getBoutiqueFactures()
             // filteredvente.value = listeVentes.value
             getTotal()
         })
@@ -246,6 +276,7 @@ export default {
       await getBoutiques()
       await getFactures()
       await loadVentes()
+      await getDettes()
 
     })
 
@@ -274,29 +305,29 @@ export default {
       //console.log(" id :::: ",id)
       alert("Vous ne pouvez pas modifier ou supprimer sur cette page")
       return
-      if( isAdmin) {
-        router.push( { name: "EditProduit", params: { token: auth.currentUser.accessToken, id: id}})
+    //   if( isAdmin) {
+    //     router.push( { name: "EditProduit", params: { token: auth.currentUser.accessToken, id: id}})
 
-      }else {
-        alert("Vous n'êtes pas autorisé à effectuer cette action")
-      }
+    //   }else {
+    //     alert("Vous n'êtes pas autorisé à effectuer cette action")
+    //   }
     }
     const destroy = async (id) => {
       //console.log(" destroy id :::: ",id)
        alert("Vous ne pouvez pas supprimer ou modifier sur cette page")
       return
-      if( isAdmin) {
-          const { destroy, error } = destroyDocument()
-          if( confirm("Voulez-vous retourner cette vente et redefinir tous le montants vendus ?? \n Cette action est definitive et irreversible !!") ) {
-            await destroy("produits", id)
+    //   if( isAdmin) {
+    //       const { destroy, error } = destroyDocument()
+    //       if( confirm("Voulez-vous retourner cette vente et redefinir tous le montants vendus ?? \n Cette action est definitive et irreversible !!") ) {
+    //         await destroy("produits", id)
 
-        }
-        if(error.value){
-          alert(error.value)
-        }
-      }else {
-        alert("Vous n'êtes pas autorisé à effectuer cette action")
-      }
+    //     }
+    //     if(error.value){
+    //       alert(error.value)
+    //     }
+    //   }else {
+    //     alert("Vous n'êtes pas autorisé à effectuer cette action")
+    //   }
     }
     const filteredfacture = computed( () =>{
         // console.log("factures in filtered facture fx : ", listeFactures.value)
@@ -345,6 +376,7 @@ export default {
       dateDebut,
       dateFin,
       totalTTC,
+      montantTotalDettes,
     }
   }
 }

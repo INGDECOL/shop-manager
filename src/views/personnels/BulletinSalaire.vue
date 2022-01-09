@@ -327,48 +327,48 @@ import { collection, onSnapshot, orderBy, query, serverTimestamp } from '@fireba
       const handleSubmit = async () => {
           alert("Fonctionnalité en cours de conception \n Veuillez réessayer ultérieurement !")
           return
-        if(salaireB.value == null || isNaN(salaireB.value)) {
-          alert("Ce personnel n'a aucun salaire de base defini !")
-          return
-        }
-        const bulletin = {
-          personnelId : id.value,
-          nom: nom.value,
-          fonction: fonction.value,
-          salaireBase: salaireB.value,
-          indemnites: indem.value,
-          antecedant: Number(ante.value ? ante.value : 0),
-          montantNet: salaireN.value,
-          mois: moisAafficher.value,
-          createdAt: serverTimestamp()
-        }
-        let percu = false
-        listeBulletins.value.forEach(salaire => {
-          // console.log(salaire.personnelId, salaire.mois, "=>", bulletin.personnelId, bulletin.mois, salaire.mois == bulletin.mois)
+        // if(salaireB.value == null || isNaN(salaireB.value)) {
+        //   alert("Ce personnel n'a aucun salaire de base defini !")
+        //   return
+        // }
+        // const bulletin = {
+        //   personnelId : id.value,
+        //   nom: nom.value,
+        //   fonction: fonction.value,
+        //   salaireBase: salaireB.value,
+        //   indemnites: indem.value,
+        //   antecedant: Number(ante.value ? ante.value : 0),
+        //   montantNet: salaireN.value,
+        //   mois: moisAafficher.value,
+        //   createdAt: serverTimestamp()
+        // }
+        // let percu = false
+        // listeBulletins.value.forEach(salaire => {
+        //   // console.log(salaire.personnelId, salaire.mois, "=>", bulletin.personnelId, bulletin.mois, salaire.mois == bulletin.mois)
 
-          if(salaire.personnelId == bulletin.personnelId && salaire.mois == bulletin.mois) {
-            percu = true
-            return
-          }
-        })
-        if (percu) {
-          alert("Ce personnel a déjà perçu son salaire du mois selectionné !")
-          return
-        }
-        console.log("bulletin : ", bulletin)
-        await create("bulletins", bulletin)
-        if(!createError.value) {
-          alert("Payement effectué avec succès !")
-          id.value =null
-          nom.value = null
-          fonction.value = null
-          contact.value = null
-          salaireB.value = salaireBase.value = null
-          indemnites.value = indem.value = null
-          salaireN.value = salaireBase.value = null
-          ante.value = antecedant.value = null
-          salaireN.value = salaireNet.value = null
-        }
+        //   if(salaire.personnelId == bulletin.personnelId && salaire.mois == bulletin.mois) {
+        //     percu = true
+        //     return
+        //   }
+        // })
+        // if (percu) {
+        //   alert("Ce personnel a déjà perçu son salaire du mois selectionné !")
+        //   return
+        // }
+        // console.log("bulletin : ", bulletin)
+        // await create("bulletins", bulletin)
+        // if(!createError.value) {
+        //   alert("Payement effectué avec succès !")
+        //   id.value =null
+        //   nom.value = null
+        //   fonction.value = null
+        //   contact.value = null
+        //   salaireB.value = salaireBase.value = null
+        //   indemnites.value = indem.value = null
+        //   salaireN.value = salaireBase.value = null
+        //   ante.value = antecedant.value = null
+        //   salaireN.value = salaireNet.value = null
+        // }
 
       }
 

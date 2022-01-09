@@ -235,16 +235,7 @@ export default {
             }
 
         }
-        // const getFournisseurs = async () => {
-        //     const docRef = collection(db, "fournisseurs")
-        //     const res = onSnapshot(docRef, (snap)=>{
-        //         fournisseurs.value = snap.docs.map(doc => {
-        //             // console.log("snap doc : ", doc.data());
-        //             return {...doc.data(), id: doc.id}
-        //         })
-        //     })
 
-        // }
         const getArticles = async () => {
             const docRef = collection(db, "produits")
             const res = onSnapshot(docRef, (snap)=>{
@@ -279,7 +270,7 @@ export default {
         }
         const filteredBoutiques = computed(()=>{
           return listeBoutiques.value && listeBoutiques.value.filter((boutique)=>{
-              return boutique.gerantBoutique == auth.currentUser.email
+              return boutique.gerantBoutique.includes( auth.currentUser.email)
           })
         })
 
@@ -298,7 +289,7 @@ export default {
         })
 
         watch(commandes.value, () => {
-            console.log("commande modified", commandes.value)
+            // console.log("commande modified", commandes.value)
             totalTTC.value = 0
             commandes.value.map(cmd => {
                 if(cmd){
@@ -401,9 +392,10 @@ export default {
             await getSolde()
 
             if(route.params.id) {
-                console.log("Router params : ", route.params.id)
+                // console.log("Router params : ", route.params.id)
                 await getFacture(route.params.id)
-                // console.log("route facture : ", facture.value)
+                boutiqueVente.value = facture.value.boutiqueId
+                console.log("boutiquevente : ", boutiqueVente.value)
                 retrieveCommande(facture.value.articles)
             }
 
@@ -482,7 +474,6 @@ export default {
             }
 
             // Nouvelle vente
-            // console.log("count : ", commandes.value.length)
             const factureId = (clientVenteId.value ? clientVenteId.value : "CltDiv") + new Date().getDate() + new Date().getMonth() + new Date().getFullYear() + new Date().getHours() + new Date().getMinutes() + "010" + new Date().getSeconds()
             //console.log(factureId)
             if(clientVenteId.value =="CltDiv" || clientVenteId.value =='') {
