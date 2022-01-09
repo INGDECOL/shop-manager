@@ -28,8 +28,8 @@ import { auth } from './firebase/config'
     //   console.log("chemin ", route.name)
     // })
     watch(route, () => {
-     
-      if(route.name == "Admin" || route.name == "ListePersonnel" || route.name == "Boutiques" || route.name == "Indemnite" || route.name == "Bon" ) {
+
+      if(route.name == "Admin" || route.name == "ListePersonnel" || route.name == "Boutiques" || route.name == "Indemnite" || route.name == "Bon" || route.name == "Bulletin" || route.name.includes("Admin") ) {
         adminRoute.value = true
       // console.log("route changed to : ", route.name , adminRoute.value)
       } else adminRoute.value = false

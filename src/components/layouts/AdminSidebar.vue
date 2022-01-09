@@ -1,5 +1,5 @@
 <template>
-  <aside class="hidden w-60 bg-gray-800 sm:block">
+  <aside class="hidden w-52 bg-gray-800 sm:block">
     <div class="py-3 text-2xl uppercase text-center tracking-widest bg-gray-900 border-b-2 border-gray-800 mb-3" id="enteteNav">
       <router-link to="/" class="text-white">Administration</router-link>
     </div>
@@ -80,12 +80,12 @@
                 </li>
                 <li>
                   <Disclosure v-slot="{ open }" :default-open="isUserActive">
-                        <router-link :to="{ name: 'ListePersonnel', params: { token: auth.currentUser.accessToken}}">
+                        <router-link :to="{ name: 'Bulletin', params: { token: auth.currentUser.accessToken}}">
                           <p
                             class="pl-6 pr-4  flex items-center w-full hover:bg-gray-700"
                             :class="open ? 'open': ''"
                           >
-                          <span class="material-icons w-5 mr-2">credit_card</span>Faire un Bon
+                          <span class="material-icons w-5 mr-2">checklist</span>Bulletin de salaire
                           </p>
                         </router-link>
 
@@ -185,12 +185,25 @@
               <ul>
                 <li>
                   <Disclosure v-slot="{ open }" :default-open="isUserActive">
+                        <router-link :to="{ name: 'AdminListeVente', params: { token: auth.currentUser.accessToken}}">
+                          <p
+                            class="pl-6 pr-4  flex items-center w-full hover:bg-gray-700"
+                            :class="open ? 'open': ''"
+                          >
+                          <span class="material-icons w-5 mr-2">format_list_numbered</span>Liste des ventes
+                          </p>
+                        </router-link>
+
+                  </Disclosure>
+                </li>
+                <li>
+                  <Disclosure v-slot="{ open }" :default-open="isUserActive">
                         <!-- <router-link :to="{ name: 'Boutiques', params: { token: auth.currentUser.accessToken}}"> -->
                           <p
                             class="pl-6 pr-4  flex items-center w-full hover:bg-gray-700"
                             :class="open ? 'open': ''"
                           >
-                          <span class="material-icons w-5 mr-2">settings_suggest</span>Liste des ventes
+                          <span class="material-icons w-5 mr-2">summarize</span>Rapport boutique
                           </p>
                         <!-- </router-link> -->
 
@@ -203,20 +216,7 @@
                             class="pl-6 pr-4  flex items-center w-full hover:bg-gray-700"
                             :class="open ? 'open': ''"
                           >
-                          <span class="material-icons w-5 mr-2">settings_suggest</span>Rapport boutique
-                          </p>
-                        <!-- </router-link> -->
-
-                  </Disclosure>
-                </li>
-                <li>
-                  <Disclosure v-slot="{ open }" :default-open="isUserActive">
-                        <!-- <router-link :to="{ name: 'Boutiques', params: { token: auth.currentUser.accessToken}}"> -->
-                          <p
-                            class="pl-6 pr-4  flex items-center w-full hover:bg-gray-700"
-                            :class="open ? 'open': ''"
-                          >
-                          <span class="material-icons w-5 mr-2">settings_suggest</span>Inventaire
+                          <span class="material-icons w-5 mr-2">inventory</span>Inventaire
                           </p>
                         <!-- </router-link> -->
 
@@ -240,6 +240,7 @@
           </Disclosure>
         </li>
 
+        <!-- Calendar -->
         <li class="px-4 cursor-pointer hover:bg-gray-700">
           <a href="#" class="py-2 flex items-center">
             <svg

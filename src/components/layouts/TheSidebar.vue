@@ -1,5 +1,5 @@
 <template>
-  <aside class="hidden w-60 bg-gray-800 sm:block">
+  <aside class="hidden w-56 bg-gray-800 sm:block">
     <div class="py-3 text-2xl uppercase text-center tracking-widest bg-gray-900 border-b-2 border-gray-800 mb-3" id="enteteNav">
       <router-link to="/" class="text-white">Ets N'NA HAWA</router-link>
     </div>

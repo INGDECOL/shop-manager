@@ -34,7 +34,10 @@ import getUser from '../controllers/getUser'
   import ListePersonnel from "../views/personnels/ListePersonnel.vue"
   import Indemnite from "../views/personnels/Indemnite.vue"
   import Bon from "../views/personnels/Bon.vue"
+  import Bulletin from "../views/personnels/BulletinSalaire.vue"
   import EditPersonnel from "../views/personnels/EditPersonnel.vue"
+
+  import AdminListeVente from "../views/etats/AdminListeVente.vue"
 
 //End of Components import
 
@@ -199,7 +202,7 @@ const routes = [
     beforeEnter: requireAuth
   },
 
-  // Admin Routes
+// Admin Routes
   // Personnel
   {
     path: "/admin/:token?",
@@ -227,9 +230,22 @@ const routes = [
     beforeEnter: requireAuthAdmin
   },
   {
+    path: "/personnels/bulletin_de_salaire/:token",
+    name: "Bulletin",
+    component: Bulletin,
+    beforeEnter: requireAuthAdmin
+  },
+  {
     path: "/personnels/editInfo/:token/:id",
     name: "EditPersonnel",
     component: EditPersonnel,
+    beforeEnter: requireAuthAdmin
+  },
+  // Etats
+  {
+    path: "/rapports/etats/liste_ventes/:token/",
+    name: "AdminListeVente",
+    component: AdminListeVente,
     beforeEnter: requireAuthAdmin
   },
 
