@@ -2,16 +2,16 @@
   <div class="md:px-2 py-8 w-full">
       <div class="shadow overflow-hidden rounded border-b border-gray-200">
         <div class="text-center font-bold mb-2 text-lg underline title">
-            GESTION DES FACTURES IMPAYEES
+            GESTION DES FACTURES FOURNISSEURS IMPAYEES
         </div>
-        <div class="flex justify-center items-center">
+        <!-- <div class="flex justify-center items-center">
           <div class="mr-2 pr-2.5">
                   <select name="magasin"  id="magasin" v-model="boutiqueVente" class=" font-bold mr-2 pr-2.5 cursor-pointer"  required title="Magasin">
                       <option value="">Selectionner la boutique</option>
                       <option v-for="boutique in filteredBoutiques" :key="boutique.id" :value="boutique.id">{{ boutique.designationBoutique }}</option>
                   </select>
               </div>
-        </div>
+        </div> -->
         <div v-if="listeFacturesBoutique.length">
             <table class="min-w-full bg-white divider-y divide-gray-400">
                 <thead class="bg-gray-800 text-white">
@@ -30,7 +30,7 @@
                     <td class="text-left py-3 px-4 font-semibold uppercase">{{ n + 1}} </td>
                     <td class="text-left py-3 px-4 font-semibold uppercase text-xs">{{ formatedDate(facture.createdAt.seconds)}} </td>
                     <td class="text-left py-3 px-4 text-xs text-blue-400 underline hover:text-blue-500 cursor-pointer" title="Cliquer pour aller au payement" @click="payerFacture(facture.id)">{{ facture.id}}</td>
-                    <td class="text-left py-3 px-4 text-xs">{{  getClient(facture.clientId) }}</td>
+                    <td class="text-left py-3 px-4 text-xs">{{  getFournisseur(facture.fournisseurId) }}</td>
                     <td class="text-left py-3 px-4 text-xs font-semibold text-pink-400 hover:text-pink-300 cursor-pointer" title="Montant restant">{{ formatedNumber(facture.impayer ? facture.impayer : 0) }}</td>
                     <!-- <td class="text-left py-3 px-4 text-xs font-semibold underline text-blue-400 hover:text-blue-300 cursor-pointer" title="Montant Total dû" >0</td> -->
                     <td class="text-left py-3 px-4 flex justify-between items-center">
@@ -71,8 +71,8 @@ export default {
     const documents = ref([])
     const listeFactures = ref([])
     const listeFacturesBoutique = ref([])
-    const listeClients = ref([])
-    const soldeClients = ref([])
+    const listeFournisseurs = ref([])
+    const soldeFournisseurs = ref([])
     const getError = ref('')
     const searchQuery = ref("")
     const editclientId = ref(null)
@@ -104,66 +104,63 @@ export default {
 
 
   const getSolde = async () =>{
-    const docRef =  collection(db, "dettes")
+    const docRef =  collection(db, "detteFournisseurs")
       const q = query( docRef, orderBy("createdAt", "desc"))
       const res = onSnapshot(q, ( snap ) =>{
           // console.log("snap vente", snap.docs)
-          soldeClients.value = snap.docs.map(doc =>{
+          soldeFournisseurs.value = snap.docs.map(doc =>{
               //doc.data().createdAt = doc.data().createdAt.seconds
               return {...doc.data(), id : doc.id}
           })
-      // console.log("solde : ", soldeClients.value)
+      // console.log("solde : ", soldeFournisseurs.value)
       })
   }
 
   const loadFactures =async () => {
-      const docRef =  collection(db, "factures")
+      const docRef =  collection(db, "facturesFournisseurs")
       const q = query( docRef, orderBy("createdAt", "desc"))
       const res = onSnapshot(q, ( snap ) =>{
           // console.log("snap vente", snap.docs)
           documents.value = snap.docs.map(doc =>{
               return {...doc.data(), id : doc.id}
           })
-          // listeFactures.value = documents.value.filter(facture => {
-          //     // console.log("list fact : ", facture, facture.clientId == route.params.id, facture.clientId, " =>", route.params.id)
-          //     return facture.clientId == route.params.id
-          // })
 
           listeFactures.value = documents.value
+          listeFacturesBoutique.value = listeFactures.value
       })
   }
 
-  const loadClients = async () => {
-    const docRef =  collection(db, "clients") // docs to fetch in firebase
+  const loadFournisseurs = async () => {
+    const docRef =  collection(db, "fournisseurs") // docs to fetch in firebase
             const q = query( docRef, orderBy("createdAt", "desc"))
             const res = onSnapshot(q, ( snap ) =>{
-                listeClients.value = snap.docs.map(doc =>{
+                listeFournisseurs.value = snap.docs.map(doc =>{
                     // console.log("Data : ", doc.data())
                     return {...doc.data(), id : doc.id}
                 })
             })
   }
 
-  const detailDette = (client) => {
-    if( client.solvabilite <= 0 ) {
+  const detailDette = (fournisseur) => {
+    if( fournisseur.solvabilite <= 0 ) {
       alert("Aucun detail à afficher le solde vaut 0 ")
       return
     }
     // console.log("Detail id : ", client.id)
-    router.push( { name: "DetailDette", params: { token: auth.currentUser.accessToken, id: client.id }})
+    router.push( { name: "DetailDette", params: { token: auth.currentUser.accessToken, id: fournisseur.id }})
   }
 
   const payerFacture = (idfacture) => {
-    router.push({ name: 'Vente', params: { token: auth.currentUser.accessToken, id: idfacture}})
+    router.push({ name: 'AdminNewCommande', params: { token: auth.currentUser.accessToken, id: idfacture}})
   }
 
-  const getClient = (id) => {
+  const getFournisseur = (id) => {
     let info
     if(id) {
-      listeClients.value.forEach(client => {
+      listeFournisseurs.value.forEach(fournisseur => {
         // console.log("params : ", client.id, " =>", id , client.id==id)
-        if(client.id === id) {
-          info = client.nom +" " + client.prenom
+        if(fournisseur.id === id) {
+          info = fournisseur.nom +" " + fournisseur.prenom
         }
       })
       return info
@@ -182,7 +179,7 @@ export default {
   })
 
     watch(listeFactures, () => {
-        // console.log("watch doc : ", listeFactures.value.length, soldeClients.value.length)
+        // console.log("watch doc : ", listeFactures.value.length, soldeFournisseurs.value.length)
 
         if(listeFactures.value.length ) {
           const lstFact = listeFactures
@@ -194,12 +191,12 @@ export default {
                 })
                 facture.total = soldeTotal
                 // Total dette de la facture
-                soldeClients.value.forEach(solde => {
+                soldeFournisseurs.value.forEach(solde => {
                     if(solde.factureId == facture.id) {
                         facture.impayer = solde.montantDette
                     }
                 })
-                // facture.client = getClient(facture.clientId)
+                // facture.client = getFournisseur(facture.clientId)
             })
             listeFactures.value = lstFact.value.filter(facture => {
               return facture.impayer >0
@@ -209,8 +206,8 @@ export default {
     })
 
     onMounted( async () => {
-      getBoutiques()
-      await loadClients()
+    //   getBoutiques()
+      await loadFournisseurs()
       await getSolde()
       await loadFactures()
       //console.log(" clients : ", documents.value)
@@ -252,6 +249,7 @@ export default {
         alert("Vous n'êtes pas autorisé à effectuer cette action")
       }
     }
+
     const destroy = async (id) => {
       //console.log(" destroy id :::: ",id)
       if( isAdmin) {
@@ -267,7 +265,8 @@ export default {
         alert("Vous n'êtes pas autorisé à effectuer cette action")
       }
     }
-    const filteredClients = computed( () =>{
+
+    const filteredFournisseurs = computed( () =>{
           return documents.value ? documents.value.filter( (client) => {
             return client.nom.toLowerCase().indexOf( searchQuery.value.toLowerCase()) != -1
           }) : []
@@ -285,15 +284,15 @@ export default {
       document,
       getError,
       searchQuery,
-      filteredClients,
+      filteredFournisseurs,
       filteredBoutiques,
       boutiqueVente,
       editclientId,
-      soldeClients,
+      soldeFournisseurs,
       formatedNumber,
       formatedDate,
       detailDette,
-      getClient,
+      getFournisseur,
       payerFacture,
       nom,
       prenom

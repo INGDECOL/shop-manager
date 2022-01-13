@@ -36,8 +36,8 @@
           <!-- Liste des factures -->
           <div class=" border rounded border-gray-300 text-xs p-0.5">
             <ul>
-              <li class="m-1 font-semibold cursor-pointer hover:underline hover:text-gray-400" @click="loadVentes">Tous</li>
-              <li class="m-1 font-semibold cursor-pointer hover:underline hover:text-gray-400" v-for="facture in filteredfacture" :key="facture.id" @click="getVenteByFacture(facture.id)">{{ formatedFacture(facture.id)}}</li>
+              <li class="m-1 font-semibold cursor-pointer hover:underline hover:text-gray-400 bg-gray-300 rounded p-1 hover:bg-gray-200" @click="loadVentes">Tous</li>
+              <li class="m-1 font-semibold cursor-pointer hover:underline hover:text-gray-400 bg-gray-300 rounded p-1 hover:bg-gray-200" v-for="facture in filteredfacture" :key="facture.id" @click="getVenteByFacture(facture.id)">{{ formatedFacture(facture.id)}}</li>
             </ul>
           </div>
           <!-- Liste des ventes -->
@@ -139,7 +139,7 @@ export default {
     }
     const filteredBoutiques = computed(()=>{
       return listeBoutiques.value && listeBoutiques.value.filter((boutique)=>{
-          return boutique.gerantBoutique == auth.currentUser.email
+          return boutique.gerantBoutique.includes(auth.currentUser.email)
       })
     })
 
@@ -241,9 +241,8 @@ export default {
         return
       }
       filteredvente.value = listeVentes.value.filter(vente => {
-        // console.log("Date compar : ",  (new Date(vente.createdAt.seconds *1000).toLocaleDateString() >= new Date(dateDebut.value).toLocaleDateString() && new Date(vente.createdAt.seconds *1000).toLocaleDateString() <= new Date(dateFin.value).toLocaleDateString()))
 
-        return new Date(vente.createdAt.seconds *1000).toLocaleDateString() >= new Date(dateDebut.value).toLocaleDateString() && new Date(vente.createdAt.seconds *1000).toLocaleDateString() <= new Date(dateFin.value).toLocaleDateString()
+        return new Date(vente.createdAt.seconds *1000) >= new Date(dateDebut.value) && new Date(vente.createdAt.seconds *1000) <= new Date(dateFin.value) && vente.boutiqueId == boutiqueVente.value
       })
       getTotal()
       //  listeVentes.value.map(vente => {

@@ -58,28 +58,24 @@
                   </tr>
                   <tr class="border-b border-gray-400 max-h-2 overflow-y-scroll striped">
                     <td class="text-left text-base py-2 px-3 font-bold uppercase">2 </td>
-                    <td class="text-left text-base font-bold py-2 px-3">Total montant en dette</td>
-                    <td class="text-center text-base font-bold py-2 px-3 cursor-pointer" title="Montant total non recouvré">{{ formatedNumber(montantTotalDettes ? montantTotalDettes : 0)}}</td>
+                    <td class="text-left text-base text-red-300 font-bold py-2 px-3">Total montant en dette</td>
+                    <td class="text-center text-base text-red-300 hover:text-red-400 font-bold py-2 px-3 cursor-pointer" title="Montant total non recouvré">{{ formatedNumber(montantTotalDettes ? montantTotalDettes : 0)}}</td>
                   </tr>
                   <tr class="border-b border-gray-400 max-h-2 overflow-y-scroll">
                     <td class="text-left text-base py-2 px-3 font-bold uppercase">3 </td>
                     <td class="text-left text-base font-bold py-2 px-3">Total PAU des articles en Stock</td>
-                    <td class="text-center text-base font-bold py-2 px-3 cursor-pointer" title="Prix d'achat total des articles dans la boutique">{{ formatedNumber(500000000)}}</td>
+                    <td class="text-center text-base font-bold py-2 px-3 cursor-pointer" title="Prix d'achat total des articles dans la boutique">{{ formatedNumber(pauTotal ? pauTotal : 0)}}</td>
                   </tr>
                   <tr class="border-b border-gray-400 max-h-2 overflow-y-scroll striped">
                     <td class="text-left text-base py-2 px-3 font-bold uppercase">4 </td>
                     <td class="text-left text-base font-bold py-2 px-3">Total PVU des articles en Stock</td>
-                    <td class="text-center text-base font-bold py-2 px-3 cursor-pointer" title="Prix de vente total des articles dans la boutique">{{ formatedNumber(900000000)}}</td>
+                    <td class="text-center text-base font-bold py-2 px-3 cursor-pointer" title="Prix de vente total des articles dans la boutique">{{ formatedNumber(pvuTotal ? pvuTotal : 0)}}</td>
                   </tr>
                 </tbody>
             </table>
             <!-- Total de la liste -->
             <div class="flex justify-center mt-2 mr-0">
-                <!-- <span class="flex justify-center gap-4 bg-green-300 text-gray-600 text-base font-bold  mb-2  rounded-md cursor-pointer hover:bg-green-200"  > -->
                     <button class=" border-2 border-green-300 bg-transparent hover:bg-green-400">Imprimer</button>
-                <!-- <span class="mx-3 my-4" >  Montant Total</span>
-                <span class="mx-3 my-4">{{totalTTC ? (totalTTC ).toLocaleString('fr-fr', {style: "currency", currency: "GNF", minimumFractionDigits: 0})  : 0 }}</span> -->
-                <!-- </span> -->
             </div>
           </div>
           <div v-else class="flex justify-center w-full">
@@ -95,13 +91,12 @@ import { computed, ref } from '@vue/reactivity';
 import { auth, db, error } from "../../firebase/config"
 import {  getDocs, collection, query, orderBy, onSnapshot } from 'firebase/firestore'
 import getUser from "../../controllers/getUser"
-import getDocument from "../../controllers/getDocument"
 import getDocuments from "../../controllers/getDocuments"
-import destroyDocument from "../../controllers/destroyDocument"
 import { useRouter } from 'vue-router'
 // import NewProduit from "./NewProduit.vue"
 import Spinner from "../../components/Spinner.vue"
 import { onMounted, watch } from '@vue/runtime-core';
+import receptionArticles from '../../controllers/receptionArticles';
 export default {
   components: {  Spinner },
   setup() {
@@ -114,6 +109,7 @@ export default {
     const listeBoutiques = ref(null)
     const searchQuery = ref("")
     const listeFactures = ref([])
+    const listeArticles = ref([])
     const filteredFactures = ref([])
     const listeDettes = ref([])
     const filteredDettes = ref([])
@@ -121,15 +117,19 @@ export default {
     const listeVentes = ref([])
     const filteredvente = ref([])
     const montantTotalDettes = ref()
+    const pvuTotal = ref()
+    const pauTotal = ref()
     const dateDebut = ref("")
     const dateFin = ref("")
     const totalTTC = ref("")
     const options = { year: 'numeric', month: 'short', day: 'numeric', timeZone:'UTC' }
 
+    const { receptionError,stock, getStock, updateStock } = receptionArticles()
+
     const formatedDate = (strDate) => {
       return new Date(strDate * 1000 ).toLocaleDateString(undefined, options)
-
     }
+
     const formatedNumber = (strNumber) => {
       return strNumber.toLocaleString('fr-fr', {style: "currency", currency: "GNF", minimumFractionDigits: 0})
     }
@@ -161,10 +161,11 @@ export default {
         if(boutiqueVente.value =='') {
             return
         }
-        // await getBoutiqueFactures()
+        await getStock(boutiqueVente.value)
         await loadBoutiqueVentes()
-        console.log("dettes : ", listeDettes.value)
+        // console.log("dettes : ", listeDettes.value)
         getDetteBoutique()
+        getRapport()
         // console.log("Dette boutiques : ", filteredDettes.value)
     })
 
@@ -204,21 +205,40 @@ export default {
         })
     }
 
-    // const getBoutiqueFactures =async () => {
-    //     const docRef =  collection(db, "factures")
-    //     const q = query( docRef, orderBy("createdAt", "desc"))
-    //     const res = onSnapshot(q, ( snap ) =>{
-    //         // console.log("sanap facture", snap.docs)
-    //         listeFactures.value = []
-    //         listeFactures.value = snap.docs.map(doc =>{
-    //                 return {...doc.data(), id : doc.id}
-    //         })
-    //         filteredFactures.value = listeFactures.value.filter (facture => {
-    //           return facture.boutiqueId == boutiqueVente.value
-    //         })
-    //         // console.log("Liste boutique facture : ", listeFactures.value, boutiqueVente.value)
-    //     })
-    // }
+    const getRapport = () => {
+      pvuTotal.value = 0
+      pauTotal.value=0
+      listeArticles.value.forEach(article => {
+        pvuTotal.value += Number(article.pvu * bringStock(article.id))
+        pauTotal.value += Number(article.pau * bringStock(article.id))
+      })
+    }
+
+    const pullStock =  ( id) => {
+        if(stock.value ) {
+        // console.log("in pullStock : ", stock.value)
+            for(let element in stock.value) {
+            if(element.toString() == id){
+                return stock.value[element].quantiteStock
+            }
+            }
+        }
+    }
+
+    const bringStock = (id) => {
+            // quantiteStock.value =  pullStock( id) ? pullStock( id) : 0
+            return  pullStock( id) ? pullStock( id) : 0
+    }
+
+    const getArticles = async () => {
+        const docRef = collection(db, "produits")
+        const res = onSnapshot(docRef, (snap)=>{
+            listeArticles.value = snap.docs.map(doc => {
+                // console.log("snap doc : ", doc.data());
+                return {...doc.data(), id: doc.id}
+            })
+        })
+    }
 
     const loadVentes =async () => {
         const docRef =  collection(db, "ventes")
@@ -267,13 +287,14 @@ export default {
         return
       }
       filteredvente.value = listeVentes.value.filter(vente => {
-        return new Date(vente.createdAt.seconds *1000) >= new Date(dateDebut.value) && new Date(vente.createdAt.seconds *1000) <= new Date(dateFin.value)
+        return new Date(vente.createdAt.seconds *1000) >= new Date(dateDebut.value) && new Date(vente.createdAt.seconds *1000) <= new Date(dateFin.value) && vente.boutiqueId == boutiqueVente.value
       })
       getTotal()
     }
 
     onMounted( async () => {
       await getBoutiques()
+      getArticles()
       await getFactures()
       await loadVentes()
       await getDettes()
@@ -377,6 +398,8 @@ export default {
       dateFin,
       totalTTC,
       montantTotalDettes,
+      pvuTotal,
+      pauTotal,
     }
   }
 }

@@ -165,6 +165,68 @@
             </DisclosurePanel>
           </Disclosure>
         </li>
+        <!-- Mouvements fournisseur -->
+        <li v-if="isAdmin">
+          <Disclosure v-slot="{ open }" :default-open="isUserManagementActive">
+            <DisclosureButton
+              class="disclosure rounded-none px-4 py-1 flex items-center w-full hover:bg-gray-700"
+              :class="open ? 'open': ''"
+            >
+              <span class="material-icons  w-5 mr-2">
+                supervisor_account
+              </span>
+
+              Fournisseurs
+              <span class="ml-auto material-icons"  :class="open ? 'transform rotate-90' : ''">
+                arrow_forward_ios
+              </span>
+            </DisclosureButton>
+            <DisclosurePanel>
+              <ul>
+                <li>
+                  <Disclosure v-slot="{ open }" :default-open="isUserActive">
+                        <router-link :to="{ name: 'AdminNewCommande', params: { token: auth.currentUser.accessToken}}">
+                          <p
+                            class="pl-6 pr-4  flex items-center w-full hover:bg-gray-700"
+                            :class="open ? 'open': ''"
+                          >
+                          <span class="material-icons w-5 mr-2">low_priority</span>
+                          Etablir une commande
+                          </p>
+                        </router-link>
+
+                  </Disclosure>
+                </li>
+                <li>
+                  <Disclosure v-slot="{ open }" :default-open="isUserActive">
+                        <router-link :to="{ name: 'AdminListeCommandes', params: { token: auth.currentUser.accessToken}}">
+                          <p
+                            class="pl-6 pr-4  flex items-center w-full hover:bg-gray-700"
+                            :class="open ? 'open': ''"
+                          >
+                          <span class="material-icons w-5 mr-2">summarize</span>Liste des commandes
+                          </p>
+                        </router-link>
+
+                  </Disclosure>
+                </li>
+                <li>
+                  <Disclosure v-slot="{ open }" :default-open="isUserActive">
+                        <router-link :to="{ name: 'AdminCompteFournisseur', params: { token: auth.currentUser.accessToken}}">
+                          <p
+                            class="pl-6 pr-4  flex items-center w-full hover:bg-gray-700"
+                            :class="open ? 'open': ''"
+                          >
+                          <span class="material-icons w-5 mr-2">euro</span> Remboursement
+                          </p>
+                        </router-link>
+
+                  </Disclosure>
+                </li>
+              </ul>
+            </DisclosurePanel>
+          </Disclosure>
+        </li>
         <!-- ETATS -->
         <li v-if="isAdmin">
           <Disclosure v-slot="{ open }" :default-open="isUserManagementActive">
@@ -173,7 +235,7 @@
               :class="open ? 'open': ''"
             >
               <span class="material-icons  w-5 mr-2">
-                store
+                print
               </span>
 
               Etats
@@ -211,27 +273,14 @@
                 </li>
                 <li>
                   <Disclosure v-slot="{ open }" :default-open="isUserActive">
-                        <!-- <router-link :to="{ name: 'Boutiques', params: { token: auth.currentUser.accessToken}}"> -->
+                        <router-link :to="{ name: 'AdminInventaire', params: { token: auth.currentUser.accessToken}}">
                           <p
                             class="pl-6 pr-4  flex items-center w-full hover:bg-gray-700"
                             :class="open ? 'open': ''"
                           >
                           <span class="material-icons w-5 mr-2">inventory</span>Inventaire
                           </p>
-                        <!-- </router-link> -->
-
-                  </Disclosure>
-                </li>
-                <li>
-                  <Disclosure v-slot="{ open }" :default-open="isUserActive">
-                        <!-- <router-link :to="{ name: 'Boutiques', params: { token: auth.currentUser.accessToken}}"> -->
-                          <p
-                            class="pl-6 pr-4  flex items-center w-full hover:bg-gray-700"
-                            :class="open ? 'open': ''"
-                          >
-                          <span class="material-icons w-5 mr-2">settings_suggest</span>Etats client
-                          </p>
-                        <!-- </router-link> -->
+                        </router-link>
 
                   </Disclosure>
                 </li>

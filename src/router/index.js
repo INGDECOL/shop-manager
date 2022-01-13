@@ -39,6 +39,10 @@ import getUser from '../controllers/getUser'
 
   import AdminListeVente from "../views/etats/AdminListeVente.vue"
   import AdminRapportBoutique from "../views/etats/AdminRapportBoutique.vue"
+  import AdminInventaire from "../views/etats/Inventaire.vue"
+  import AdminNewCommande from "../views/etats/CommandeFournisseurs.vue"
+  import AdminListeCommandes from "../views/etats/AdminListeCommandes.vue"
+  import AdminCompteFournisseur from "../views/etats/CompteFournisseur.vue"
 
 //End of Components import
 
@@ -254,6 +258,31 @@ const routes = [
     path: "/rapports/etats/Rapport_boutique/:token/",
     name: "AdminRapportBoutique",
     component: AdminRapportBoutique,
+    beforeEnter: requireAuthAdmin
+  },
+  {
+    path: "/rapports/etats/Inventaire/:token/",
+    name: "AdminInventaire",
+    component: AdminInventaire,
+    beforeEnter: requireAuthAdmin
+  },
+
+  {
+    path: "/commandes/new_commande_fournisseur/:token/:id?",
+    name: "AdminNewCommande",
+    component: AdminNewCommande,
+    beforeEnter: requireAuthAdmin
+  },
+  {
+    path: "/rapports/etats/commandes_fournisseurs/:token/",
+    name: "AdminListeCommandes",
+    component: AdminListeCommandes,
+    beforeEnter: requireAuthAdmin
+  },
+  {
+    path: "/rapports/etats/comptes/comptes_fournisseurs/:token/",
+    name: "AdminCompteFournisseur",
+    component: AdminCompteFournisseur,
     beforeEnter: requireAuthAdmin
   },
 

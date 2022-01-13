@@ -9,12 +9,13 @@
                   search
             </span>
           </div>
-          <!-- Boutique -->
+          <!-- Fournisseurs -->
           <div class="mr-2 pr-2.5">
-              <select name="magasin"  id="magasin" v-model="boutiqueVente" class=" font-bold mr-2 pr-2.5 cursor-pointer"  required title="Magasin">
-                  <option value="">Selectionner la boutique</option>
-                  <option v-for="boutique in filteredBoutiques" :key="boutique.id" :value="boutique.id">{{ boutique.designationBoutique }}</option>
-              </select>
+              <select name="magasin"  id="magasin" v-model="fournisseurCmdId" class=" font-bold  cursor-pointer"  title="Fournisseur" required>
+                      <option value="">Selectionner le fournisseur</option>
+                      <option value="FssDiv">FssDiv</option>
+                      <option v-for="fournisseur in filteredFournisseurs" :key="fournisseur.id" :value="fournisseur.id">{{fournisseur.nom +" "+fournisseur.prenom }}</option>
+                  </select>
           </div>
           <!-- Dates -->
           <div class="flex justify-start gap-2 mr-1">
@@ -24,27 +25,31 @@
             </div>
             <div class="flex justify-between items-center gap-2 mr-1">
               <label for="">A</label>
-              <input type="date" name="dateFin" id="dateFin" v-model="dateFin" @change="getVenteByDate">
+              <input type="date" name="dateFin" id="dateFin" v-model="dateFin" @change="getCommandeByDate">
             </div>
           </div>
+          <!-- <div>
+            <button class="my-0 mx-2 py-0 flex justify-between items-center" @click="toggleForm"><span class="material-icons text-center py-1 m-0">add</span>Ajouter</button>
+
+          </div> -->
         </div>
         <div  class="flex justify-start gap-2">
           <!-- Liste des factures -->
           <div class=" border rounded border-gray-300 text-xs p-0.5">
             <ul>
-              <li class="m-1 font-semibold cursor-pointer hover:underline hover:text-gray-400 bg-gray-300 rounded p-1 hover:bg-gray-200" @click="loadVentes">Tous</li>
-              <li class="m-1 font-semibold cursor-pointer hover:underline hover:text-gray-400 bg-gray-300 rounded p-1 hover:bg-gray-200" v-for="facture in filteredfacture" :key="facture.id" @click="getVenteByFacture(facture.id)">{{ formatedFacture(facture.id)}}</li>
+              <li class="m-1 font-semibold cursor-pointer hover:underline hover:text-gray-400" @click="getFournisseursFactures">Tous</li>
+              <li class="m-1 font-semibold cursor-pointer hover:underline hover:text-gray-400" v-for="facture in filteredfacture" :key="facture.id" @click="getCommandeByFacture(facture.id)">{{ formatedFacture(facture.id)}}</li>
             </ul>
           </div>
           <!-- Liste des ventes -->
-          <div v-if="listeVentes.length" class="border border-gray-300 rounded overflow-scroll p-0.5 w-full">
+          <div v-if="listeCommandes.length" class="border border-gray-300 rounded overflow-scroll p-0.5 w-full">
             <table class="min-w-full bg-white divider-y divide-gray-400">
                 <thead class="bg-gray-800 text-white">
                   <tr >
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">#</th>
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Date</th>
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Article</th>
-                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">PVU</th>
+                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">PAU</th>
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Qté cmd</th>
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Montant</th>
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Actions</th>
@@ -55,7 +60,7 @@
                     <td class="text-left text-xs py-2 px-3 font-semibold uppercase">{{ n + 1 }} </td>
                     <td class="text-left text-xs py-2 px-3 ">{{ formatedDate(vente.createdAt.seconds ) }}</td>
                     <td class="text-left text-xs py-2 px-3 uppercase">{{vente.article}}</td>
-                    <td class="text-left text-xs py-2 px-3">{{ formatedNumber(vente.pvu) }}</td>
+                    <td class="text-left text-xs py-2 px-3">{{ formatedNumber(vente.pau) }}</td>
                     <td class="text-center text-xs py-2 px-3">{{ vente.qtecmd}}</td>
                     <td class="text-center text-xs py-2 px-3 " title="Montant Total">{{ formatedNumber(vente.payer) }}</td>
                     <td class="text-left text-xs py-2 px-3 flex justify-between items-center">
@@ -71,6 +76,9 @@
                 <span class="mx-3 my-4" >  Montant Total</span>
                 <span class="mx-3 my-4">{{totalTTC ? (totalTTC ).toLocaleString('fr-fr', {style: "currency", currency: "GNF", minimumFractionDigits: 0})  : 0 }}</span>
                 </span>
+            </div>
+            <div class="flex justify-center">
+                <button class="bg-transparent border border-green-400 hover:bg-green-400 hover:text-gray-700">Imprimer la liste</button>
             </div>
           </div>
         <div v-else class="flex justify-center w-full">
@@ -100,13 +108,14 @@ export default {
     // const documents = ref("")
     // const getError = ref("")
     const {documents, getError, load} = getDocuments()
-    const boutiqueVente = ref('')
+    const fournisseurCmdId = ref('')
     const listeBoutiques = ref(null)
+    const listeFournisseurs = ref(null)
     const searchQuery = ref("")
     const listeFactures = ref([])
     const filteredFactures = ref([])
     const editproduitId = ref(null)
-    const listeVentes = ref([])
+    const listeCommandes = ref([])
     const filteredvente = ref([])
     const dateDebut = ref("")
     const dateFin = ref("")
@@ -117,43 +126,41 @@ export default {
       return new Date(strDate * 1000 ).toLocaleDateString(undefined, options)
 
     }
+
     const formatedNumber = (strNumber) => {
       return strNumber.toLocaleString('fr-fr', {style: "currency", currency: "GNF", minimumFractionDigits: 0})
     }
+
     const formatedFacture = (strFactId) => {
       return strFactId.length > 20 ? strFactId.substring(0,20) +"..." : strFactId
     }
 
-    const getBoutiques = async () => {
-      const docRef = collection(db, "boutiques")
+    const getFournisseurs = async () => {
+      const docRef = collection(db, "fournisseurs")
       const res = onSnapshot(docRef, (snap)=>{
-          listeBoutiques.value = snap.docs.map(doc => {
+          listeFournisseurs.value = snap.docs.map(doc => {
               return {...doc.data(), id: doc.id}
           })
       })
 
     }
-    const filteredBoutiques = computed(()=>{
-      return listeBoutiques.value && listeBoutiques.value.filter((boutique)=>{
-        if(isAdmin){
-          return boutique //.gerantBoutique == auth.currentUser.email
-        }else {
-          return boutique.gerantBoutique == auth.currentUser.email
-
-        }
-      })
+    const filteredFournisseurs = computed(()=>{
+      return listeFournisseurs.value && listeFournisseurs.value.filter((FSS)=>{
+              return listeFournisseurs.value
+            //   return client.nom.toLowerCase().indexOf( searchQuery.value.toLowerCase()) != -1
+          })
     })
 
-    watch(boutiqueVente, async()=>{
-        if(boutiqueVente.value =='') {
+    watch(fournisseurCmdId, async()=>{
+        if(fournisseurCmdId.value =='') {
             return
         }
-        await getBoutiqueFactures()
-        await loadBoutiqueVentes()
+        await getFournisseursFactures()
+        await loadfournisseurCmdIds()
     })
 
     const getFactures =async () => {
-        const docRef =  collection(db, "factures")
+        const docRef =  collection(db, "facturesFournisseurs")
         const q = query( docRef, orderBy("createdAt", "desc"))
         const res = onSnapshot(q, ( snap ) =>{
             // console.log("sanap facture", snap.docs, new Date().getMonth())
@@ -165,8 +172,8 @@ export default {
         })
     }
 
-    const getBoutiqueFactures =async () => {
-        const docRef =  collection(db, "factures")
+    const getFournisseursFactures =async () => {
+        const docRef =  collection(db, "facturesFournisseurs")
         const q = query( docRef, orderBy("createdAt", "desc"))
         const res = onSnapshot(q, ( snap ) =>{
             // console.log("sanap facture", snap.docs)
@@ -175,34 +182,35 @@ export default {
                     return {...doc.data(), id : doc.id}
             })
             filteredFactures.value = listeFactures.value.filter (facture => {
-              return facture.boutiqueId == boutiqueVente.value
+              return facture.fournisseurId === fournisseurCmdId.value
             })
-            // console.log("Liste boutique facture : ", listeFactures.value, boutiqueVente.value)
+            loadfournisseurCmdIds()
+            // console.log("Liste boutique facture : ", listeFactures.value, fournisseurCmdId.value)
         })
     }
 
-    const loadVentes =async () => {
-        const docRef =  collection(db, "ventes")
+    const loadCommandes =async () => {
+        const docRef =  collection(db, "commandeFournisseurs")
         const q = query( docRef, orderBy("createdAt", "desc"))
         const res = onSnapshot(q, ( snap ) =>{
             // console.log("snap vente", snap.docs)
-            listeVentes.value = snap.docs.map(doc =>{
+            listeCommandes.value = snap.docs.map(doc =>{
                 return {...doc.data(), id : doc.id}
             })
-            loadBoutiqueVentes()
-            getBoutiqueFactures()
-            // filteredvente.value = listeVentes.value
+            loadfournisseurCmdIds()
+            getFournisseursFactures()
+            // filteredvente.value = listeCommandes.value
             getTotal()
         })
         await getFactures()
     }
 
-    const loadBoutiqueVentes =async () => {
+    const loadfournisseurCmdIds =async () => {
 
-        filteredvente.value = listeVentes.value.filter(vente => {
-          return vente.boutiqueId == boutiqueVente.value
+        filteredvente.value = listeCommandes.value.filter(vente => {
+          return vente.fournisseurId == fournisseurCmdId.value
         })
-        // filteredvente.value = listeVentes.value
+        // filteredvente.value = listeCommandes.value
         getTotal()
     }
 
@@ -213,33 +221,38 @@ export default {
       })
     }
 
-    const getVenteByFacture = (facture) => {
-      if(boutiqueVente.value ==''){
+    const getCommandeByFacture = (facture) => {
+      if(fournisseurCmdId.value ==''){
         alert("Veuillez selectionner une boutique !")
         return
       }
-      filteredvente.value = listeVentes.value.filter(vente => {
+      filteredvente.value = listeCommandes.value.filter(vente => {
         return vente.factureId == facture
       })
       getTotal()
     }
 
-    const getVenteByDate = (facture) => {
-       if(boutiqueVente.value ==''){
-        alert("Veuillez selectionner une boutique !")
+    const getCommandeByDate = (facture) => {
+       if(fournisseurCmdId.value ==''){
+        alert("Veuillez selectionner un fournisseur !")
         return
       }
 
-      filteredvente.value = listeVentes.value.filter(vente => {
-        return new Date(vente.createdAt.seconds *1000) >= new Date(dateDebut.value) && new Date(vente.createdAt.seconds *1000) <= new Date(dateFin.value) && vente.boutiqueId == boutiqueVente.value
+      filteredvente.value = listeCommandes.value.filter(vente => {
+        return new Date(vente.createdAt.seconds *1000) >= new Date(dateDebut.value) && new Date(vente.createdAt.seconds *1000) <= new Date(dateFin.value) && vente.fournisseurId == fournisseurCmdId.value
       })
       getTotal()
+
+      filteredFactures.value = listeFactures.value.filter(facture => {
+          return new Date(facture.createdAt.seconds *1000) >= new Date(dateDebut.value) && new Date(facture.createdAt.seconds *1000) <= new Date(dateFin.value) && facture.fournisseurId == fournisseurCmdId.value
+      })
+
     }
 
     onMounted( async () => {
-      await getBoutiques()
+      await getFournisseurs()
       await getFactures()
-      await loadVentes()
+      await loadCommandes()
 
     })
 
@@ -301,9 +314,9 @@ export default {
 
     })
 
-    const formatedVentes = () => {
+    const formatedCommandes = () => {
       // console.log("length : ", documents.value.length)
-      return listeVentes.value ?  listeVentes.value.map(vente => {
+      return listeCommandes.value ?  listeCommandes.value.map(vente => {
          vente.createdAt = new Date(vente.createdAt.seconds *1000).toLocaleString(undefined, options)
             vente.pvu = vente.pvu.toLocaleString('fr-fr', {style: "currency", currency: "GNF", minimumFractionDigits: 0})
             vente.payer = vente.payer.toLocaleString('fr-fr', {style: "currency", currency: "GNF", minimumFractionDigits: 0})
@@ -313,10 +326,11 @@ export default {
     }
 
     return {
-      boutiqueVente,
-      filteredBoutiques,
+      fournisseurCmdId,
+      filteredFournisseurs,
       formatedFacture,
-      formatedVentes,
+      getFactures,
+      formatedCommandes,
       formatedDate,
       formatedNumber,
       auth,
@@ -330,11 +344,12 @@ export default {
       filteredfacture,
       editproduitId,
       listeFactures,
-      listeVentes,
+      listeCommandes,
       filteredvente,
-      getVenteByDate,
-      getVenteByFacture,
-      loadVentes,
+      getCommandeByDate,
+      getCommandeByFacture,
+      loadCommandes,
+      getFournisseursFactures,
       dateDebut,
       dateFin,
       totalTTC,
