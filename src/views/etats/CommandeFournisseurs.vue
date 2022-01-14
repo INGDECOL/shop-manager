@@ -203,9 +203,9 @@ export default {
         const showPop = () =>{
           document.querySelector(" .searchList").classList.toggle("active")
         }
-        const selectedFournisseur = (client) => {
-            fournisseurId.value = client.id
-            //  console.log("clien : ", fournisseurId.value)
+        const selectedFournisseur = (fss) => {
+            fournisseurId.value = fss.id
+            console.log("fss : ", fournisseurId.value)
 
         }
 

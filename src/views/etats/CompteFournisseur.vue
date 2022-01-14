@@ -19,7 +19,7 @@
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">#</th>
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Date</th>
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">N° Facture</th>
-                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Client</th>
+                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Fournisseurs</th>
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Impayé</th>
                     <!-- <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Solvabilité</th> -->
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Actions</th>
@@ -179,7 +179,6 @@ export default {
   })
 
     watch(listeFactures, () => {
-        // console.log("watch doc : ", listeFactures.value.length, soldeFournisseurs.value.length)
 
         if(listeFactures.value.length ) {
           const lstFact = listeFactures
@@ -201,6 +200,7 @@ export default {
             listeFactures.value = lstFact.value.filter(facture => {
               return facture.impayer >0
             })
+            listeFacturesBoutique.value = listeFactures.value
         }
 
     })

@@ -296,7 +296,7 @@ export default {
                     totalTTC.value += cmd.pvu * cmd.qtecmd
                 }
             })
-            console.log("Total TTC : ", (totalTTC.value).toLocaleString('fr-fr', {style: "currency", currency: "GNF", minimumFractionDigits: 0}))
+            // console.log("Total TTC : ", (totalTTC.value).toLocaleString('fr-fr', {style: "currency", currency: "GNF", minimumFractionDigits: 0}))
             //Si c'est un Remboursement
             if(route.params.id) {
                 soldeClients.value.forEach(solde => {
@@ -395,7 +395,7 @@ export default {
                 // console.log("Router params : ", route.params.id)
                 await getFacture(route.params.id)
                 boutiqueVente.value = facture.value.boutiqueId
-                console.log("boutiquevente : ", boutiqueVente.value)
+                // console.log("boutiquevente : ", boutiqueVente.value)
                 retrieveCommande(facture.value.articles)
             }
 
@@ -436,7 +436,7 @@ export default {
             // Remboursement
             if(route.params.id) {
                 const factureId = route.params.id
-                console.log("Data to send : ", oldDette.value.id)
+                // console.log("Data to send : ", oldDette.value.id)
                 // Save dette
                 if((totalTTC.value - montantRegle.value) > 0 ) {
                     let dette = {
