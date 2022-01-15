@@ -44,6 +44,8 @@ import getUser from '../controllers/getUser'
   import AdminListeCommandes from "../views/etats/AdminListeCommandes.vue"
   import AdminCompteFournisseur from "../views/etats/CompteFournisseur.vue"
 
+  import AdminGestionCompte from "../views/comptes/GestionCompte.vue"
+
 //End of Components import
 
 //auth guard
@@ -283,6 +285,13 @@ const routes = [
     path: "/rapports/etats/comptes/comptes_fournisseurs/:token/",
     name: "AdminCompteFournisseur",
     component: AdminCompteFournisseur,
+    beforeEnter: requireAuthAdmin
+  },
+
+  {
+    path: "/compte_auxilliaire/gestion/gestion_comptes/:token/",
+    name: "AdminGestionCompte",
+    component: AdminGestionCompte,
     beforeEnter: requireAuthAdmin
   },
 
