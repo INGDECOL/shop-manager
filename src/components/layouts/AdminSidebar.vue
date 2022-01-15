@@ -340,17 +340,17 @@
 
                   </Disclosure>
                 </li>
-                <!-- Solde des comptes -->
+                <!-- Liste Transactions -->
                 <li>
                   <Disclosure v-slot="{ open }" :default-open="isUserActive">
-                        <!-- <router-link :to="{ name: 'AdminInventaire', params: { token: auth.currentUser.accessToken}}"> -->
+                        <router-link :to="{ name: 'AdminTransactions', params: { token: auth.currentUser.accessToken}}">
                           <p
                             class="pl-6 pr-4  flex items-center w-full hover:bg-gray-700"
                             :class="open ? 'open': ''"
                           >
-                          <span class="material-icons w-5 mr-2">battery_unknown</span>Solde des comptes
+                          <span class="material-icons w-5 mr-2">battery_unknown</span>Liste des Transactions
                           </p>
-                        <!-- </router-link> -->
+                        </router-link>
 
                   </Disclosure>
                 </li>

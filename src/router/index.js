@@ -46,6 +46,7 @@ import getUser from '../controllers/getUser'
 
   import AdminGestionCompte from "../views/comptes/GestionCompte.vue"
   import AdminOperations from "../views/comptes/Operations.vue"
+  import AdminTransactions from "../views/comptes/ListeTransactions.vue"
 
 //End of Components import
 
@@ -218,18 +219,21 @@ const routes = [
     component: Home,
     beforeEnter: requireAuthAdmin
   },
+  // Liste personnels
   {
     path: "/personnels/listePersonnel/:token",
     name: "ListePersonnel",
     component: ListePersonnel,
     beforeEnter: requireAuthAdmin
   },
+  // Indemnites
   {
     path: "/personnels/Indemnites/:token",
     name: "Indemnite",
     component: Indemnite,
     beforeEnter: requireAuthAdmin
   },
+  // Bon
   {
     path: "/personnels/Bon/:token/:id",
     name: "Bon",
@@ -237,12 +241,14 @@ const routes = [
     props: true,
     beforeEnter: requireAuthAdmin
   },
+  // Bulletin de Salaire
   {
     path: "/personnels/bulletin_de_salaire/:token",
     name: "Bulletin",
     component: Bulletin,
     beforeEnter: requireAuthAdmin
   },
+  // Edit Infos
   {
     path: "/personnels/editInfo/:token/:id",
     name: "EditPersonnel",
@@ -269,7 +275,7 @@ const routes = [
     component: AdminInventaire,
     beforeEnter: requireAuthAdmin
   },
-
+// Etats fournisseurs
   {
     path: "/commandes/new_commande_fournisseur/:token/:id?",
     name: "AdminNewCommande",
@@ -288,7 +294,7 @@ const routes = [
     component: AdminCompteFournisseur,
     beforeEnter: requireAuthAdmin
   },
-
+// Compte auxilliaire
   {
     path: "/compte_auxilliaire/gestion/gestion_comptes/:token/",
     name: "AdminGestionCompte",
@@ -299,6 +305,12 @@ const routes = [
     path: "/compte_auxilliaire/gestion/new_transaction/:token/",
     name: "AdminOperations",
     component: AdminOperations,
+    beforeEnter: requireAuthAdmin
+  },
+  {
+    path: "/compte_auxilliaire/gestion/liste_transactions/:token/",
+    name: "AdminTransactions",
+    component: AdminTransactions,
     beforeEnter: requireAuthAdmin
   },
 

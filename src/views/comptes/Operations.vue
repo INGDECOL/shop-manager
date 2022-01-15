@@ -124,7 +124,7 @@ export default {
     }
 
 
-    const getFactures =async () => {
+    const getAccounts =async () => {
         const docRef =  collection(db, "comptes")
         const q = query( docRef, orderBy("createdAt", "desc"))
         const res = onSnapshot(q, ( snap ) =>{
@@ -138,21 +138,21 @@ export default {
         })
     }
 
-    const getAccounts =async () => {
-        const docRef =  collection(db, "facturesFournisseurs")
-        const q = query( docRef, orderBy("createdAt", "desc"))
-        const res = onSnapshot(q, ( snap ) =>{
-            // console.log("sanap facture", snap.docs)
-            accountList.value = []
-            accountList.value = snap.docs.map(doc =>{
-                    return {...doc.data(), id : doc.id}
-            })
-            filteredAccounts.value = accountList.value.filter (facture => {
-              return facture.fournisseurId === fournisseurCmdId.value
-            })
-            // console.log("Liste boutique facture : ", accountList.value, fournisseurCmdId.value)
-        })
-    }
+    // const getAccounts =async () => {
+    //     const docRef =  collection(db, "facturesFournisseurs")
+    //     const q = query( docRef, orderBy("createdAt", "desc"))
+    //     const res = onSnapshot(q, ( snap ) =>{
+    //         // console.log("sanap facture", snap.docs)
+    //         accountList.value = []
+    //         accountList.value = snap.docs.map(doc =>{
+    //                 return {...doc.data(), id : doc.id}
+    //         })
+    //         filteredAccounts.value = accountList.value.filter (facture => {
+    //           return facture.fournisseurId === fournisseurCmdId.value
+    //         })
+    //         // console.log("Liste boutique facture : ", accountList.value, fournisseurCmdId.value)
+    //     })
+    // }
 
     const getSoldes = async () =>{
         const docRef =  collection(db, "mouvements")
@@ -191,7 +191,7 @@ export default {
 
     onMounted( async () => {
       await getSoldes()
-      await getFactures()
+      await getAccounts()
     //   await loadCommandes()
 
     })
@@ -236,6 +236,10 @@ export default {
             alert("Veuillez selectionner une opération à effectuer !")
             return
         }
+        if(typeOperation.value =='Retrait' && montantOperation.value > soldeActuel.value ) {
+            alert("Solde insuffisant pour le montant demandé !")
+            return
+        }
 
         const mouvement = {
                 compteId : accountId.value,
@@ -243,7 +247,7 @@ export default {
                 montant: Number(montantOperation.value),
                 createdAt: serverTimestamp()
             }
-            console.log("mouvement : ", mouvement)
+            // console.log("mouvement : ", mouvement)
             await create("mouvements", mouvement)
             if(!createError.value) {
                 alert("Mouvement enregistré avec succès ! ")
@@ -253,6 +257,7 @@ export default {
                 montantOperation.value=''
                 typeOperation.value=''
                 accountId.value=''
+                soldeActuel.value =''
             }
     }
 
@@ -261,8 +266,7 @@ export default {
       id,
       createError,
       soldeActuel,
-      formatedFacture,
-      getFactures,
+      getAccounts,
       formatedDate,
       formatedNumber,
       auth,
