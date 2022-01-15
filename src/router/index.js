@@ -45,6 +45,7 @@ import getUser from '../controllers/getUser'
   import AdminCompteFournisseur from "../views/etats/CompteFournisseur.vue"
 
   import AdminGestionCompte from "../views/comptes/GestionCompte.vue"
+  import AdminOperations from "../views/comptes/Operations.vue"
 
 //End of Components import
 
@@ -292,6 +293,12 @@ const routes = [
     path: "/compte_auxilliaire/gestion/gestion_comptes/:token/",
     name: "AdminGestionCompte",
     component: AdminGestionCompte,
+    beforeEnter: requireAuthAdmin
+  },
+  {
+    path: "/compte_auxilliaire/gestion/new_transaction/:token/",
+    name: "AdminOperations",
+    component: AdminOperations,
     beforeEnter: requireAuthAdmin
   },
 

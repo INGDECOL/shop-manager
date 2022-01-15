@@ -37,8 +37,8 @@
           <!-- Liste des factures -->
           <div class=" border rounded border-gray-300 text-xs p-0.5">
             <ul>
-              <li class="m-1 font-semibold cursor-pointer hover:underline hover:text-gray-400" @click="getFournisseursFactures">Tous</li>
-              <li class="m-1 font-semibold cursor-pointer hover:underline hover:text-gray-400" v-for="facture in filteredfacture" :key="facture.id" @click="getCommandeByFacture(facture.id)">{{ formatedFacture(facture.id)}}</li>
+              <li class="m-1 font-semibold cursor-pointer hover:underline hover:text-gray-400 bg-gray-300 rounded p-1" @click="getFournisseursFactures">Tous</li>
+              <li class="m-1 font-semibold cursor-pointer hover:underline hover:text-gray-400 bg-gray-300 rounded p-1" v-for="facture in filteredfacture" :key="facture.id" @click="getCommandeByFacture(facture.id)">{{ formatedFacture(facture.id)}}</li>
             </ul>
           </div>
           <!-- Liste des ventes -->

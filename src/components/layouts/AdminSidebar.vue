@@ -329,14 +329,14 @@
                 <!-- Mouvements de compte -->
                 <li>
                   <Disclosure v-slot="{ open }" :default-open="isUserActive">
-                        <!-- <router-link :to="{ name: 'AdminRapportBoutique', params: { token: auth.currentUser.accessToken}}"> -->
+                        <router-link :to="{ name: 'AdminOperations', params: { token: auth.currentUser.accessToken}}">
                           <p
                             class="pl-6 pr-4  flex items-center w-full hover:bg-gray-700"
                             :class="open ? 'open': ''"
                           >
                           <span class="material-icons w-5 mr-2">compare_arrows</span>Mouvements de compte
                           </p>
-                        <!-- </router-link> -->
+                        </router-link>
 
                   </Disclosure>
                 </li>

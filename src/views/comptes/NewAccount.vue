@@ -59,7 +59,7 @@ export default {
                 montant: Number(fondDepart.value),
                 createdAt: serverTimestamp()
             }
-            console.log("mouvement : ", mouvement)
+            // console.log("mouvement : ", mouvement)
             await create("mouvements", mouvement)
             if(!createError.value){
                 document.querySelector(".create form").reset()
@@ -68,14 +68,7 @@ export default {
                 contact.value = ''
             }
         }
-        // computed ( () => {
-        //     console.log("computed")
-        //     if(props.editrayonId ){
-        //         console.log("props rayon : ", props.editrayonId)
-
-        //     }
-        // })
-
+        
         return {
             handleSubmit,
             id,

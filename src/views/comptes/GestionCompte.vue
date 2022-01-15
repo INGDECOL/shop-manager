@@ -30,9 +30,9 @@
                     <td class="text-left py-3 px-4 font-semibold uppercase">{{ n + 1}} </td>
                     <td class="text-left py-3 px-4 font-semibold uppercase text-xs">{{ formatedDate(compte.createdAt.seconds)}} </td>
                     <td class="text-left py-3 px-4 text-xs text-blue-400 underline hover:text-blue-500 cursor-pointer" title="Cliquer pour aller au payement" @click="payerFacture(compte.id)">{{ compte.id}}</td>
-                    <td class="text-left py-3 px-4 text-xs">{{  getFournisseur(compte.fournisseurId) }}</td>
-                    <td class="text-left py-3 px-4 text-xs font-semibold text-pink-400 hover:text-pink-300 cursor-pointer" title="Montant restant">{{ formatedNumber(compte.impayer ? compte.impayer : 0) }}</td>
-                    <!-- <td class="text-left py-3 px-4 text-xs font-semibold underline text-blue-400 hover:text-blue-300 cursor-pointer" title="Montant Total dû" >0</td> -->
+                    <td class="text-left py-3 px-4 text-xs">{{  compte.nom +" "+ compte.prenom }}</td>
+                    <td class="text-center py-3 px-4 text-xs font-semibold text-green-600 hover:text-green-700 cursor-pointer" title="Montant initial à la creation">{{ formatedNumber(compte.fondDepart ? compte.fondDepart : 0) }}</td>
+                    <td class=" py-3 px-4 text-xs font-semibold  text-center hover:text-blue-300 cursor-pointer" title="Solde actuel du compte" >{{ formatedNumber(getSolde(compte.id)?? 0) }}</td>
                     <td class="text-left py-3 px-4 flex justify-between items-center">
                       <span class="material-icons " :class="{ disabled: !isAdmin }" >edit</span>
                       <span class="material-icons strash text-red-300" :class="{ disabled: !isAdmin }">delete</span>
@@ -70,10 +70,10 @@ export default {
     const boutiqueVente = ref('')
     const prenom = ref('')
     const documents = ref([])
-    const listeFactures = ref([])
+    const comptes = ref([])
     const listeComptes = ref([])
     const listeFournisseurs = ref([])
-    const soldeFournisseurs = ref([])
+    const listeMouvements = ref([])
     const getError = ref('')
     const searchQuery = ref("")
     const editclientId = ref(null)
@@ -88,37 +88,50 @@ export default {
 
   }
 
-  const getBoutiques = async () => {
-    const docRef = collection(db, "boutiques")
-    const res = onSnapshot(docRef, (snap)=>{
-        listeBoutiques.value = snap.docs.map(doc => {
-            return {...doc.data(), id: doc.id}
-        })
-    })
-  }
+//   const getBoutiques = async () => {
+//     const docRef = collection(db, "boutiques")
+//     const res = onSnapshot(docRef, (snap)=>{
+//         listeBoutiques.value = snap.docs.map(doc => {
+//             return {...doc.data(), id: doc.id}
+//         })
+//     })
+//   }
 
-  const filteredBoutiques = computed(()=>{
-    return listeBoutiques.value && listeBoutiques.value.filter((boutique)=>{
-        return boutique.gerantBoutique.toString().includes(auth.currentUser.email)// == auth.currentUser.email
-    })
-  })
+//   const filteredBoutiques = computed(()=>{
+//     return listeBoutiques.value && listeBoutiques.value.filter((boutique)=>{
+//         return boutique.gerantBoutique.toString().includes(auth.currentUser.email)// == auth.currentUser.email
+//     })
+//   })
 
 
-  const getSolde = async () =>{
-    const docRef =  collection(db, "detteFournisseurs")
+  const getSoldes = async () =>{
+    const docRef =  collection(db, "mouvements")
       const q = query( docRef, orderBy("createdAt", "desc"))
       const res = onSnapshot(q, ( snap ) =>{
           // console.log("snap vente", snap.docs)
-          soldeFournisseurs.value = snap.docs.map(doc =>{
+          listeMouvements.value = snap.docs.map(doc =>{
               //doc.data().createdAt = doc.data().createdAt.seconds
               return {...doc.data(), id : doc.id}
           })
-      // console.log("solde : ", soldeFournisseurs.value)
+      // console.log("solde : ", listeMouvements.value)
       })
   }
+  const getSolde =  (id) =>{
+    let versement=0, retrait =0, solde=0
 
-  const loadFactures =async () => {
-      const docRef =  collection(db, "facturesFournisseurs")
+    listeMouvements.value.map(mouvement => {
+        if(mouvement.compteId == id && mouvement.operation =="Versement") {
+            versement += Number(mouvement.montant)
+        }else if(mouvement.compteId == id && mouvement.operation =="Retrait") {
+            retrait += mouvement.montant
+        }
+    })
+    solde = versement - retrait
+    return solde
+  }
+
+  const loadAccount =async () => {
+      const docRef =  collection(db, "comptes")
       const q = query( docRef, orderBy("createdAt", "desc"))
       const res = onSnapshot(q, ( snap ) =>{
           // console.log("snap vente", snap.docs)
@@ -126,91 +139,49 @@ export default {
               return {...doc.data(), id : doc.id}
           })
 
-          listeFactures.value = documents.value
-          listeComptes.value = listeFactures.value
+          comptes.value = documents.value
+          listeComptes.value = comptes.value
       })
   }
 
-  const loadFournisseurs = async () => {
-    const docRef =  collection(db, "fournisseurs") // docs to fetch in firebase
-            const q = query( docRef, orderBy("createdAt", "desc"))
-            const res = onSnapshot(q, ( snap ) =>{
-                listeFournisseurs.value = snap.docs.map(doc =>{
-                    // console.log("Data : ", doc.data())
-                    return {...doc.data(), id : doc.id}
-                })
-            })
-  }
 
-  const detailDette = (fournisseur) => {
-    if( fournisseur.solvabilite <= 0 ) {
-      alert("Aucun detail à afficher le solde vaut 0 ")
-      return
-    }
-    // console.log("Detail id : ", client.id)
-    router.push( { name: "DetailDette", params: { token: auth.currentUser.accessToken, id: fournisseur.id }})
-  }
+//   const detailDette = (fournisseur) => {
+//     if( fournisseur.solvabilite <= 0 ) {
+//       alert("Aucun detail à afficher le solde vaut 0 ")
+//       return
+//     }
+//     // console.log("Detail id : ", client.id)
+//     router.push( { name: "DetailDette", params: { token: auth.currentUser.accessToken, id: fournisseur.id }})
+//   }
 
-  const payerFacture = (idfacture) => {
-    router.push({ name: 'AdminNewCommande', params: { token: auth.currentUser.accessToken, id: idfacture}})
-  }
+//   const payerFacture = (idfacture) => {
+//     router.push({ name: 'AdminNewCommande', params: { token: auth.currentUser.accessToken, id: idfacture}})
+//   }
 
-  const getFournisseur = (id) => {
-    let info
-    if(id) {
-      listeFournisseurs.value.forEach(fournisseur => {
-        // console.log("params : ", client.id, " =>", id , client.id==id)
-        if(fournisseur.id === id) {
-          info = fournisseur.nom +" " + fournisseur.prenom
+
+//   watch(boutiqueVente, async()=>{
+//       if(boutiqueVente.value =='') {
+//           return
+//       }
+//       // console.log("boutique : ", comptes.value.length, comptes.value)
+//       listeComptes.value = comptes.value.filter(facture => {
+//         // console.log("facture :: ", facture.boutiqueId, boutiqueVente.value)
+//         return facture.boutiqueId == boutiqueVente.value
+//       })
+//   })
+
+    watch(comptes, () => {
+        if(comptes.value.length ) {
+
+            listeComptes.value = comptes.value
         }
-      })
-      return info
-    }else return "Inconnue"
-  }
-
-  watch(boutiqueVente, async()=>{
-      if(boutiqueVente.value =='') {
-          return
-      }
-      // console.log("boutique : ", listeFactures.value.length, listeFactures.value)
-      listeComptes.value = listeFactures.value.filter(facture => {
-        // console.log("facture :: ", facture.boutiqueId, boutiqueVente.value)
-        return facture.boutiqueId == boutiqueVente.value
-      })
-  })
-
-    watch(listeFactures, () => {
-
-        if(listeFactures.value.length ) {
-          const lstFact = listeFactures
-        // Calculer le solde total par facture
-            lstFact.value.map(facture => {
-                let soldeTotal =0
-                facture.articles.forEach(solde => {
-                    soldeTotal += Number(solde.pvu * solde.qtecmd)
-                })
-                facture.total = soldeTotal
-                // Total dette de la facture
-                soldeFournisseurs.value.forEach(solde => {
-                    if(solde.factureId == facture.id) {
-                        facture.impayer = solde.montantDette
-                    }
-                })
-                // facture.client = getFournisseur(facture.clientId)
-            })
-            listeFactures.value = lstFact.value.filter(facture => {
-              return facture.impayer >0
-            })
-            listeComptes.value = listeFactures.value
-        }
-
     })
 
     onMounted( async () => {
     //   getBoutiques()
-      await loadFournisseurs()
-      await getSolde()
-      await loadFactures()
+    //   await loadFournisseurs()
+      await getSoldes()
+      await loadAccount()
       //console.log(" clients : ", documents.value)
     })
 
@@ -280,21 +251,16 @@ export default {
       destroy,
       toggleForm,
       documents,
-      listeFactures,
+      comptes,
+      getSolde,
       listeComptes,
       document,
       getError,
       searchQuery,
-      filteredFournisseurs,
-      filteredBoutiques,
-      boutiqueVente,
       editclientId,
-      soldeFournisseurs,
+      listeMouvements,
       formatedNumber,
       formatedDate,
-      detailDette,
-      getFournisseur,
-      payerFacture,
       nom,
       prenom
     }
