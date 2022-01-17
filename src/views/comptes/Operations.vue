@@ -123,7 +123,6 @@ export default {
       return strFactId.length > 20 ? strFactId.substring(0,20) +"..." : strFactId
     }
 
-
     const getAccounts =async () => {
         const docRef =  collection(db, "comptes")
         const q = query( docRef, orderBy("createdAt", "desc"))

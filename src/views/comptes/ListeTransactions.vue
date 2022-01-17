@@ -63,7 +63,7 @@
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Date Op</th>
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Type</th>
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Montant</th>
-                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Solde</th>
+                    <th class="text-center py-3 px-4 uppercase font-semibold text-sm">Solde</th>
                     <!-- <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Montant</th> -->
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Actions</th>
                   </tr>
@@ -74,7 +74,7 @@
                     <td class="text-left text-xs py-2 px-3 ">{{ formatedDate(mouvement.createdAt.seconds ) }}</td>
                     <td class="text-left text-xs py-2 px-3 uppercase">{{mouvement.operation}}</td>
                     <td class="text-left text-xs py-2 px-3">{{ formatedNumber(mouvement.montant) }}</td>
-                    <td class="text-center text-xs py-2 px-3">{{ formatedNumber(mouvement.solde ? mouvement.solde : 0) }}</td>
+                    <td class="text-center text-xs font-bold py-2 px-3">{{ formatedNumber(mouvement.solde ? mouvement.solde : 0) }}</td>
                     <!-- <td class="text-center text-xs py-2 px-3 " title="Montant Total">{{ formatedNumber(mouvement.payer) }}</td> -->
                     <td class="text-left text-xs py-2 px-3 flex justify-between items-center">
                       <span class="material-icons disabled" title="Modifier"  @click="edit(mouvement.id)" >edit</span>
