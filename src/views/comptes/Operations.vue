@@ -172,7 +172,7 @@ export default {
         listeMouvements.value.map(mouvement => {
             if(mouvement.compteId == id && mouvement.operation =="Versement") {
                 versement += Number(mouvement.montant)
-            }else if(mouvement.compteId == id && mouvement.operation =="Versement") {
+            }else if(mouvement.compteId == id && mouvement.operation =="Retrait") {
                 retrait += mouvement.montant
             }
         })

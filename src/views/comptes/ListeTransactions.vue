@@ -54,8 +54,8 @@
               <li class="m-1 font-semibold cursor-pointer hover:underline hover:text-gray-400 bg-gray-300 rounded p-1 hover:bg-gray-200" v-for="account in filteredAccount" :key="account.id" @click="accountSelected(account)">{{ account.nom +" "+ account.prenom}}</li>
             </ul>
           </div>
-          <!-- Liste des ventes -->
-          <div v-if="accountList.length" class="border border-gray-300 rounded overflow-scroll p-0.5 w-full">
+          <!-- Liste des mouvements -->
+          <div v-if="filteredMouvements.length" class="border border-gray-300 rounded overflow-scroll p-0.5 w-full">
             <table class="min-w-full bg-white divider-y divide-gray-400">
                 <thead class="bg-gray-800 text-white">
                   <tr >
@@ -94,8 +94,12 @@
                 <button class="bg-transparent border border-green-400 hover:bg-green-400 hover:text-gray-700">Imprimer la liste</button>
             </div>
           </div>
-        <div v-else class="flex justify-center w-full">
+        <div v-else class=" items-center w-full">
+          <p class="text-center font-bold">Aucune donnée trouvée</p>
+          <div>
+
           <Spinner />
+          </div>
         </div>
         </div>
       </div>
@@ -210,7 +214,7 @@ export default {
 
     const getSoldes = async () =>{
         const docRef =  collection(db, "mouvements")
-        const q = query( docRef, orderBy("createdAt", "desc"))
+        const q = query( docRef, orderBy("createdAt", "asc"))
         const res = onSnapshot(q, ( snap ) =>{
             // console.log("snap vente", snap.docs)
             listeMouvements.value = snap.docs.map(doc =>{
@@ -222,15 +226,15 @@ export default {
     }
     const getSolde =  (id) =>{
         let versement=0, retrait =0, solde=0
-
         listeMouvements.value.map(mouvement => {
             if(mouvement.compteId == id && mouvement.operation =="Versement") {
                 versement += Number(mouvement.montant)
-            }else if(mouvement.compteId == id && mouvement.operation =="Versement") {
+            }else if(mouvement.compteId == id && mouvement.operation =="Retrait") {
                 retrait += mouvement.montant
             }
         })
         solde = versement - retrait
+        console.log("solde : ", versement, retrait)
         return solde
     }
     const getMouvements =  (id) =>{
