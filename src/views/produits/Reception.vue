@@ -136,9 +136,9 @@ export default {
             })
         }
         const filteredBoutiques = computed(()=>{
-            return listeBoutiques.value && listeBoutiques.value.filter((boutique)=>{
-                return boutique.gerantBoutique == auth.currentUser.email
-            })
+          return listeBoutiques.value && listeBoutiques.value.filter((boutique)=>{
+              return boutique.gerantBoutique.includes( auth.currentUser.email)
+          })
         })
 
         const filteredArticles = computed(()=>{

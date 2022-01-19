@@ -81,9 +81,9 @@
                     </div>
                   </div>
                   <!-- cote droit -->
-                    <div class="border rounded mb-2 px-1 mx-1 w-full">
+                    <div class="border rounded mb-2 px-1 mx-1 w-full" id="cmd">
                         <div class="border m-1 p-1 max-h-48 overflow-y-scroll overflow-x-scroll">
-                            <table class="min-w-full bg-white divider-y divide-gray-400 ">
+                            <table class="min-w-full bg-white divider-y divide-gray-400 " id="commande">
                                 <thead class="bg-gray-800 text-white">
                                         <tr>
                                             <th class="text-left py-3 px-4 uppercase font-semibold text-sm">#</th>
@@ -112,8 +112,8 @@
                         <div class="border m-1">
                             <div class="input flex justify-between items-center m-1 gap-3">
                                 <label for="">Règlement </label>
-                                <select name="modeReglement" id="modeReglement" required class="h-6 text-xs py-0">
-                                    <option value="Espece">Espèce</option>
+                                <select name="modeReglement" id="modeReglement" v-model="modeReglement" required class="h-6 text-xs py-0">
+                                    <option value="Espece" selected>Espèce</option>
                                     <option value="Virement">Virement</option>
                                 </select>
 
@@ -139,6 +139,7 @@
                         </div>
                     </div>
                 </div>
+                <!-- <input type="file" name="fontconv" id="fontconv" @change="fontConverter"> -->
                 </div>
             </form>
         </div>
@@ -156,6 +157,8 @@ import { onMounted, watch } from '@vue/runtime-core'
 import { db, auth } from '../../firebase/config'
 import { getAuth } from '@firebase/auth'
 import receptionArticles from '../../controllers/receptionArticles'
+import genererPDF from '../../controllers/genererPDF'
+// import fontConv from '../../controllers/fontConverter'
 
 export default {
   setup () {
@@ -175,9 +178,11 @@ export default {
         const commandes = ref([])
         const clientVenteId = ref('')
         const clientId = ref('')
+        const clientNom = ref('')
         const seuil = ref('')
         const totalTTC = ref('')
         const montantRegle = ref('')
+        const modeReglement = ref('')
         const facture = ref()
         const vendeur = ref(getAuth().currentUser)
         const soldeClients = ref([])
@@ -187,11 +192,13 @@ export default {
         const options = { year: 'numeric', month: 'long', day: 'numeric' }
 
          const { receptionError,stock, getStock, updateStock } = receptionArticles()
-          const  dateDuJour = new Date().toLocaleDateString(undefined, options)
+        const  dateDuJour = new Date().toLocaleDateString(undefined, options)
 
         const { createError, create } = createDocument()
         const { setError, insert } = setDocument()
         const { destroy, error} = destroyDocument()
+
+        const { makePDF } = genererPDF()
         const formatedNumber = (strNumber) => {
             return strNumber.toLocaleString('fr-fr', {style: "currency", currency: "GNF", minimumFractionDigits: 0})
         }
@@ -202,6 +209,7 @@ export default {
         }
         const selectedClient = (client) => {
             clientId.value = client.id
+            clientNom.value = client.nom +" " + client.prenom
             // console.log("clien : ", clientId.value)
 
         }
@@ -345,6 +353,10 @@ export default {
                     alert("La quantité demandée est supérieur au stock disponible !")
                     return
                 }
+                if(!id.value || !designation.value){
+                    alert("Selectionner d'abord un produit !")
+                    return
+                }
             }
             let commande = {
                 id : id.value,
@@ -398,6 +410,7 @@ export default {
                 // console.log("boutiquevente : ", boutiqueVente.value)
                 retrieveCommande(facture.value.articles)
             }
+            modeReglement.value="Espece"
 
         })
 
@@ -472,6 +485,10 @@ export default {
                 router.push({ name: 'Vente', params: { token: auth.currentUser.accessToken}})
                 return
             }
+            if(!commandes.value.length) {
+                alert("Il n'ya aucune commande à enregistrer ! ")
+                return
+            }
 
             // Nouvelle vente
             const factureId = (clientVenteId.value ? clientVenteId.value : "CltDiv") + new Date().getDate() + new Date().getMonth() + new Date().getFullYear() + new Date().getHours() + new Date().getMinutes() + "010" + new Date().getSeconds()
@@ -511,7 +528,7 @@ export default {
                 updatedAt: serverTimestamp()
             }
             updateStock(stock,boutiqueVente.value)
-            console.log("cmd : ", vente)
+            // console.log("cmd : ", vente)
             })
             // Save facture
             let articleFacture = commandes.value.map(article => {
@@ -545,6 +562,18 @@ export default {
                 }
                 create("dettes", dette)
             }
+            /// Generate facture in pdf
+            let reglement = {
+                totalTTC : totalTTC.value.toString(),
+                montantRegle: montantRegle.value.toString(),
+                restant : (totalTTC.value - montantRegle.value),
+                modeReglement : modeReglement.value,
+                client: clientNom.value ? clientNom.value : "Client divers",
+                gerant: auth.currentUser.displayName
+            }
+            makePDF({title : 'Facture N° ' + factureId, orientation : "p", format : "a4",data : articleFacture, id : 'commande', option: reglement})
+            /// End of Generate facture in pdf
+
             if(!createError.value) {
                 alert("Vente Enregistrer avec succès ! ")
                 designation.value=""
@@ -560,6 +589,7 @@ export default {
         const goBack = () => {
             router.back()
         }
+
         return {
             dateDuJour,
             receptionError,
@@ -592,6 +622,7 @@ export default {
             createError,
             goBack,
             selectedClient,
+            modeReglement,
 
         }
   }

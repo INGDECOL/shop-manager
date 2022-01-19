@@ -1,7 +1,7 @@
 <template>
   <header class="header">
       <div class="flex justify-between items-center m-1">
-          <img src="../assets/logo.png" alt="Logo"  width="50" srcset="" class="mr-1">
+          <img src="../assets/logo.png" alt="Logo"  width="50" srcset="" class="mr-1" id="navLogo">
         <h1>Ets N'NAHAWA MS</h1>
       </div>
         <nav>
