@@ -38,7 +38,7 @@
           </div>
           <!-- Liste des ventes -->
           <div v-if="listeVentes.length" class="border border-gray-300 rounded overflow-scroll p-0.5 w-full">
-            <table class="min-w-full bg-white divider-y divide-gray-400">
+            <table class="min-w-full bg-white divider-y divide-gray-400" id="listeVentes">
                 <thead class="bg-gray-800 text-white">
                   <tr >
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">#</th>
@@ -47,7 +47,7 @@
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">PVU</th>
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Qté cmd</th>
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Montant</th>
-                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Actions</th>
+                    <!-- <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Actions</th> -->
                   </tr>
                 </thead>
                 <tbody class="text-gray-700">
@@ -55,13 +55,13 @@
                     <td class="text-left text-xs py-2 px-3 font-semibold uppercase">{{ n + 1 }} </td>
                     <td class="text-left text-xs py-2 px-3 ">{{ formatedDate(vente.createdAt.seconds ) }}</td>
                     <td class="text-left text-xs py-2 px-3 uppercase">{{vente.article}}</td>
-                    <td class="text-left text-xs py-2 px-3">{{ formatedNumber(vente.pvu) }}</td>
+                    <td class="text-center text-xs py-2 px-3">{{ (vente.pvu) }}</td>
                     <td class="text-center text-xs py-2 px-3">{{ vente.qtecmd}}</td>
-                    <td class="text-center text-xs py-2 px-3 " title="Montant Total">{{ formatedNumber(vente.payer) }}</td>
-                    <td class="text-left text-xs py-2 px-3 flex justify-between items-center">
+                    <td class="text-center text-xs py-2 px-3 " title="Montant Total">{{ (vente.payer) }}</td>
+                    <!-- <td class="text-left text-xs py-2 px-3 flex justify-between items-center">
                       <span class="material-icons disabled" title="Modifier"  @click="edit(vente.id)" >edit</span>
                       <span class="material-icons strash text-red-300 disabled" title="Supprimer" @click="destroy(vente.id)">delete</span>
-                    </td>
+                    </td> -->
                   </tr>
                 </tbody>
             </table>
@@ -71,6 +71,9 @@
                 <span class="mx-3 my-4" >  Montant Total</span>
                 <span class="mx-3 my-4">{{totalTTC ? (totalTTC ).toLocaleString('fr-fr', {style: "currency", currency: "GNF", minimumFractionDigits: 0})  : 0 }}</span>
                 </span>
+            </div>
+            <div class="flex justify-center" v-if="filteredvente.length">
+                <button class="bg-transparent border border-green-400 hover:bg-green-400 hover:text-gray-700" @click="exportPDF">Imprimer la liste</button>
             </div>
           </div>
         <div v-else class="flex justify-center w-full">
@@ -92,7 +95,8 @@ import destroyDocument from "../../controllers/destroyDocument"
 import { useRouter } from 'vue-router'
 // import NewProduit from "./NewProduit.vue"
 import Spinner from "../../components/Spinner.vue"
-import { onMounted, watch } from '@vue/runtime-core';
+import { onMounted, watch } from '@vue/runtime-core'
+import genererPDF from '../../controllers/genererPDF'
 export default {
   components: {  Spinner },
   setup() {
@@ -101,6 +105,7 @@ export default {
     // const getError = ref("")
     const {documents, getError, load} = getDocuments()
     const boutiqueVente = ref('')
+    const boutique = ref()
     const listeBoutiques = ref(null)
     const searchQuery = ref("")
     const listeFactures = ref([])
@@ -111,6 +116,7 @@ export default {
     const dateDebut = ref("")
     const dateFin = ref("")
     const totalTTC = ref("")
+    const { makePDF } = genererPDF()
     const options = { year: 'numeric', month: 'short', day: 'numeric', timeZone:'UTC' }
 
     const formatedDate = (strDate) => {
@@ -144,10 +150,18 @@ export default {
       })
     })
 
+    const getBoutique = (id) =>{
+      boutique.value = listeBoutiques.value.filter(boutique =>{
+        return boutique.id == id
+      })
+    }
+
     watch(boutiqueVente, async()=>{
         if(boutiqueVente.value =='') {
             return
         }
+        getBoutique(boutiqueVente.value)
+        // console.log("boutique : ", boutique.value[0].designationBoutique)
         await getBoutiqueFactures()
         await loadBoutiqueVentes()
     })
@@ -312,6 +326,21 @@ export default {
       }): []
     }
 
+    const exportPDF = () => {
+    /// Generate facture in pdf
+      let dateDe= dateDebut.value
+      let dateA = dateFin.value
+      let options = {
+          totalTTC : totalTTC.value.toString(),
+          dateDe: dateDe,
+          dateA: dateA,
+          boutique: boutiqueVente.value,
+          gerant: auth.currentUser.displayName
+      }
+      makePDF({title : 'LISTE DES VENTES DE LA BOUTIQUE  ' + boutique.value[0].designationBoutique, orientation : "p", format : "a4", id : 'listeVentes', option: options})
+        /// End of Generate facture in pdf
+    }
+
     return {
       boutiqueVente,
       filteredBoutiques,
@@ -338,6 +367,7 @@ export default {
       dateDebut,
       dateFin,
       totalTTC,
+      exportPDF,
     }
   }
 }

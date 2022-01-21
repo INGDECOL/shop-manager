@@ -119,18 +119,18 @@ export default {
       // Calculer le solde total par client
       if(soldeClients.value.length ) {
         soldeClients.value.forEach(solde => {
-          console.log("liste solde : ", solde.id, "=>", solde.clientId, solde.montantDette)
+          // console.log("liste solde : ", solde.id, "=>", solde.clientId, solde.montantDette)
         })
         documents.value.map(client => {
           let soldeTotal =0
           soldeClients.value.forEach(solde => {
             if( solde.clientId == client.id ) {
-              console.log("corespondance")
+              // console.log("corespondance")
               soldeTotal += solde.montantDette
             }
           })
           client.solvabilite = soldeTotal
-          console.log("Solde client : ", client)
+          // console.log("Solde client : ", client)
         })
       }
 

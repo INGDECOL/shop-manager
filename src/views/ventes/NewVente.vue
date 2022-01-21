@@ -83,7 +83,7 @@
                   <!-- cote droit -->
                     <div class="border rounded mb-2 px-1 mx-1 w-full" id="cmd">
                         <div class="border m-1 p-1 max-h-48 overflow-y-scroll overflow-x-scroll">
-                            <table class="min-w-full bg-white divider-y divide-gray-400 " id="commande">
+                            <table class="min-w-full bg-white divider-y divide-gray-400 " id="commande1">
                                 <thead class="bg-gray-800 text-white">
                                         <tr>
                                             <th class="text-left py-3 px-4 uppercase font-semibold text-sm">#</th>
@@ -99,9 +99,9 @@
                                             <span class="bg-red-400 text-white rounded-sm p-1 cursor-pointer hover:bg-red-500" title="Supprimer la ligne" @click="removeCommande(cmd)">x</span>
                                         </td>
                                         <td class="text-left py-3 px-4 text-xs  font-semibold uppercase">{{ cmd.designation }}</td>
-                                        <td class="text-center py-3 px-4 text-xs  font-semibold uppercase">{{ cmd.pvu}}</td>
+                                        <td class="text-center py-3 px-4 text-xs  font-semibold uppercase">{{ formatedNumber(cmd.pvu)}}</td>
                                         <td class="text-center py-3 px-4 text-xs  font-semibold uppercase">{{ cmd.qtecmd }}</td>
-                                        <td class="text-center py-3 px-4 text-xs  font-semibold uppercase">{{ cmd.pvu * cmd.qtecmd }}</td>
+                                        <td class="text-center py-3 px-4 text-xs  font-semibold uppercase">{{ formatedNumber(cmd.pvu * cmd.qtecmd) }}</td>
 
                                     </tr>
 
@@ -139,6 +139,43 @@
                         </div>
                     </div>
                 </div>
+                <!-- Facture à imprimer -->
+                <div class="border m-1 p-1 max-h-48 overflow-y-scroll overflow-x-scroll">
+                    <table class="min-w-full bg-white border-collapse " id="commande">
+                        <thead class="bg-gray-800 text-white">
+                                <tr>
+                                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">#</th>
+                                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Désignation</th>
+                                    <th class="text-center py-3 px-4 uppercase font-semibold text-sm">P. Unitaire</th>
+                                    <th class="text-center py-3 px-4 uppercase font-semibold text-sm">Qté</th>
+                                    <th class="text-center py-3 px-4 uppercase font-semibold text-sm">Total</th>
+                                </tr>
+                        </thead>
+                        <tbody class="text-gray-700 ">
+                            <tr class="border-b border-gray-400 " :class="{ striped : n % 2 ===0}" v-for="(cmd,n) in commandes" :key="cmd.id">
+                                <td class="text-left py-3 px-4 text-sm font-semibold uppercase">
+                                    <span class="bg-red-400 text-white rounded-sm p-1 cursor-pointer hover:bg-red-500" title="Supprimer la ligne" @click="removeCommande(cmd)">{{n+1}}</span>
+                                </td>
+                                <td class="text-left py-3 px-4 text-sm  font-semibold uppercase">{{ cmd.designation }}</td>
+                                <td class="text-center py-3 px-4 text-sm  font-semibold uppercase">{{ cmd.pvu}}</td>
+                                <td class="text-center py-3 px-4 text-sm  font-semibold uppercase">{{ cmd.qtecmd }}</td>
+                                <td class="text-center py-3 px-4 text-sm  font-semibold uppercase">{{ cmd.pvu * cmd.qtecmd }}</td>
+
+                            </tr>
+
+                        </tbody>
+                            <tfoot>
+                                <tr class="border-b border-gray-400 bg-gray-300">
+                                    <td class="text-left py-3 px-4 text-sm  font-bold uppercase" colspan="2">Totaux </td>
+                                    <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{ numberFormatter.format(totalPVU)}} </td>
+                                    <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{totalQte}} </td>
+                                    <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{ numberFormatter.format(totalTTC)}} </td>
+                                </tr>
+
+                            </tfoot>
+                    </table>
+                </div>
+
                 <!-- <input type="file" name="fontconv" id="fontconv" @change="fontConverter"> -->
                 </div>
             </form>
@@ -181,6 +218,8 @@ export default {
         const clientNom = ref('')
         const seuil = ref('')
         const totalTTC = ref('')
+        const totalQte = ref('')
+        const totalPVU = ref('')
         const montantRegle = ref('')
         const modeReglement = ref('')
         const facture = ref()
@@ -191,17 +230,28 @@ export default {
         const route = useRoute()
         const options = { year: 'numeric', month: 'long', day: 'numeric' }
 
-         const { receptionError,stock, getStock, updateStock } = receptionArticles()
+        const { receptionError,stock, getStock, updateStock } = receptionArticles()
         const  dateDuJour = new Date().toLocaleDateString(undefined, options)
 
         const { createError, create } = createDocument()
         const { setError, insert } = setDocument()
         const { destroy, error} = destroyDocument()
 
-        const { makePDF } = genererPDF()
+        const { makeFacture } = genererPDF()
+
         const formatedNumber = (strNumber) => {
             return strNumber.toLocaleString('fr-fr', {style: "currency", currency: "GNF", minimumFractionDigits: 0})
         }
+
+        const numberFormatter = new Intl.NumberFormat('de-DE', {
+        style: 'currency',
+        currency: 'GNF',
+
+        // These options are needed to round to whole numbers if that's what you want.
+        //minimumFractionDigits: 0, // (this suffices for whole numbers, but will print 2500.10 as $2,500.1)
+        //maximumFractionDigits: 0, // (causes 2500.99 to be printed as $2,501)
+        })
+
 
 
         const showPop = () =>{
@@ -209,8 +259,8 @@ export default {
         }
         const selectedClient = (client) => {
             clientId.value = client.id
-            clientNom.value = client.nom +" " + client.prenom
-            // console.log("clien : ", clientId.value)
+            clientNom.value = client.nom +" " + client.prenom + " " + client.contact
+            // console.log("clien : ", client)
 
         }
 
@@ -299,9 +349,13 @@ export default {
         watch(commandes.value, () => {
             // console.log("commande modified", commandes.value)
             totalTTC.value = 0
+            totalQte.value = 0
+            totalPVU.value = 0
             commandes.value.map(cmd => {
                 if(cmd){
                     totalTTC.value += cmd.pvu * cmd.qtecmd
+                    totalQte.value += cmd.qtecmd
+                    totalPVU.value += cmd.pvu
                 }
             })
             // console.log("Total TTC : ", (totalTTC.value).toLocaleString('fr-fr', {style: "currency", currency: "GNF", minimumFractionDigits: 0}))
@@ -491,7 +545,7 @@ export default {
             }
 
             // Nouvelle vente
-            const factureId = (clientVenteId.value ? clientVenteId.value : "CltDiv") + new Date().getDate() + new Date().getMonth() + new Date().getFullYear() + new Date().getHours() + new Date().getMinutes() + "010" + new Date().getSeconds()
+            const factureId = new Date().getDate() + new Date().getMonth() + new Date().getFullYear() + new Date().getHours() + new Date().getMinutes() + "010" + new Date().getSeconds()
             //console.log(factureId)
             if(clientVenteId.value =="CltDiv" || clientVenteId.value =='') {
                 if((totalTTC.value - montantRegle.value) > 0 ) {
@@ -568,10 +622,10 @@ export default {
                 montantRegle: montantRegle.value.toString(),
                 restant : (totalTTC.value - montantRegle.value),
                 modeReglement : modeReglement.value,
-                client: clientNom.value ? clientNom.value : "Client divers",
+                client: clientNom.value ? clientNom.value  : "Client divers",
                 gerant: auth.currentUser.displayName
             }
-            makePDF({title : 'Facture N° ' + factureId, orientation : "p", format : "a4",data : articleFacture, id : 'commande', option: reglement})
+            makeFacture({title : 'Facture N° ' + factureId, orientation : "p", format : "a4",data : articleFacture, id : 'commande', option: reglement})
             /// End of Generate facture in pdf
 
             if(!createError.value) {
@@ -614,6 +668,8 @@ export default {
             bringStock,
             qtecmd,
             totalTTC,
+            totalQte,
+            totalPVU,
             montantRegle,
             hideModal,
             addCommande,
@@ -623,6 +679,8 @@ export default {
             goBack,
             selectedClient,
             modeReglement,
+            formatedNumber,
+            numberFormatter,
 
         }
   }

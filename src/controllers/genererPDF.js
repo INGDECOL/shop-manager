@@ -17,35 +17,31 @@ const dateFormatter = new Intl.DateTimeFormat('FR-fr', {
     timeStyle: 'short'
  })
 
-const makePDF = ( {title = '',  orientation = 'p',  format = 'a4',  data = [], id = '', option = {}}) => {
+const makeFacture = ( {title = '',  orientation = 'p',  format = 'a4',  data = [], id = '', option = {}}) => {
     let table = document.getElementById(id)
     let tableFinalHeight = 0
-    console.log("Options : ", option)
-    // Pdf using "jspdf-html2canvas"
-//     let doc = document.getElementById(id)
-//     html2PDF(doc, {
-//     jsPDF: {
-//       format: 'a4',
-//     },
-//     imageType: 'image/jpeg',
-//     output: './pdf/generate.pdf'
-//   })
+        // console.log("Options : ", option)
+        // Pdf using "jspdf-html2canvas"
+    //  let doc = document.getElementById(id)
+    //  html2PDF(doc, {
+    //  jsPDF: {
+    //    format: 'a4',
+    //  },
+    //  imageType: 'image/jpeg',
+    //  output: './pdf/generate.pdf'
+    //})
 
     // using jsPDF & autotable
     const doc = new jsPDF({ orientation: orientation, format: format})
 
     let img = document.getElementById('navLogo')
     console.log("fonts : ", doc.getFontList())
-    // const myFont = "" // load the *.ttf font file as binary string
-
-// add the font to jsPDF
-    // doc.addFileToVFS("MyFont.ttf", myFont)
-    // doc.addFont("MyFont.ttf", "MyFont", "bold")
-    // doc.setFont("MyFont")
 
     // Entête de la page
     setEntete(doc, img)
-    let head = Object.keys(data[0])
+
+    // Entete du tableau
+    // let head = Object.keys(data[0]) ? Object.keys(data[0]) : []
     doc.setTextColor('black')
     doc.setFontSize(14)
     doc.setFont("Times","bold")
@@ -62,6 +58,8 @@ const makePDF = ( {title = '',  orientation = 'p',  format = 'a4',  data = [], i
 
     // Generation du tableau en fonction du tableau html fournis
     autotable(doc, {
+        styles: { font: "times"},
+        footStyles: { fillColor: "#777b7e"},
         html: table,
         margin : { top: 50},
         didDrawPage: (d) => {
@@ -70,20 +68,33 @@ const makePDF = ( {title = '',  orientation = 'p',  format = 'a4',  data = [], i
         },
     })
 
-    // if it is Facture
-    if(option.totalTTC){
+    doc.setFontSize(14)
+    doc.setFont("courrier","bold")
+    doc.setTextColor("#0e4c92")
+    doc.text("Montant Total :  " + numberFormatter.format(option.totalTTC)  , 20, tableFinalHeight + 14)
+    // doc.setLineWidth(0.5)
+    doc.setDrawColor("#88807b")
+    doc.line(18, tableFinalHeight + 16, 138, tableFinalHeight + 16)
 
-        doc.setFontSize(14)
-        doc.setFont("courrier","bold")
-        doc.text("Montant Total :  " + numberFormatter.format(option.totalTTC)  , 20, tableFinalHeight + 10)
-        doc.text("Montant Payé :  "+ numberFormatter.format(option.montantRegle.toString()), 20, tableFinalHeight + 18)
-        doc.text("Montant Restant :  "+ numberFormatter.format(option.restant), 20, tableFinalHeight + 26)
-        doc.text("Règlement en "+ option.modeReglement, 20, tableFinalHeight + 34)
+    doc.setTextColor("#0b6633")
+    doc.text("Montant Payé :  "+ numberFormatter.format(option.montantRegle.toString()), 20, tableFinalHeight + 22)
+    doc.line(18, tableFinalHeight + 24, 138, tableFinalHeight + 24)
 
-        doc.text("Le Gérant principal ", doc.internal.pageSize.width * 0.8 , tableFinalHeight + 48, {align: 'center'})
-        doc.text(option.gerant, doc.internal.pageSize.width * 0.8 , tableFinalHeight + 70, {align: 'center'})
+    doc.setTextColor("#ed2939")
+    doc.text("Montant Restant :  "+ numberFormatter.format(option.restant), 20, tableFinalHeight + 30)
+    doc.line(18, tableFinalHeight + 32, 138, tableFinalHeight + 32)
 
-    }
+    doc.setTextColor("black")
+    doc.text("Règlement en "+ option.modeReglement, 20, tableFinalHeight + 38)
+
+    doc.setLineWidth(1)
+    doc.setDrawColor("black")
+    doc.rect(18, tableFinalHeight + 8 , 120, 32);
+
+    doc.text("Le Gérant principal ", doc.internal.pageSize.width * 0.8 , tableFinalHeight + 50, {align: 'center'})
+    doc.text(option.gerant, doc.internal.pageSize.width * 0.8 , tableFinalHeight + 72, {align: 'center'})
+
+
     // console.log("last row : ",doc.internal.getNumberOfPages())
 
     setFooters(doc)
@@ -92,13 +103,21 @@ const makePDF = ( {title = '',  orientation = 'p',  format = 'a4',  data = [], i
 
 }
 
+const makeDocument = () => {
+
+    doc.setFontSize(10)
+    doc.setFont("Times","bold")
+    doc.text("Du : " + option.dateDe, 15 , 47, { align: "left"})
+    doc.text("Au : " + option.dateA, 40 , 47, { align: "left"})
+}
+
 const formatedNumber = (strNumber) => {
     return strNumber.toLocaleString('fr-fr', {style: "currency", currency: "GNF", minimumFractionDigits: 0})
 }
 
 const setEntete = (doc, img='') => {
     // zapfdingbats Courier Helvetica symbol
-    doc.addImage(img, "png", 15,10,15,15)
+    doc.addImage(img, "png", 10,3,30,30)
     // console.log('img : ', img)
     doc.setFontSize(30)
     doc.setFont("Times","bold")
@@ -108,7 +127,7 @@ const setEntete = (doc, img='') => {
     doc.text("Achat et vente de marchandise", 55,20)
     doc.setFontSize(10)
     doc.setFont("symbol","bold, italic")
-    doc.text("Contact : 622 22 91 41 ", doc.internal.pageSize.width / 2, 25, {align: 'center'})
+    doc.text("Contact : 622 22 91 41 / 621 79 02 82 / 663 63 05 66 ", doc.internal.pageSize.width / 2, 25, {align: 'center'})
     doc.setTextColor('skyblue')
     doc.setFont("Times","italic")
     doc.text("Email : younoussa41@gmail.com", doc.internal.pageSize.width / 2, 30, {align: 'center'})
@@ -122,6 +141,8 @@ const setFooters = doc => {
   doc.setFontSize(8)
   for (var i = 1; i <= pageCount; i++) {
     doc.setPage(i)
+    doc.setLineWidth(0.5)
+    doc.setDrawColor("#88807b")
     doc.line(0, 282, 300, 282)
     doc.text("Les articles vendus ne sont ni echangés ni retournés !", 10, 287, { align: 'left'})
     doc.text('Page ' + String(i) + ' sur ' + String(pageCount), doc.internal.pageSize.width * 0.9, 287, {
@@ -132,7 +153,7 @@ const setFooters = doc => {
 
 
 const genererPDF = () => {
-    return { makePDF }
+    return { makeFacture, makeDocument }
 }
 
 export default genererPDF
