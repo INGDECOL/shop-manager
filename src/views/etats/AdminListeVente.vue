@@ -44,9 +44,9 @@
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">#</th>
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Date</th>
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Article</th>
-                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">PVU</th>
-                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Qté cmd</th>
-                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Montant</th>
+                    <th class="text-center py-3 px-4 uppercase font-semibold text-sm">PVU</th>
+                    <th class="text-center py-3 px-4 uppercase font-semibold text-sm">Qté cmd</th>
+                    <th class="text-center py-3 px-4 uppercase font-semibold text-sm">Montant</th>
                     <!-- <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Actions</th> -->
                   </tr>
                 </thead>
@@ -64,6 +64,14 @@
                     </td> -->
                   </tr>
                 </tbody>
+                <tfoot>
+                    <tr class="border-b border-gray-400 bg-gray-300">
+                        <td class="text-left py-3 px-4 text-sm  font-bold uppercase" colspan="3">Totaux </td>
+                        <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{ numberFormatter.format(totalPVU)}} </td>
+                        <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{totalQte}} </td>
+                        <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{ numberFormatter.format(totalTTC)}} </td>
+                    </tr>
+                </tfoot>
             </table>
             <!-- Total de la liste -->
             <div class="flex justify-center mt-2 mr-0">
@@ -116,7 +124,9 @@ export default {
     const dateDebut = ref("")
     const dateFin = ref("")
     const totalTTC = ref("")
-    const { makePDF } = genererPDF()
+    const totalPVU = ref("")
+    const totalQte = ref("")
+    const { makeDocument } = genererPDF()
     const options = { year: 'numeric', month: 'short', day: 'numeric', timeZone:'UTC' }
 
     const formatedDate = (strDate) => {
@@ -126,6 +136,16 @@ export default {
     const formatedNumber = (strNumber) => {
       return strNumber.toLocaleString('fr-fr', {style: "currency", currency: "GNF", minimumFractionDigits: 0})
     }
+
+    const numberFormatter = new Intl.NumberFormat('de-DE', {
+    style: 'currency',
+    currency: 'GNF',
+
+    // These options are needed to round to whole numbers if that's what you want.
+    //minimumFractionDigits: 0, // (this suffices for whole numbers, but will print 2500.10 as $2,500.1)
+    //maximumFractionDigits: 0, // (causes 2500.99 to be printed as $2,501)
+    })
+
     const formatedFacture = (strFactId) => {
       return strFactId.length > 20 ? strFactId.substring(0,20) +"..." : strFactId
     }
@@ -222,8 +242,13 @@ export default {
 
     const getTotal = () => {
       totalTTC.value = 0
+      totalPVU.value = 0
+      totalQte.value = 0
       filteredvente.value.map(vente => {
         totalTTC.value += Number(vente.payer)
+        totalQte.value += Number(vente.qtecmd)
+        totalPVU.value += Number(vente.pvu)
+
       })
     }
 
@@ -337,7 +362,7 @@ export default {
           boutique: boutiqueVente.value,
           gerant: auth.currentUser.displayName
       }
-      makePDF({title : 'LISTE DES VENTES DE LA BOUTIQUE  ' + boutique.value[0].designationBoutique, orientation : "p", format : "a4", id : 'listeVentes', option: options})
+      makeDocument({title : 'LISTE DES VENTES DE LA BOUTIQUE  ' + boutique.value[0].designationBoutique, orientation : "p", format : "a4", id : 'listeVentes', option: options})
         /// End of Generate facture in pdf
     }
 
@@ -348,6 +373,7 @@ export default {
       formatedVentes,
       formatedDate,
       formatedNumber,
+      numberFormatter,
       auth,
       isAdmin,
       edit,
@@ -367,6 +393,8 @@ export default {
       dateDebut,
       dateFin,
       totalTTC,
+      totalPVU,
+      totalQte,
       exportPDF,
     }
   }

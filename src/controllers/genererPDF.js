@@ -61,9 +61,10 @@ const makeFacture = ( {title = '',  orientation = 'p',  format = 'a4',  data = [
         styles: { font: "times"},
         footStyles: { fillColor: "#777b7e"},
         html: table,
-        margin : { top: 50},
+        startY: 50,
+        margin : { top: 20},
         didDrawPage: (d) => {
-            console.log("final height : ", Math.round(Number(d.cursor.y)))
+            // console.log("final height : ", Math.round(Number(d.cursor.y)))
             tableFinalHeight = Math.round(Number(d.cursor.y))
         },
     })
@@ -103,12 +104,59 @@ const makeFacture = ( {title = '',  orientation = 'p',  format = 'a4',  data = [
 
 }
 
-const makeDocument = () => {
+const makeDocument = ({title = '',  orientation = 'p',  format = 'a4',  data = [], id = '', option = {}}) => {
 
-    doc.setFontSize(10)
+    let table = document.getElementById(id)
+    let tableFinalHeight = 0
+
+        const doc = new jsPDF({ orientation: orientation, format: format})
+
+    let img = document.getElementById('navLogo')
+    console.log("fonts : ", doc.getFontList())
+
+    // Entête de la page
+    setEntete(doc, img)
+
+    // Entete du tableau
+    // let head = Object.keys(data[0]) ? Object.keys(data[0]) : []
+    doc.setTextColor('black')
+    doc.setFontSize(14)
     doc.setFont("Times","bold")
-    doc.text("Du : " + option.dateDe, 15 , 47, { align: "left"})
-    doc.text("Au : " + option.dateA, 40 , 47, { align: "left"})
+    doc.text(title, doc.internal.pageSize.width / 2, 42, { align: "center"})
+    if(option.dateDe) {
+        doc.setFontSize(10)
+        doc.setFont("Times","bold")
+        doc.text("Du : " + option.dateDe, 15 , 47, { align: "left"})
+        doc.text("Au : " + option.dateA, 40 , 47, { align: "left"})
+    }
+
+    doc.setFontSize(9)
+    doc.setFont("Times","bold, italic")
+    doc.text("Siguiri, le " + dateFormatter.format(new Date().now), doc.internal.pageSize.width * 0.8 , 47, { align: "center"})
+
+    // Generation du tableau en fonction du tableau html fournis
+    autotable(doc, {
+        styles: { font: "times"},
+        footStyles: { fillColor: "#777b7e"},
+        html: table,
+        startY: 50,
+        margin : { top: 20},
+        showFoot: "lastPage",
+        didDrawPage: (d) => {
+            // console.log("final height : ", Math.round(Number(d.cursor.y)))
+            tableFinalHeight = Math.round(Number(d.cursor.y))
+        },
+    })
+
+    doc.setFontSize(14)
+    doc.setFont("courrier","bold")
+    doc.setTextColor("#0e4c92")
+    doc.text("Montant Total :  " + numberFormatter.format(option.totalTTC)  , 20, tableFinalHeight + 14)
+
+    setFooters(doc)
+    doc.save(title+".pdf")
+
+
 }
 
 const formatedNumber = (strNumber) => {
@@ -138,6 +186,7 @@ const setFooters = doc => {
   const pageCount = doc.internal.getNumberOfPages()
 
   doc.setFont('helvetica', 'italic')
+  doc.setTextColor("black")
   doc.setFontSize(8)
   for (var i = 1; i <= pageCount; i++) {
     doc.setPage(i)

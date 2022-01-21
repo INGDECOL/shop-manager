@@ -99,9 +99,9 @@
                                             <span class="bg-red-400 text-white rounded-sm p-1 cursor-pointer hover:bg-red-500" title="Supprimer la ligne" @click="removeCommande(cmd)">x</span>
                                         </td>
                                         <td class="text-left py-3 px-4 text-xs  font-semibold uppercase">{{ cmd.designation }}</td>
-                                        <td class="text-center py-3 px-4 text-xs  font-semibold uppercase">{{ formatedNumber(cmd.pvu)}}</td>
+                                        <td class="text-center py-3 px-4 text-xs  font-semibold uppercase">{{ (cmd.pvu)}}</td>
                                         <td class="text-center py-3 px-4 text-xs  font-semibold uppercase">{{ cmd.qtecmd }}</td>
-                                        <td class="text-center py-3 px-4 text-xs  font-semibold uppercase">{{ formatedNumber(cmd.pvu * cmd.qtecmd) }}</td>
+                                        <td class="text-center py-3 px-4 text-xs  font-semibold uppercase">{{ (cmd.pvu * cmd.qtecmd) }}</td>
 
                                     </tr>
 
@@ -140,7 +140,7 @@
                     </div>
                 </div>
                 <!-- Facture à imprimer -->
-                <div class="border m-1 p-1 max-h-48 overflow-y-scroll overflow-x-scroll">
+                <div class="border m-1 p-1 max-h-48 overflow-y-scroll overflow-x-scroll hidden">
                     <table class="min-w-full bg-white border-collapse " id="commande">
                         <thead class="bg-gray-800 text-white">
                                 <tr>
@@ -164,15 +164,15 @@
                             </tr>
 
                         </tbody>
-                            <tfoot>
-                                <tr class="border-b border-gray-400 bg-gray-300">
-                                    <td class="text-left py-3 px-4 text-sm  font-bold uppercase" colspan="2">Totaux </td>
-                                    <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{ numberFormatter.format(totalPVU)}} </td>
-                                    <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{totalQte}} </td>
-                                    <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{ numberFormatter.format(totalTTC)}} </td>
-                                </tr>
+                        <tfoot>
+                            <tr class="border-b border-gray-400 bg-gray-300">
+                                <td class="text-left py-3 px-4 text-sm  font-bold uppercase" colspan="2">Totaux </td>
+                                <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{ numberFormatter.format(totalPVU)}} </td>
+                                <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{totalQte}} </td>
+                                <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{ numberFormatter.format(totalTTC)}} </td>
+                            </tr>
 
-                            </tfoot>
+                        </tfoot>
                     </table>
                 </div>
 
@@ -260,7 +260,10 @@ export default {
         const selectedClient = (client) => {
             clientId.value = client.id
             clientNom.value = client.nom +" " + client.prenom + " " + client.contact
-            // console.log("clien : ", client)
+            // let day = new Date().getDate()
+            // let month = new Date().getMonth() < 10 ? new Date().getMonth() < 1 ? "01": "0" + new Date().getMonth() : new Date().getMonth()
+            // let year = new Date().getFullYear()
+            //  console.log("date : ", day+ " " + month + " " + year +" " + new Date().getHours() +" " + new Date().getMinutes() + " 010" +" " + new Date().getSeconds())
 
         }
 
@@ -545,8 +548,12 @@ export default {
             }
 
             // Nouvelle vente
-            const factureId = new Date().getDate() + new Date().getMonth() + new Date().getFullYear() + new Date().getHours() + new Date().getMinutes() + "010" + new Date().getSeconds()
-            //console.log(factureId)
+            let day = new Date().getDate()
+            let month = new Date().getMonth() < 10 ? new Date().getMonth() < 1 ? "01": "0" + new Date().getMonth() : new Date().getMonth()
+            let year = new Date().getFullYear()
+            const factureId = day + month + year + new Date().getHours() + new Date().getMinutes() + "010" + new Date().getSeconds()
+            // console.log(factureId)
+
             if(clientVenteId.value =="CltDiv" || clientVenteId.value =='') {
                 if((totalTTC.value - montantRegle.value) > 0 ) {
                     alert("Le montant Total de la facture est supérieur au montant règlé, or le client divers n'est pas autorisé à effectuer des ventes à crédit. \n Pensez à Enregistrer cet client !")
