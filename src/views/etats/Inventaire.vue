@@ -22,25 +22,35 @@
                                   </select>
                               </div>
                             </div>
-                        <table class="min-w-full bg-white divider-y divide-gray-400">
+                        <table class="min-w-full bg-white divider-y divide-gray-400" id="inventaire">
                             <thead class="bg-gray-800 text-white">
                                 <tr>
+                                    <th class="text-left py-3 px-4 uppercase font-semibold text-xs">#</th>
                                     <th class="text-left py-3 px-4 uppercase font-semibold text-xs">Désignation</th>
-                                    <th class="text-left py-3 px-4 uppercase font-semibold text-xs">code famille</th>
-                                    <th class="text-left py-3 px-4 uppercase font-semibold text-xs">pvu</th>
-                                    <th class="text-left py-3 px-4 uppercase font-semibold text-xs">Qté Stock</th>
+                                    <th class="text-left py-3 px-4 uppercase font-semibold text-xs">Code Famille</th>
+                                    <th class="text-center py-3 px-4 uppercase font-semibold text-xs">PVU</th>
+                                    <th class="text-center py-3 px-4 uppercase font-semibold text-xs">Qté Stock</th>
                                 </tr>
                             </thead>
                             <tbody class="text-gray-700">
                                 <tr class="border-b border-gray-400 max-h-2 overflow-y-scroll" :class="{ striped : n % 2 ===0}" v-for="(article, n) in filteredArticles" :key="article.id">
-                                    <td class="text-left py-3 px-4 font-semibold uppercase text-xs underline hover:text-blue-400 cursor-pointer" @click="selectedArticle(article)">{{ article.designation}}</td>
+                                    <td class="text-left py-3 px-4 font-bold uppercase text-xs  hover:text-blue-400 cursor-pointer" >{{ n+1}}</td>
+                                    <td class="text-left py-3 px-4 font-semibold uppercase text-xs underline hover:text-blue-400 cursor-pointer" >{{ article.designation}}</td>
                                     <td class="text-center py-3 px-4 font-semibold uppercase text-xs">{{ article.codeFamille }}</td>
-                                    <td class="text-left py-3 px-4 font-semibold uppercase text-xs">{{ article.pvu}}</td>
+                                    <td class="text-center py-3 px-4 font-semibold uppercase text-xs">{{ article.pvu}}</td>
                                     <td class="text-center py-3 px-4 font-bold  text-xs ">{{boutiqueReception ? bringStock(article.id) : 0 }}</td>
                                 </tr>
                             </tbody>
+                            <tfoot>
+                                <tr class="border-b border-gray-400 bg-gray-300">
+                                    <td class="text-left py-3 px-4 text-sm  font-bold uppercase" colspan="3">Totaux </td>
+                                    <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{ numberFormatter.format(totalPVU)}} </td>
+                                    <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{totalQte}} </td>
+                                    <!-- <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{ numberFormatter.format(totalTTC)}} </td> -->
+                                </tr>
+                            </tfoot>
                         </table>
-                        <button>Imprimer</button>
+                        <button @click="exportPDF" v-if="boutiqueReception">Imprimer</button>
                         <p class="error">{{ receptionError }}</p>
                         <p class="error">{{ getError }}</p>
                       </div>
@@ -115,19 +125,24 @@ import { db, auth } from '../../firebase/config'
 import updateDocument from '../../controllers/updateDocument'
 import createDocument from '../../controllers/createDocument'
 import getUser from '../../controllers/getUser'
+import genererPDF from '../../controllers/genererPDF'
 export default {
     // props: [ 'editFournisseurId'],
     setup(props) {
 
         const listeBoutiques = ref(null)
         const listeArticles = ref(null)
+        const prelisteArticles = ref(null)
         const id = ref('')
-        const dateReception = ref('')
+        const boutique = ref()
         const boutiqueReception = ref('')
         const designation = ref('')
         const pau = ref('')
         const newpau = ref('')
         const pvu = ref('')
+        const totalPVU = ref("")
+        const totalQte = ref("")
+
         const newpvu = ref('')
         const codeFamille = ref('')
         const fournisseurId = ref('')
@@ -151,6 +166,7 @@ export default {
         const articleRecu = ref([])
         const { receptionError,stock, getStock, reception, updateStock } = receptionArticles()
         const {updateError, update } = updateDocument()
+        const { makeDocument } = genererPDF()
 
         const isAdmin = ref(async () =>{
             const { findUser, error, user } = getUser()
@@ -168,6 +184,14 @@ export default {
                 }
         })
 
+        const numberFormatter = new Intl.NumberFormat('de-DE', {
+        style: 'currency',
+        currency: 'GNF',
+
+        // These options are needed to round to whole numbers if that's what you want.
+        //minimumFractionDigits: 0, // (this suffices for whole numbers, but will print 2500.10 as $2,500.1)
+        //maximumFractionDigits: 0, // (causes 2500.99 to be printed as $2,501)
+        })
 
         const getBoutiques = async () => {
             const docRef = collection(db, "boutiques")
@@ -179,20 +203,37 @@ export default {
             })
 
         }
+
+        const getBoutique = (id) =>{
+        boutique.value = listeBoutiques.value.filter(boutique =>{
+            return boutique.id == id
+        })
+        }
+
         watch(boutiqueReception, async()=>{
             if(boutiqueReception.value =='') {
                 return
             }
+            getBoutique(boutiqueReception.value)
             await getStock(boutiqueReception.value)
+            if(stock.value){
+                totalQte.value = 0
+                listeArticles.value = prelisteArticles.value.filter(article => {
+                    totalQte.value += bringStock(article.id)
+                    return bringStock(article.id) > 0
+                })
+            }
+
         })
 
         const getArticles = async () => {
             const docRef = collection(db, "produits")
             const res = onSnapshot(docRef, (snap)=>{
-                listeArticles.value = snap.docs.map(doc => {
+                prelisteArticles.value = snap.docs.map(doc => {
                     // console.log("snap doc : ", doc.data());
                     return {...doc.data(), id: doc.id}
                 })
+                listeArticles.value = prelisteArticles.value
             })
         }
         const pullStock =  ( id) => {
@@ -216,13 +257,12 @@ export default {
         }
         const filteredBoutiques = computed(()=>{
            return listeBoutiques.value && listeBoutiques.value.filter((boutique)=>{
-        if(isAdmin){
-          return boutique //.gerantBoutique == auth.currentUser.email
-        }else {
-          return boutique.gerantBoutique == auth.currentUser.email
-
-        }
-      })
+                if(isAdmin){
+                return boutique //.gerantBoutique == auth.currentUser.email
+                }else {
+                return boutique.gerantBoutique == auth.currentUser.email
+                }
+            })
         })
 
         const filteredArticles = computed(()=>{
@@ -231,16 +271,25 @@ export default {
             })
         })
 
-        const getFournisseurs = async () => {
-            const docRef = collection(db, "fournisseurs")
-            const res = onSnapshot(docRef, (snap)=>{
-                fournisseurs.value = snap.docs.map(doc => {
-                    // console.log("snap doc : ", doc.data());
-                    return {...doc.data(), id: doc.id}
-                })
+        watch(filteredArticles, ()=> {
+            // console.log("art :", filteredArticles.value.length)
+            totalPVU.value = 0
+            // totalQte.value = 0
+            filteredArticles.value.map(article => {
+                totalPVU.value += article.pvu
             })
+        })
 
-        }
+        watch(stock, () => {
+             totalQte.value = 0
+            if(stock.value) {
+                for(let stk in stock.value) {
+                    // console.log(stock.value[stk].quantiteStock)
+                    totalQte.value += Number(stock.value[stk].quantiteStock ? stock.value[stk].quantiteStock : 0)
+                }
+            }
+        })
+
         const hideModal = (e) => {
             if(e.target.classList.contains("create")){
                 document.querySelector(".create").classList.toggle("open")
@@ -249,21 +298,6 @@ export default {
         const showPop = () =>{
             document.querySelector(" .dropdown-popover").classList.toggle("active")
         }
-        const selectedArticle = (article) => {
-            //console.log("selectedArticle : ", article)
-            id.value = article.id
-            designation.value = article.designation
-            codeFamille.value = article.codeFamille
-            quantiteStock.value = bringStock(article.id)
-            quantiteStockRestant.value = quantiteStock.value
-            newdesignation.value = designation.value + "_detail"
-            expiration.value = article.expiration
-            fournisseurId.value = article.fournisseurId
-            pau.value = article.pau
-            pvu.value = article.pvu
-            seuil.value = article.seuil
-
-        }
         onMounted( async () => {
             getBoutiques()
             getArticles()
@@ -271,166 +305,42 @@ export default {
             //console.log("boutiquessssssss : ", listeBoutiques.value, auth.currentUser.email)
         })
 
-        const handleSubmit = async () => {
-            const { createError, create } = createDocument()
-            const newArticle = {
-                designation: newdesignation.value.toUpperCase(),
-                pau: Number(newpau.value),
-                pvu: Number(newpvu.value),
-                fournisseurId: fournisseurId.value,
-                codeFamille: codeFamille.value,
-                expiration: expiration.value,
-                seuil: Number(seuil.value),
-                createdAt: serverTimestamp()
-            }
-            // console.log("produit : ", newArticle);
-            //  const res = await create("produits", newArticle)
-             if(createError.value){
-                 getError.value = createError.value
-                 return
-             }
-            //  id.value = res.id
-            //  console.log("idddd : ", id.value)
-
-            //   if(res.id =='' || res.id == null) {
-            //       receptionError.value = "L'article est enregistré mais impossible de mettre à jour le stock, essayer avec le formulaire de reception"
-            //     return
-            //  }
-
-            // const stock = {
-            //     //boutiqueReception : boutiqueReception.value,
-            //     articleId : res.id,
-            //     quantiteStock : Number(newquantiteStock.value),
-            //     updatedAt: serverTimestamp()
-            // }
-            // console.log("fournisseur : ", fournisseur)
-            // await reception(stock, boutiqueReception.value )
-
-            const oldStok = {
-                articleId : id.value,
-                quantiteStock : Number(quantiteStockRestant.value),
-                updatedAt: serverTimestamp()
-            }
-            // await updateStock(oldStok, boutiqueReception.value)
-
-
-            if(!receptionError.value){
-                designation.value =''
-                newdesignation.value =''
-                pau.value = ''
-                pvu.value = ''
-                fournisseurId.value = ''
-                codeFamille.value = ''
-                expiration.value = ''
-                seuil.value = ''
-                quantiteRecu.value = ''
-                quantiteStock.value = ''
-                quantiteStockRestant.value = ''
-                quantiteDesintegrer.value = ''
-                newdesignation.value = ''
-                newquantiteStock.value = ''
-                newpau.value = ''
-                newpvu.value = ''
-
-            }
-
-
-
-        }
-
-        const saisiepau = () => {
-            try {
-                if(newpau.value !=''){
-                    if(isNaN(newpau.value)) {
-                        throw Error("Saisie invalid")
-                    }else saisiepauError.value = ''
-                }else saisiepauError.value = ''
-            } catch (error) {
-                saisiepauError.value = error.message
-            }
-        }
-        const saisiepvu = () => {
-            try {
-                if(newpvu.value !=''){
-                    if(isNaN(newpvu.value)) {
-                        throw Error("Saisie invalid")
-                    }else saisiepvuError.value = ''
-                }else saisiepvuError.value = ''
-            } catch (error) {
-                saisiepvuError.value = error.message
-            }
-        }
-        const saisieqte = () => {
-            try {
-                if(newquantiteStock.value !=''){
-                    if(isNaN(newquantiteStock.value)) {
-                        throw Error("Saisie invalid")
-                    }else saisieqteError.value = ''
-                }else saisieqteError.value = ''
-            } catch (error) {
-                saisieqteError.value = error.message
-            }
-        }
-
-        const operation = (e) => {
-            calcError.value = null
-            try {
-                if(quantiteDesintegrer.value !='' || !quantiteDesintegrer.value ==null) {
-                quantiteStockRestant.value = Number(quantiteStock.value) - Number(quantiteDesintegrer.value)
-                // console.log("Qt : ", isNaN(quantiteStockRestant.value), quantiteStockRestant.value)
-                if(isNaN(quantiteStockRestant.value) || quantiteStockRestant.value < 0) {
-                    throw Error("Saisie invalid")
-                }
-                }
-
-            } catch (error) {
-                calcError.value = error.message
-            }
-        }
         const goBack = () => {
             router.back()
         }
+        const exportPDF = () => {
+        /// Generate facture in pdf
+        // let dateDe= dateDebut.value
+        // let dateA = dateFin.value
+        let options = {
+            // totalTTC : totalTTC.value.toString(),
+            // dateDe: dateDe,
+            // dateA: dateA,
+            boutique: boutiqueReception.value,
+            gerant: auth.currentUser.displayName
+        }
+        makeDocument({title : 'INVENTAIRE GLOBAL DE LA BOUTIQUE  ' + boutique.value[0].designationBoutique, orientation : "p", format : "a4", id : 'inventaire', option: options})
+            /// End of Generate facture in pdf
+        }
 
         return {
-            handleSubmit,
-            dateReception,
             boutiqueReception,
             bringStock,
             pullStock,
             listeArticles,
-            selectedArticle,
-            articleRecu,
-            id,
             listeBoutiques,
             filteredBoutiques,
             filteredArticles,
-            designation,
-            pau,
-            pvu,
-            newpau,
-            newpvu,
-            codeFamille,
-            quantiteRecu,
-            newdesignation,
-            newquantiteStock,
-            quantiteStock,
-            quantiteStockRestant,
-            quantiteDesintegrer,
-            operation,
-            calcError,
-            saisiepauError,
-            saisiepvuError,
-            saisieqteError,
-            saisieqte,
-            fournisseurs,
+            totalPVU,
+            totalQte,
             searchQuery,
             showPop,
             hideModal,
             receptionError,
             getError,
             goBack,
-            saisiepau,
-            saisiepvu,
+            numberFormatter,
+            exportPDF,
 
         }
     }
