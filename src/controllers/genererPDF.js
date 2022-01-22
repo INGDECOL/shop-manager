@@ -136,7 +136,7 @@ const makeDocument = ({title = '',  orientation = 'p',  format = 'a4',  data = [
 
     // Generation du tableau en fonction du tableau html fournis
     autotable(doc, {
-        styles: { font: "times"},
+        styles: { font: "times", fontSize: 12},
         footStyles: { fillColor: "#777b7e"},
         html: table,
         startY: 50,
@@ -151,7 +151,7 @@ const makeDocument = ({title = '',  orientation = 'p',  format = 'a4',  data = [
     doc.setFontSize(14)
     doc.setFont("courrier","bold")
     doc.setTextColor("#0e4c92")
-    doc.text("Montant Total :  " + numberFormatter.format(option.totalTTC)  , 20, tableFinalHeight + 14)
+    option.totalTTC && doc.text("Montant Total :  " + numberFormatter.format(option.totalTTC)  , 20, tableFinalHeight + 14)
 
     setFooters(doc)
     doc.save(title+".pdf")

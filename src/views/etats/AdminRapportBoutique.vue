@@ -42,7 +42,7 @@
           </div>
           <!-- Liste des operation -->
           <div v-if="listeVentes.length" class="border border-gray-300 rounded p-0.5 ">
-            <table class="min-w-full bg-white divider-y divide-gray-400">
+            <table class="min-w-full bg-white divider-y divide-gray-400" id="rapportGlobal">
                 <thead class="bg-gray-800 text-white">
                   <tr >
                     <th class="text-left py-3 px-4 uppercase font-bold text-base">#</th>
@@ -54,28 +54,28 @@
                   <tr class="border-b border-gray-400 max-h-2 overflow-y-scroll"  >
                     <td class="text-left text-base py-2 px-3 font-bold uppercase">1 </td>
                     <td class="text-left text-base font-bold py-2 px-3 ">Total des ventes</td>
-                    <td class="text-center text-base font-bold py-2 px-3 uppercase">{{ formatedNumber(totalTTC ? totalTTC : 0 )}}</td>
+                    <td class="text-center text-base font-bold py-2 px-3 uppercase">{{ numberFormatter.format(totalTTC ? totalTTC : 0 )}}</td>
                   </tr>
                   <tr class="border-b border-gray-400 max-h-2 overflow-y-scroll striped">
                     <td class="text-left text-base py-2 px-3 font-bold uppercase">2 </td>
                     <td class="text-left text-base text-red-300 font-bold py-2 px-3">Total montant en dette</td>
-                    <td class="text-center text-base text-red-300 hover:text-red-400 font-bold py-2 px-3 cursor-pointer" title="Montant total non recouvré">{{ formatedNumber(montantTotalDettes ? montantTotalDettes : 0)}}</td>
+                    <td class="text-center text-base text-red-300 hover:text-red-400 font-bold py-2 px-3 cursor-pointer" title="Montant total non recouvré">{{ numberFormatter.format(montantTotalDettes ? montantTotalDettes : 0)}}</td>
                   </tr>
                   <tr class="border-b border-gray-400 max-h-2 overflow-y-scroll">
                     <td class="text-left text-base py-2 px-3 font-bold uppercase">3 </td>
                     <td class="text-left text-base font-bold py-2 px-3">Total PAU des articles en Stock</td>
-                    <td class="text-center text-base font-bold py-2 px-3 cursor-pointer" title="Prix d'achat total des articles dans la boutique">{{ formatedNumber(pauTotal ? pauTotal : 0)}}</td>
+                    <td class="text-center text-base font-bold py-2 px-3 cursor-pointer" title="Prix d'achat total des articles dans la boutique">{{ numberFormatter.format(pauTotal ? pauTotal : 0)}}</td>
                   </tr>
                   <tr class="border-b border-gray-400 max-h-2 overflow-y-scroll striped">
                     <td class="text-left text-base py-2 px-3 font-bold uppercase">4 </td>
                     <td class="text-left text-base font-bold py-2 px-3">Total PVU des articles en Stock</td>
-                    <td class="text-center text-base font-bold py-2 px-3 cursor-pointer" title="Prix de vente total des articles dans la boutique">{{ formatedNumber(pvuTotal ? pvuTotal : 0)}}</td>
+                    <td class="text-center text-base font-bold py-2 px-3 cursor-pointer" title="Prix de vente total des articles dans la boutique">{{ numberFormatter.format(pvuTotal ? pvuTotal : 0)}}</td>
                   </tr>
                 </tbody>
             </table>
             <!-- Total de la liste -->
             <div class="flex justify-center mt-2 mr-0">
-                    <button class=" border-2 border-green-300 bg-transparent hover:bg-green-400">Imprimer</button>
+                    <button class=" border-2 border-green-300 bg-transparent hover:bg-green-400" @click="exportPDF">Imprimer</button>
             </div>
           </div>
           <div v-else class="flex justify-center w-full">
@@ -97,6 +97,7 @@ import { useRouter } from 'vue-router'
 import Spinner from "../../components/Spinner.vue"
 import { onMounted, watch } from '@vue/runtime-core';
 import receptionArticles from '../../controllers/receptionArticles';
+import genererPDF from '../../controllers/genererPDF';
 export default {
   components: {  Spinner },
   setup() {
@@ -119,9 +120,11 @@ export default {
     const montantTotalDettes = ref()
     const pvuTotal = ref()
     const pauTotal = ref()
+    const boutique = ref()
     const dateDebut = ref("")
     const dateFin = ref("")
     const totalTTC = ref("")
+    const { makeDocument } = genererPDF()
     const options = { year: 'numeric', month: 'short', day: 'numeric', timeZone:'UTC' }
 
     const { receptionError,stock, getStock, updateStock } = receptionArticles()
@@ -133,6 +136,16 @@ export default {
     const formatedNumber = (strNumber) => {
       return strNumber.toLocaleString('fr-fr', {style: "currency", currency: "GNF", minimumFractionDigits: 0})
     }
+
+    const numberFormatter = new Intl.NumberFormat('de-DE', {
+    style: 'currency',
+    currency: 'GNF',
+
+    // These options are needed to round to whole numbers if that's what you want.
+    //minimumFractionDigits: 0, // (this suffices for whole numbers, but will print 2500.10 as $2,500.1)
+    //maximumFractionDigits: 0, // (causes 2500.99 to be printed as $2,501)
+    })
+
     const formatedFacture = (strFactId) => {
       return strFactId.length > 20 ? strFactId.substring(0,20) +"..." : strFactId
     }
@@ -146,6 +159,13 @@ export default {
       })
 
     }
+
+    const getBoutique = (id) =>{
+      boutique.value = listeBoutiques.value.filter(boutique =>{
+        return boutique.id == id
+      })
+    }
+
     const filteredBoutiques = computed(()=>{
       return listeBoutiques.value && listeBoutiques.value.filter((boutique)=>{
         if(isAdmin){
@@ -161,6 +181,7 @@ export default {
         if(boutiqueVente.value =='') {
             return
         }
+        getBoutique(boutiqueVente.value)
         await getStock(boutiqueVente.value)
         await loadBoutiqueVentes()
         // console.log("dettes : ", listeDettes.value)
@@ -370,6 +391,21 @@ export default {
       }): []
     }
 
+    const exportPDF = () => {
+    /// Generate facture in pdf
+      let dateDe= dateDebut.value
+      let dateA = dateFin.value
+      let options = {
+          // totalTTC : totalTTC.value.toString(),
+          dateDe: dateDe,
+          dateA: dateA,
+          boutique: boutiqueVente.value,
+          gerant: auth.currentUser.displayName
+      }
+      makeDocument({title : 'RAPPORT GLOBAL DE LA BOUTIQUE  ' + boutique.value[0].designationBoutique, orientation : "p", format : "a4", id : 'rapportGlobal', option: options})
+        /// End of Generate facture in pdf
+    }
+
     return {
       boutiqueVente,
       filteredBoutiques,
@@ -377,6 +413,7 @@ export default {
       formatedVentes,
       formatedDate,
       formatedNumber,
+      numberFormatter,
       auth,
       isAdmin,
       edit,
@@ -400,6 +437,7 @@ export default {
       montantTotalDettes,
       pvuTotal,
       pauTotal,
+      exportPDF,
     }
   }
 }
