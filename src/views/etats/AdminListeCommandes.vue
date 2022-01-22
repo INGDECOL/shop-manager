@@ -28,10 +28,6 @@
               <input type="date" name="dateFin" id="dateFin" v-model="dateFin" @change="getCommandeByDate">
             </div>
           </div>
-          <!-- <div>
-            <button class="my-0 mx-2 py-0 flex justify-between items-center" @click="toggleForm"><span class="material-icons text-center py-1 m-0">add</span>Ajouter</button>
-
-          </div> -->
         </div>
         <div  class="flex justify-start gap-2">
           <!-- Liste des factures -->
@@ -43,15 +39,15 @@
           </div>
           <!-- Liste des ventes -->
           <div v-if="listeCommandes.length" class="border border-gray-300 rounded overflow-scroll p-0.5 w-full">
-            <table class="min-w-full bg-white divider-y divide-gray-400">
+            <table class="min-w-full bg-white divider-y divide-gray-400" id="listeCommande1">
                 <thead class="bg-gray-800 text-white">
                   <tr >
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">#</th>
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Date</th>
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Article</th>
-                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">PAU</th>
-                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Qté cmd</th>
-                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Montant</th>
+                    <th class="text-center py-3 px-4 uppercase font-semibold text-sm">PAU</th>
+                    <th class="text-center py-3 px-4 uppercase font-semibold text-sm">Qté cmd</th>
+                    <th class="text-center py-3 px-4 uppercase font-semibold text-sm">Montant</th>
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Actions</th>
                   </tr>
                 </thead>
@@ -60,15 +56,25 @@
                     <td class="text-left text-xs py-2 px-3 font-semibold uppercase">{{ n + 1 }} </td>
                     <td class="text-left text-xs py-2 px-3 ">{{ formatedDate(vente.createdAt.seconds ) }}</td>
                     <td class="text-left text-xs py-2 px-3 uppercase">{{vente.article}}</td>
-                    <td class="text-left text-xs py-2 px-3">{{ formatedNumber(vente.pau) }}</td>
+                    <td class="text-center text-xs py-2 px-3">{{ numberFormatter.format(vente.pau) }}</td>
                     <td class="text-center text-xs py-2 px-3">{{ vente.qtecmd}}</td>
-                    <td class="text-center text-xs py-2 px-3 " title="Montant Total">{{ formatedNumber(vente.payer) }}</td>
+                    <td class="text-center text-xs py-2 px-3 " title="Montant Total">{{ numberFormatter.format(vente.payer) }}</td>
                     <td class="text-left text-xs py-2 px-3 flex justify-between items-center">
                       <span class="material-icons disabled" title="Modifier"  @click="edit(vente.id)" >edit</span>
                       <span class="material-icons strash text-red-300 disabled" title="Supprimer" @click="destroy(vente.id)">delete</span>
                     </td>
                   </tr>
                 </tbody>
+                  <tfoot>
+                    <tr class="border-b border-gray-400 bg-gray-300">
+                        <td class="text-left py-3 px-4 text-sm  font-bold uppercase" colspan="3">Totaux </td>
+                        <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{ numberFormatter.format(totalPAU)}} </td>
+                        <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{totalQte}} </td>
+                        <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{ numberFormatter.format(totalTTC)}} </td>
+                        <td class="text-center py-3 px-4 text-sm  font-bold uppercase" > </td>
+                    </tr>
+                </tfoot>
+
             </table>
             <!-- Total de la liste -->
             <div class="flex justify-center mt-2 mr-0">
@@ -77,14 +83,52 @@
                 <span class="mx-3 my-4">{{totalTTC ? (totalTTC ).toLocaleString('fr-fr', {style: "currency", currency: "GNF", minimumFractionDigits: 0})  : 0 }}</span>
                 </span>
             </div>
-            <div class="flex justify-center" v-if="filteredvente">
-                <button class="bg-transparent border border-green-400 hover:bg-green-400 hover:text-gray-700">Imprimer la liste</button>
+            <div class="flex justify-center" v-if="filteredvente.length">
+                <button class="bg-transparent border border-green-400 hover:bg-green-400 hover:text-gray-700" @click="exportPDF">Imprimer la liste</button>
             </div>
           </div>
         <div v-else class="flex justify-center w-full">
           <Spinner />
         </div>
         </div>
+          <div v-if="listeCommandes.length" class="border border-gray-300 rounded overflow-scroll p-0.5 w-full hidden">
+            <table class="min-w-full bg-white divider-y divide-gray-400" id="listeCommande">
+                <thead class="bg-gray-800 text-white">
+                  <tr >
+                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">#</th>
+                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Date</th>
+                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Article</th>
+                    <th class="text-center py-3 px-4 uppercase font-semibold text-sm">PAU</th>
+                    <th class="text-center py-3 px-4 uppercase font-semibold text-sm">Qté cmd</th>
+                    <th class="text-center py-3 px-4 uppercase font-semibold text-sm">Montant</th>
+                  </tr>
+                </thead>
+                <tbody class="text-gray-700">
+                  <tr class="border-b border-gray-400 max-h-2 overflow-y-scroll" :class="{ striped : n % 2 ===0}" v-for="(vente, n) in filteredvente " :key="vente.id">
+                    <td class="text-left text-xs py-2 px-3 font-semibold uppercase">{{ n + 1 }} </td>
+                    <td class="text-left text-xs py-2 px-3 ">{{ formatedDate(vente.createdAt.seconds ) }}</td>
+                    <td class="text-left text-xs py-2 px-3 uppercase">{{vente.article}}</td>
+                    <td class="text-center text-xs py-2 px-3">{{ numberFormatter.format(vente.pau) }}</td>
+                    <td class="text-center text-xs py-2 px-3">{{ vente.qtecmd}}</td>
+                    <td class="text-center text-xs py-2 px-3 " title="Montant Total">{{ numberFormatter.format(vente.payer) }}</td>
+                    <td class="text-left text-xs py-2 px-3 flex justify-between items-center">
+                      <span class="material-icons disabled" title="Modifier"  @click="edit(vente.id)" >edit</span>
+                      <span class="material-icons strash text-red-300 disabled" title="Supprimer" @click="destroy(vente.id)">delete</span>
+                    </td>
+                  </tr>
+                </tbody>
+                  <tfoot>
+                    <tr class="border-b border-gray-400 bg-gray-300">
+                        <td class="text-left py-3 px-4 text-sm  font-bold uppercase" colspan="3">Totaux </td>
+                        <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{ numberFormatter.format(totalPAU)}} </td>
+                        <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{totalQte}} </td>
+                        <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{ numberFormatter.format(totalTTC)}} </td>
+                    </tr>
+                </tfoot>
+
+            </table>
+            <!-- Total de la liste -->
+          </div>
       </div>
   </div>
 </template>
@@ -101,6 +145,7 @@ import { useRouter } from 'vue-router'
 // import NewProduit from "./NewProduit.vue"
 import Spinner from "../../components/Spinner.vue"
 import { onMounted, watch } from '@vue/runtime-core';
+import genererPDF from '../../controllers/genererPDF';
 export default {
   components: {  Spinner },
   setup() {
@@ -109,7 +154,7 @@ export default {
     // const getError = ref("")
     const {documents, getError, load} = getDocuments()
     const fournisseurCmdId = ref('')
-    const listeBoutiques = ref(null)
+    const fournisseur = ref()
     const listeFournisseurs = ref(null)
     const searchQuery = ref("")
     const listeFactures = ref([])
@@ -120,7 +165,10 @@ export default {
     const dateDebut = ref("")
     const dateFin = ref("")
     const totalTTC = ref("")
+    const totalPAU = ref("")
+    const totalQte = ref("")
     const options = { year: 'numeric', month: 'short', day: 'numeric', timeZone:'UTC' }
+    const { makeDocument } = genererPDF()
 
     const formatedDate = (strDate) => {
       return new Date(strDate * 1000 ).toLocaleDateString(undefined, options)
@@ -130,6 +178,15 @@ export default {
     const formatedNumber = (strNumber) => {
       return strNumber.toLocaleString('fr-fr', {style: "currency", currency: "GNF", minimumFractionDigits: 0})
     }
+
+    const numberFormatter = new Intl.NumberFormat('de-DE', {
+    style: 'currency',
+    currency: 'GNF',
+
+    // These options are needed to round to whole numbers if that's what you want.
+    //minimumFractionDigits: 0, // (this suffices for whole numbers, but will print 2500.10 as $2,500.1)
+    //maximumFractionDigits: 0, // (causes 2500.99 to be printed as $2,501)
+    })
 
     const formatedFacture = (strFactId) => {
       return strFactId.length > 20 ? strFactId.substring(0,20) +"..." : strFactId
@@ -144,6 +201,12 @@ export default {
       })
 
     }
+    const getFournisseur =  (id) => {
+          fournisseur.value = listeFournisseurs.value.filter(fournisseur => {
+            return fournisseur.id == id
+          })
+      }
+
     const filteredFournisseurs = computed(()=>{
       return listeFournisseurs.value && listeFournisseurs.value.filter((FSS)=>{
               return listeFournisseurs.value
@@ -155,8 +218,22 @@ export default {
         if(fournisseurCmdId.value =='') {
             return
         }
+        getFournisseur(fournisseurCmdId.value)
         await getFournisseursFactures()
         await loadfournisseurCmdIds()
+    })
+
+    watch(filteredvente, () => {
+      if(filteredvente.value.length) {
+        totalQte.value = 0
+        totalPAU.value = 0
+        filteredvente.value.forEach(vente => {
+          totalPAU.value += vente.pau
+          totalQte.value += vente.qtecmd
+
+        })
+        console.log(totalPAU.value, totalQte.value, totalTTC.value)
+      }
     })
 
     const getFactures =async () => {
@@ -325,6 +402,22 @@ export default {
       }): []
     }
 
+    const exportPDF = () => {
+    /// Generate facture in pdf
+      let dateDe= dateDebut.value
+      let dateA = dateFin.value
+      let options = {
+          totalTTC : totalTTC.value.toString(),
+          dateDe: dateDe,
+          dateA: dateA,
+          acheteur: auth.currentUser.displayName
+      }
+      makeDocument({title : 'LISTE DES COMMANDES DU FOURNISSEUR  ' + fournisseur.value[0].nom +" " + fournisseur.value[0].prenom , orientation : "p", format : "a4", id : 'listeCommande', option: options})
+        /// End of Generate facture in pdf
+    }
+
+
+
     return {
       fournisseurCmdId,
       filteredFournisseurs,
@@ -353,6 +446,10 @@ export default {
       dateDebut,
       dateFin,
       totalTTC,
+      totalPAU,
+      totalQte,
+      numberFormatter,
+      exportPDF,
     }
   }
 }
