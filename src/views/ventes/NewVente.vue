@@ -171,7 +171,6 @@
                                 <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{totalQte}} </td>
                                 <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{ numberFormatter.format(totalTTC)}} </td>
                             </tr>
-
                         </tfoot>
                     </table>
                 </div>
@@ -260,10 +259,6 @@ export default {
         const selectedClient = (client) => {
             clientId.value = client.id
             clientNom.value = client.nom +" " + client.prenom + " " + client.contact
-            // let day = new Date().getDate()
-            // let month = new Date().getMonth() < 10 ? new Date().getMonth() < 1 ? "01": "0" + new Date().getMonth() : new Date().getMonth()
-            // let year = new Date().getFullYear()
-            //  console.log("date : ", day+ " " + month + " " + year +" " + new Date().getHours() +" " + new Date().getMinutes() + " 010" +" " + new Date().getSeconds())
 
         }
 

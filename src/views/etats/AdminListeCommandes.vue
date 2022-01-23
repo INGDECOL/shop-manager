@@ -232,7 +232,7 @@ export default {
           totalQte.value += vente.qtecmd
 
         })
-        console.log(totalPAU.value, totalQte.value, totalTTC.value)
+        // console.log(totalPAU.value, totalQte.value, totalTTC.value)
       }
     })
 
@@ -408,6 +408,8 @@ export default {
       let dateA = dateFin.value
       let options = {
           totalTTC : totalTTC.value.toString(),
+          totalPAU : totalPAU.value,
+          totalQte : totalQte.value,
           dateDe: dateDe,
           dateA: dateA,
           acheteur: auth.currentUser.displayName
@@ -415,8 +417,6 @@ export default {
       makeDocument({title : 'LISTE DES COMMANDES DU FOURNISSEUR  ' + fournisseur.value[0].nom +" " + fournisseur.value[0].prenom , orientation : "p", format : "a4", id : 'listeCommande', option: options})
         /// End of Generate facture in pdf
     }
-
-
 
     return {
       fournisseurCmdId,

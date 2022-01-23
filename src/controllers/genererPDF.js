@@ -103,13 +103,87 @@ const makeFacture = ( {title = '',  orientation = 'p',  format = 'a4',  data = [
 
 
 }
+const makeCommande = ( {title = '',  orientation = 'p',  format = 'a4',  data = [], id = '', option = {}}) => {
+    let table = document.getElementById(id)
+    let tableFinalHeight = 0
+
+    // using jsPDF & autotable
+    const doc = new jsPDF({ orientation: orientation, format: format})
+
+    let img = document.getElementById('navLogo')
+    console.log("fonts : ", doc.getFontList())
+
+    // Entête de la page
+    setEntete(doc, img)
+
+    doc.setTextColor('black')
+    doc.setFontSize(14)
+    doc.setFont("Times","bold")
+    doc.text(title, doc.internal.pageSize.width / 2, 42, { align: "center"})
+
+    doc.setFontSize(10)
+    doc.setFont("Times","bolditalic")
+    doc.text("Fournisseur : " + option.fournisseur, 15 , 47, { align: "left"})
+
+    doc.setFontSize(9)
+    doc.setFont("Times","bold, italic")
+    doc.text("Siguiri, le " + dateFormatter.format(new Date().now), doc.internal.pageSize.width * 0.8 , 47, { align: "center"})
+
+
+    // Generation du tableau en fonction du tableau html fournis
+    autotable(doc, {
+        styles: { font: "times"},
+        footStyles: { fillColor: "#777b7e"},
+        html: table,
+        startY: 50,
+        margin : { top: 20},
+        didDrawPage: (d) => {
+            // console.log("final height : ", Math.round(Number(d.cursor.y)))
+            tableFinalHeight = Math.round(Number(d.cursor.y))
+        },
+    })
+
+    doc.setFontSize(14)
+    doc.setFont("courrier","bold")
+    doc.setTextColor("#0e4c92")
+    doc.text("Montant Total :  " + numberFormatter.format(option.totalHT)  , 20, tableFinalHeight + 14)
+    // doc.setLineWidth(0.5)
+    doc.setDrawColor("#88807b")
+    doc.line(18, tableFinalHeight + 16, 138, tableFinalHeight + 16)
+
+    doc.setTextColor("#0b6633")
+    doc.text("Montant Payé :  "+ numberFormatter.format(option.montantRegle.toString()), 20, tableFinalHeight + 22)
+    doc.line(18, tableFinalHeight + 24, 138, tableFinalHeight + 24)
+
+    doc.setTextColor("#ed2939")
+    doc.text("Montant Restant :  "+ numberFormatter.format(option.restant), 20, tableFinalHeight + 30)
+    doc.line(18, tableFinalHeight + 32, 138, tableFinalHeight + 32)
+
+    doc.setTextColor("black")
+    doc.text("Règlement en "+ option.modeReglement, 20, tableFinalHeight + 38)
+
+    doc.setLineWidth(1)
+    doc.setDrawColor("black")
+    doc.rect(18, tableFinalHeight + 8 , 120, 32);
+
+    doc.text("Acheteur principal ", doc.internal.pageSize.width * 0.8 , tableFinalHeight + 50, {align: 'center'})
+    doc.text(option.acheteur, doc.internal.pageSize.width * 0.8 , tableFinalHeight + 72, {align: 'center'})
+
+
+    // console.log("last row : ",doc.internal.getNumberOfPages())
+
+    setSpecFooters(doc)
+    doc.save(title+".pdf")
+
+
+}
 
 const makeDocument = ({title = '',  orientation = 'p',  format = 'a4',  data = [], id = '', option = {}}) => {
 
     let table = document.getElementById(id)
     let tableFinalHeight = 0
 
-        const doc = new jsPDF({ orientation: orientation, format: format})
+    const doc = new jsPDF({ orientation: orientation, format: format})
 
     let img = document.getElementById('navLogo')
     console.log("fonts : ", doc.getFontList())
@@ -148,10 +222,40 @@ const makeDocument = ({title = '',  orientation = 'p',  format = 'a4',  data = [
         },
     })
 
-    doc.setFontSize(14)
-    doc.setFont("courrier","bold")
-    doc.setTextColor("#0e4c92")
-    option.totalTTC && doc.text("Montant Total :  " + numberFormatter.format(option.totalTTC)  , 20, tableFinalHeight + 14)
+    if(option.totalTTC && option.totalQte && option.totalPAU ) {
+        doc.setFontSize(14)
+        doc.setFont("courrier","bold")
+        doc.setTextColor("#black")//doc.setTextColor("#0e4c92")
+        doc.text("Montant Total :  " + numberFormatter.format(option.totalTTC)  , 20, tableFinalHeight + 14)
+        // doc.setLineWidth(0.5)
+        doc.setDrawColor("#88807b")
+        doc.line(18, tableFinalHeight + 16, 138, tableFinalHeight + 16)
+
+        doc.setTextColor("#black")//doc.setTextColor("#0b6633")
+        doc.text("Total des Quantités :  "+ numberFormatter.format(option.totalQte.toString()), 20, tableFinalHeight + 22)
+        doc.line(18, tableFinalHeight + 24, 138, tableFinalHeight + 24)
+
+        doc.setTextColor("#black")//doc.setTextColor("#ed2939")
+        doc.text("Total PAU :  "+ numberFormatter.format(option.totalPAU), 20, tableFinalHeight + 30)
+        // doc.line(18, tableFinalHeight + 32, 138, tableFinalHeight + 32)
+
+        doc.setLineWidth(1)
+        doc.setDrawColor("black")
+        doc.rect(18, tableFinalHeight + 8 , 120, 25);
+
+        if(option.acheteur){
+            doc.text("Acheteur principal ", doc.internal.pageSize.width * 0.8 , tableFinalHeight + 50, {align: 'center'})
+            doc.text(option.acheteur, doc.internal.pageSize.width * 0.8 , tableFinalHeight + 72, {align: 'center'})
+
+        }
+    }else {
+        doc.setFontSize(14)
+        doc.setFont("courrier","bold")
+        doc.setTextColor("#0e4c92")
+        option.totalTTC && doc.text("Montant Total :  " + numberFormatter.format(option.totalTTC)  , 20, tableFinalHeight + 14)
+
+    }
+
 
     setFooters(doc)
     doc.save(title+".pdf")
@@ -199,10 +303,27 @@ const setFooters = doc => {
     })
   }
 }
+const setSpecFooters = doc => {
+  const pageCount = doc.internal.getNumberOfPages()
+
+  doc.setFont('helvetica', 'italic')
+  doc.setTextColor("black")
+  doc.setFontSize(8)
+  for (var i = 1; i <= pageCount; i++) {
+    doc.setPage(i)
+    doc.setLineWidth(0.5)
+    doc.setDrawColor("#88807b")
+    doc.line(0, 282, 300, 282)
+    doc.text("Ets N'NAHAWA Multi-Services Rep de Guinée - Region : KANKAN- Pref.: Siguiri - Contact :  22 22 91 41 / 621 79 02 82", 5, 287, { align: 'left'})
+    doc.text('Page ' + String(i) + ' sur ' + String(pageCount), doc.internal.pageSize.width * 0.9, 287, {
+      align: 'center'
+    })
+  }
+}
 
 
 const genererPDF = () => {
-    return { makeFacture, makeDocument }
+    return { makeFacture, makeDocument, makeCommande }
 }
 
 export default genererPDF
