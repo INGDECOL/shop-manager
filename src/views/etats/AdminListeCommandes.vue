@@ -91,6 +91,7 @@
           <Spinner />
         </div>
         </div>
+        <!-- Liste à Imprimer -->
           <div v-if="listeCommandes.length" class="border border-gray-300 rounded overflow-scroll p-0.5 w-full hidden">
             <table class="min-w-full bg-white divider-y divide-gray-400" id="listeCommande">
                 <thead class="bg-gray-800 text-white">
@@ -105,16 +106,16 @@
                 </thead>
                 <tbody class="text-gray-700">
                   <tr class="border-b border-gray-400 max-h-2 overflow-y-scroll" :class="{ striped : n % 2 ===0}" v-for="(vente, n) in filteredvente " :key="vente.id">
-                    <td class="text-left text-xs py-2 px-3 font-semibold uppercase">{{ n + 1 }} </td>
-                    <td class="text-left text-xs py-2 px-3 ">{{ formatedDate(vente.createdAt.seconds ) }}</td>
-                    <td class="text-left text-xs py-2 px-3 uppercase">{{vente.article}}</td>
-                    <td class="text-center text-xs py-2 px-3">{{ numberFormatter.format(vente.pau) }}</td>
-                    <td class="text-center text-xs py-2 px-3">{{ vente.qtecmd}}</td>
-                    <td class="text-center text-xs py-2 px-3 " title="Montant Total">{{ numberFormatter.format(vente.payer) }}</td>
-                    <td class="text-left text-xs py-2 px-3 flex justify-between items-center">
+                    <td class="text-left text-sm py-2 px-3 font-semibold uppercase">{{ n + 1 }} </td>
+                    <td class="text-left text-sm py-2 px-3 ">{{ formatedDate(vente.createdAt.seconds ) }}</td>
+                    <td class="text-left text-sm py-2 px-3 uppercase">{{vente.article}}</td>
+                    <td class="text-center text-sm py-2 px-3">{{ numberFormatter.format(vente.pau) }}</td>
+                    <td class="text-right text-sm py-2 px-3">{{ vente.qtecmd}}</td>
+                    <td class="text-center text-sm py-2 px-3 " title="Montant Total">{{ numberFormatter.format(vente.payer) }}</td>
+                    <!-- <td class="text-left text-sm py-2 px-3 flex justify-between items-center">
                       <span class="material-icons disabled" title="Modifier"  @click="edit(vente.id)" >edit</span>
                       <span class="material-icons strash text-red-300 disabled" title="Supprimer" @click="destroy(vente.id)">delete</span>
-                    </td>
+                    </td> -->
                   </tr>
                 </tbody>
                   <tfoot>

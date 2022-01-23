@@ -232,7 +232,7 @@ const makeDocument = ({title = '',  orientation = 'p',  format = 'a4',  data = [
         doc.line(18, tableFinalHeight + 16, 138, tableFinalHeight + 16)
 
         doc.setTextColor("#black")//doc.setTextColor("#0b6633")
-        doc.text("Total des Quantités :  "+ numberFormatter.format(option.totalQte.toString()), 20, tableFinalHeight + 22)
+        doc.text("Total des Quantités :  "+ option.totalQte.toString(), 20, tableFinalHeight + 22)
         doc.line(18, tableFinalHeight + 24, 138, tableFinalHeight + 24)
 
         doc.setTextColor("#black")//doc.setTextColor("#ed2939")
@@ -248,12 +248,20 @@ const makeDocument = ({title = '',  orientation = 'p',  format = 'a4',  data = [
             doc.text(option.acheteur, doc.internal.pageSize.width * 0.8 , tableFinalHeight + 72, {align: 'center'})
 
         }
+    }else if(title.includes('IMPAYEES')){
+        doc.setFontSize(15)
+        doc.setFont("courrier","bold")
+        doc.setTextColor("#ed2939")
+        option.totalTTC && doc.text("Montant Total :  " + numberFormatter.format(option.totalTTC)  , 20, tableFinalHeight + 14)
+        // doc.setDrawColor("#ed2939")
+        // doc.line(20, tableFinalHeight + 15, Math.round(doc.getTextWidth("Montant Total :  " + numberFormatter.format(option.totalTTC))), tableFinalHeight + 15, 'FD')
+        // console.log("text width : ", Math.round(doc.getTextWidth("Montant Total :  " + numberFormatter.format(option.totalTTC))))
+
     }else {
         doc.setFontSize(14)
         doc.setFont("courrier","bold")
         doc.setTextColor("#0e4c92")
         option.totalTTC && doc.text("Montant Total :  " + numberFormatter.format(option.totalTTC)  , 20, tableFinalHeight + 14)
-
     }
 
 

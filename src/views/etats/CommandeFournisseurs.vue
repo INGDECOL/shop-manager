@@ -142,7 +142,7 @@
                     </div>
                 </div>
                 <!-- Facture à imprimer -->
-                <div class="border m-1 p-1 max-h-48 overflow-y-scroll overflow-x-scroll">
+                <div class="border m-1 p-1 max-h-48 overflow-y-scroll overflow-x-scroll hidden">
                     <table class="min-w-full bg-white divider-y divide-gray-400 " id="commande">
                         <thead class="bg-gray-800 text-white">
                                 <tr>
