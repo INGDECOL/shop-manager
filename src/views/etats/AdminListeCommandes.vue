@@ -159,6 +159,7 @@ export default {
     const listeFournisseurs = ref(null)
     const searchQuery = ref("")
     const listeFactures = ref([])
+    const factureSelected = ref('')
     const filteredFactures = ref([])
     const editproduitId = ref(null)
     const listeCommandes = ref([])
@@ -216,6 +217,7 @@ export default {
     })
 
     watch(fournisseurCmdId, async()=>{
+      factureSelected.value = ''
         if(fournisseurCmdId.value =='') {
             return
         }
@@ -308,6 +310,8 @@ export default {
         return vente.factureId == facture
       })
       getTotal()
+      factureSelected.value = facture
+      // console.log(factureSelected.value)
     }
 
     const getCommandeByDate = (facture) => {
@@ -413,6 +417,7 @@ export default {
           totalQte : totalQte.value,
           dateDe: dateDe,
           dateA: dateA,
+          facture: factureSelected.value,
           acheteur: auth.currentUser.displayName
       }
       makeDocument({title : 'LISTE DES COMMANDES DU FOURNISSEUR  ' + fournisseur.value[0].nom +" " + fournisseur.value[0].prenom , orientation : "p", format : "a4", id : 'listeCommande', option: options})

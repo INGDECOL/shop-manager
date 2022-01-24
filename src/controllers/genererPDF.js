@@ -203,6 +203,15 @@ const makeDocument = ({title = '',  orientation = 'p',  format = 'a4',  data = [
         doc.text("Du : " + option.dateDe, 15 , 47, { align: "left"})
         doc.text("Au : " + option.dateA, 40 , 47, { align: "left"})
     }
+    if(option.facture && option.dateDe) {
+        doc.text("Fact : " + option.facture, 89, 47, { align: "center"})
+
+    }else if (option.facture && !option.dateDe ) {
+        doc.setFontSize(10)
+        doc.setFont("Times","bold")
+        doc.text("Fact : " + option.facture, 15 , 47, { align: "left"})
+
+    }
 
     doc.setFontSize(9)
     doc.setFont("Times","bold, italic")
