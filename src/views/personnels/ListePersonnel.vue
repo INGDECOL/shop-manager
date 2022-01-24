@@ -42,6 +42,34 @@
                 </tbody>
             </table>
         </div>
+        <div class="flex justify-center mb-1" v-if="documents.length">
+          <button class="bg-transparent border border-green-400 hover:bg-green-400 hover:text-gray-700" @click="exportPDF">Imprimer la liste</button>
+        </div>
+        <!-- Liste à Imprimer -->
+        <div v-if="documents.length" class="hidden">
+            <table class="min-w-full bg-white divider-y divide-gray-400" id="personnel">
+                <thead class="bg-gray-800 text-white">
+                  <tr >
+                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">N°</th>
+                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Nom Complet</th>
+                    <th class="text-center py-3 px-4 uppercase font-semibold text-sm">Contact</th>
+                    <!-- <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Adresse</th> -->
+                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Email</th>
+                    <th class="text-center py-3 px-4 uppercase font-semibold text-sm">Fonction</th>
+                  </tr>
+                </thead>
+                <tbody class="text-gray-700">
+                  <tr class="border-b border-gray-400 max-h-2 overflow-y-scroll" :class="{ striped : n % 2 ===0}" v-for="(personnel, n) in filteredPersonnels" :key="personnel.id">
+                    <td class="text-left py-3 px-4 font-semibold uppercase">{{ n+1}} </td>
+                    <td class="text-left py-3 px-4 font-semibold uppercase">{{ personnel.nom}} </td>
+                    <td class="text-center py-3 px-4">{{ personnel.phoneNumber}}</td>
+                    <td class="text-left py-3 px-4 text-blue-400 underline cursor-pointer">{{ personnel.email }}</td>
+                    <td class="text-center py-3 px-4">{{ personnel.fonction }}</td>
+                  </tr>
+                </tbody>
+            </table>
+        </div>
+
         <div v-else>
           <Spinner />
         </div>
@@ -61,6 +89,7 @@ import Bon from "./Bon.vue"
 import Spinner from "../../components/Spinner.vue"
 import { onMounted } from '@vue/runtime-core';
 import { collection, onSnapshot, orderBy, query } from '@firebase/firestore';
+import genererPDF from '../../controllers/genererPDF';
 export default {
   components: { NewPersonnel, Spinner, Bon },
 
@@ -72,6 +101,7 @@ export default {
     const listeSalaires = ref([])
     const listeBons = ref([])
     const options = { year: 'numeric', month: 'short', day: 'numeric', timeZone:'UTC' }
+    const { makeDocument } = genererPDF()
 
     const formatedDate = (strDate) => {
       return new Date(strDate * 1000 ).toLocaleDateString(undefined, options)
@@ -224,6 +254,23 @@ export default {
 
     })
 
+    const exportPDF = () => {
+    /// Generate facture in pdf
+      // let dateDe= dateDebut.value
+      // let dateA = dateFin.value
+      let options = {
+          // totalTTC : totalTTC.value.toString(),
+          // totalPAU : totalPAU.value,
+          // totalQte : totalQte.value,
+          // dateDe: dateDe,
+          // dateA: dateA,
+          // facture: factureSelected.value,
+          gerant: auth.currentUser.displayName
+      }
+      makeDocument({title : 'LISTE DU PERSONNEL  '  , orientation : "p", format : "a4", id : 'personnel', option: options})
+        /// End of Generate facture in pdf
+    }
+
 
 
     return {
@@ -238,6 +285,7 @@ export default {
       filteredPersonnels,
       editPersonnelId,
       faireUnBon,
+      exportPDF,
     }
   }
 }

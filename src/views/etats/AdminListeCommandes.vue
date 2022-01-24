@@ -83,7 +83,7 @@
                 <span class="mx-3 my-4">{{totalTTC ? (totalTTC ).toLocaleString('fr-fr', {style: "currency", currency: "GNF", minimumFractionDigits: 0})  : 0 }}</span>
                 </span>
             </div>
-            <div class="flex justify-center" v-if="filteredvente.length">
+            <div class="flex justify-center mb-1" v-if="filteredvente.length">
                 <button class="bg-transparent border border-green-400 hover:bg-green-400 hover:text-gray-700" @click="exportPDF">Imprimer la liste</button>
             </div>
           </div>

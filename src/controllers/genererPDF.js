@@ -255,7 +255,6 @@ const makeDocument = ({title = '',  orientation = 'p',  format = 'a4',  data = [
         if(option.acheteur){
             doc.text("Acheteur principal ", doc.internal.pageSize.width * 0.8 , tableFinalHeight + 50, {align: 'center'})
             doc.text(option.acheteur, doc.internal.pageSize.width * 0.8 , tableFinalHeight + 72, {align: 'center'})
-
         }
     }else if(title.includes('IMPAYEES')){
         doc.setFontSize(15)
@@ -266,6 +265,11 @@ const makeDocument = ({title = '',  orientation = 'p',  format = 'a4',  data = [
         // doc.line(20, tableFinalHeight + 15, Math.round(doc.getTextWidth("Montant Total :  " + numberFormatter.format(option.totalTTC))), tableFinalHeight + 15, 'FD')
         // console.log("text width : ", Math.round(doc.getTextWidth("Montant Total :  " + numberFormatter.format(option.totalTTC))))
 
+    }else if (option.gerant) {
+         doc.setFontSize(14)
+        doc.setFont("courrier","bold")
+        doc.text("Gérant principal ", doc.internal.pageSize.width * 0.8 , tableFinalHeight + 30, {align: 'center'})
+        doc.text(option.gerant, doc.internal.pageSize.width * 0.8 , tableFinalHeight + 52, {align: 'center'})
     }else {
         doc.setFontSize(14)
         doc.setFont("courrier","bold")
