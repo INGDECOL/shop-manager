@@ -43,10 +43,7 @@
                                   <!-- <td class="text-left py-3 px-4">{{ personnel.adresse}}</td> -->
                                   <!-- <td class="text-left py-3 px-4 text-blue-400 underline cursor-pointer">{{ personnel.email }}</td> -->
                                   <td class="text-left py-3 px-3 text-xs">{{ personnel.fonction }}</td>
-                                  <!-- <td class="text-left py-3 px-4 flex justify-between items-center">
-                                    <span class="material-icons " title="Modifier" :class="{ disabled: !isAdmin }" @click="edit(personnel.id)">edit</span>
-                                    <span class="material-icons strash text-red-300" title="Supprimer" :class="{ disabled: !isAdmin }" @click="destroy(personnel.id)">delete</span>
-                                  </td> -->
+                                  
                                 </tr>
                               </tbody>
                           </table>
@@ -93,6 +90,66 @@
                         </div>
                     </div>
                 </div>
+                <!-- Liste à Imprimer -->
+                <div v-if="documents.length" class="hidden">
+                    <table class="min-w-full bg-white divider-y divide-gray-400" id="bulletin">
+                      <thead class="bg-gray-800 text-white">
+                        <tr >
+                          <th class="text-left py-3 px-3 uppercase  text-xs">Code</th>
+                          <th class="text-left py-3 px-3 uppercase  text-xs">Libelle</th>
+                          <th class="text-left py-3 px-3 uppercase  text-xs">MT Gain</th>
+                          <th class="text-left py-3 px-3 uppercase  text-xs">MT Retenu</th>
+                        </tr>
+                      </thead>
+                      <tbody class="text-gray-700">
+                        <tr class="border-b border-gray-400 max-h-2 overflow-y-scroll"  >
+                          <td class="text-left py-3 px-3 text-xs uppercase " >{{ 102 }} </td>
+                          <td class="text-left py-3 px-3 text-xs">Salaire de base indiciaire</td>
+                          <td class="text-left py-3 px-3 text-xs">{{ salaireBase ? salaireBase : "0 GNF" }}</td>
+                          <td class="text-left py-3 px-3 text-xs">{{ numberFormatter.format(0) }}</td>
+                        </tr>
+                        <!-- Indemnites -->
+                        <tr class="border-b border-gray-400 max-h-2 overflow-y-scroll striped"  >
+                          <td class="text-left py-3 px-3 text-xs uppercase " >{{ 280 }} </td>
+                          <td class="text-left py-3 px-3 text-xs">Indemnites</td>
+                          <td class="text-left py-3 px-3 text-xs">{{ indemnites ? indemnites : "0 GNF" }}</td>
+                          <td class="text-left py-3 px-3 text-xs">{{ numberFormatter.format(0) }}</td>
+                        </tr>
+                        <!-- Cotisations -->
+                        <tr class="border-b border-gray-400 max-h-2 overflow-y-scroll "  >
+                          <td class="text-left py-3 px-3 text-xs uppercase " >{{ 707 }} </td>
+                          <td class="text-left py-3 px-3 text-xs">Retenu pour cotisation sociale</td>
+                          <td class="text-left py-3 px-3 text-xs">{{ numberFormatter.format(0) }}</td>
+                          <td class="text-left py-3 px-3 text-xs">{{ cotisation ? cotisation : "0 GNF" }}</td>
+                        </tr>
+                        <!-- Bon et autre -->
+                        <tr class="border-b border-gray-400 max-h-2 overflow-y-scroll striped"  >
+                          <td class="text-left py-3 px-3 text-xs uppercase " >{{ 901 }} </td>
+                          <td class="text-left py-3 px-3 text-xs">Retenu pour Bon et avance sur S</td>
+                          <td class="text-left py-3 px-3 text-xs">{{ numberFormatter.format(0) }}</td>
+                          <td class="text-left py-3 px-3 text-xs">{{ antecedant ? antecedant : "0 GNF" }}</td>
+                        </tr>
+                      </tbody>
+                      <tfoot>
+                        <!-- TOTAL -->
+                        <tr class="border-b  border-gray-500 max-h-2 overflow-y-scroll bg-gray-400"  >
+                          <td class="text-left py-3 px-3 text-xs uppercase font-bold border-r border-gray-500" colspan="2">TOTAL </td>
+                          <td class="text-left py-3 px-3 text-xs font-bold border-r border-gray-500">{{ mtTotal ? numberFormatter.format(mtTotal) : "0 GNF" }}</td>
+                          <td class="text-left py-3 px-3 text-xs font-bold ">{{ antecedant ? antecedant : "0 GNF" }}</td>
+                        </tr>
+                        <tr class="border-b  border-gray-500 max-h-2 overflow-y-scroll bg-gray-400"  >
+                          <td class="text-left py-3 px-3 text-xs uppercase font-bold border-r border-gray-500" colspan="2"> </td>
+                          <td class="text-left py-3 px-3 text-xs font-bold border-r border-gray-500">IMPOSABLE</td>
+                          <td class="text-left py-3 px-3 text-xs font-bold ">NET A PAYER</td>
+                        </tr>
+                        <tr class="border-b  border-gray-500 max-h-2 overflow-y-scroll bg-gray-400"  >
+                          <td class="text-left py-3 px-3 text-xs uppercase font-bold border-r border-gray-500" colspan="2"> </td>
+                          <td class="text-left py-3 px-3 text-xs font-bold border-r border-gray-500">{{ salaireBase }}</td>
+                          <td class="text-left py-3 px-3 text-xs font-bold ">{{ salaireNet ? salaireNet : "0 GNF"}}</td>
+                        </tr>
+                      </tfoot>
+                    </table>
+                </div>
                 </div>
             </form>
         </div>
@@ -104,15 +161,18 @@
   import { computed, ref } from '@vue/reactivity'
   import { useRouter } from 'vue-router'
   import getDocuments from '../../controllers/getDocuments'
+  import destroyDocument from '../../controllers/destroyDocument'
   import { onMounted } from '@vue/runtime-core'
   import { auth, db } from "../../firebase/config"
   import createDocument from "../../controllers/createDocument"
 import { collection, onSnapshot, orderBy, query, serverTimestamp } from '@firebase/firestore'
+import genererPDF from '../../controllers/genererPDF'
   export default {
     setup() {
       const router = useRouter()
       const {documents, getError, load} = getDocuments()
       const { createError, create} = createDocument()
+      const {  destroy } = destroyDocument()
       const searchQuery = ref("")
       const editPersonnelId = ref(null)
       const id = ref('')
@@ -127,12 +187,16 @@ import { collection, onSnapshot, orderBy, query, serverTimestamp } from '@fireba
       const indem = ref()
       const salaireNet = ref()
       const salaireN = ref()
+      const cotisation = ref()
+      const mtTotal = ref()
       const moisApayer = ref()
       const listeBons = ref([])
+      const listeBonsId = ref(new Set())
       const listeSalaires = ref([])
       const listeMois = ref([])
       const listeBulletins = ref([])
       const options = { year: 'numeric', month: 'short', day: 'numeric', timeZone:'UTC' }
+      const { makeBulletin } = genererPDF()
 
       const formatedDate = (strDate) => {
         return new Date(strDate * 1000 ).toLocaleDateString(undefined, options)
@@ -141,6 +205,15 @@ import { collection, onSnapshot, orderBy, query, serverTimestamp } from '@fireba
       const formatedNumber = (strNumber) => {
         return strNumber.toLocaleString('fr-fr', {style: "currency", currency: "GNF", minimumFractionDigits: 0})
       }
+
+      const numberFormatter = new Intl.NumberFormat('de-DE', {
+        style: 'currency',
+        currency: 'GNF',
+
+        // These options are needed to round to whole numbers if that's what you want.
+        //minimumFractionDigits: 0, // (this suffices for whole numbers, but will print 2500.10 as $2,500.1)
+        //maximumFractionDigits: 0, // (causes 2500.99 to be printed as $2,501)
+      })
 
       const getMois = () => {
         let months = ['Janv', 'Fevr', 'Mars', 'Avril', 'Mai', 'Juin', 'Juil', 'Aout', 'Sept', 'Oct', 'Nov', 'Dec']
@@ -197,8 +270,9 @@ import { collection, onSnapshot, orderBy, query, serverTimestamp } from '@fireba
       const getAntecedants = (id) => {
         let montanAntecedant =0
         listeBons.value.map(bon => {
-          if(bon.personnelId == id) {
+          if(bon.personnelId === id) {
             montanAntecedant += bon.montant
+            listeBonsId.value.add(bon.id)
           }
         })
         return montanAntecedant
@@ -212,9 +286,9 @@ import { collection, onSnapshot, orderBy, query, serverTimestamp } from '@fireba
             indem.value =Number(salaire.indemnites)
             salaireN.value = ((salaire.salaireBase) + (salaire.indemnites)) - (antecedant.value ? antecedant.value : 0)
 
-            salaireBase.value = formatedNumber(salaireB.value)
-            indemnites.value = formatedNumber(indem.value)
-            salaireNet.value = formatedNumber(salaireN.value)
+            salaireBase.value = numberFormatter.format(salaireB.value)
+            indemnites.value = numberFormatter.format(indem.value)
+            salaireNet.value = numberFormatter.format(salaireN.value)
           }
         })
       }
@@ -231,10 +305,12 @@ import { collection, onSnapshot, orderBy, query, serverTimestamp } from '@fireba
         contact.value = personnel.phoneNumber
         fonction.value = personnel.fonction
         ante.value = getAntecedants(personnel.id) ? getAntecedants(personnel.id) : 0
-        antecedant.value = formatedNumber(ante.value)
+        antecedant.value = numberFormatter.format(ante.value)
+        console.log("ids : ", listeBonsId.value)
 
          salaireN.value = ((salaireB.value) + (indem.value)) - (ante.value ? ante.value : 0)
-        salaireNet.value = formatedNumber(salaireN.value)
+        salaireNet.value = numberFormatter.format(salaireN.value)
+        mtTotal.value = (salaireB.value) + (indem.value)
 
       }
 
@@ -267,8 +343,28 @@ import { collection, onSnapshot, orderBy, query, serverTimestamp } from '@fireba
           alert("Ce personnel a déjà perçu son salaire du mois selectionné !")
           return
         }
-        console.log("bulletin : ", bulletin)
+        // console.log("bulletin : ", bulletin)
         await create("bulletins", bulletin)
+        listeBonsId.value.forEach(async id => {
+          await destroy("bons", id)
+
+        })
+
+        /// Generation du bulletin de salaire pdf
+        let options = {
+          personnelId : id.value,
+          nom: nom.value,
+          fonction: fonction.value,
+          mois: moisApayer.value,
+          contact: contact.value,
+              // dateA: dateA,
+              // facture: factureSelected.value,
+          gerant: auth.currentUser.displayName
+        }
+        makeBulletin({title : 'BULLETIN DE SALAIRE  '  , orientation : "p", format : "a4", id : 'bulletin', option: options})
+
+
+        /// Fin Generation du pdf
         if(!createError.value) {
           alert("Payement effectué avec succès !")
           id.value =null
@@ -283,6 +379,23 @@ import { collection, onSnapshot, orderBy, query, serverTimestamp } from '@fireba
         }
 
       }
+
+      const exportPDF = () => {
+        /// Generate facture in pdf
+          // let dateDe= dateDebut.value
+          // let dateA = dateFin.value
+          let options = {
+              // totalTTC : totalTTC.value.toString(),
+              // totalPAU : totalPAU.value,
+              // totalQte : totalQte.value,
+              // dateDe: dateDe,
+              // dateA: dateA,
+              // facture: factureSelected.value,
+              gerant: auth.currentUser.displayName
+          }
+          makeDocument({title : 'LISTE DU PERSONNEL  '  , orientation : "p", format : "a4", id : 'personnel', option: options})
+            /// End of Generate facture in pdf
+        }
 
 
       return {
@@ -304,6 +417,10 @@ import { collection, onSnapshot, orderBy, query, serverTimestamp } from '@fireba
         listeMois,
         moisApayer,
         handleSubmit,
+        numberFormatter,
+        exportPDF,
+        cotisation,
+        mtTotal,
 
       }
     }

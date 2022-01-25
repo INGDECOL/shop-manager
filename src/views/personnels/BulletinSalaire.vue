@@ -61,14 +61,14 @@
                               <tr class="border-b border-gray-400 max-h-2 overflow-y-scroll"  >
                                 <td class="text-left py-3 px-3 text-xs uppercase " >{{ 102 }} </td>
                                 <td class="text-left py-3 px-3 text-xs">Salaire de base indiciaire</td>
-                                <td class="text-left py-3 px-3 text-xs">{{ salaireBase ? salaireBase : "0 GNF" }}</td>
+                                <td class="text-left py-3 px-3 text-xs">{{ formatedNumber(salaireBase ? salaireBase : 0) }}</td>
                                 <td class="text-left py-3 px-3 text-xs">{{ formatedNumber(0) }}</td>
                               </tr>
                               <!-- Indemnites -->
                               <tr class="border-b border-gray-400 max-h-2 overflow-y-scroll striped"  >
                                 <td class="text-left py-3 px-3 text-xs uppercase " >{{ 280 }} </td>
                                 <td class="text-left py-3 px-3 text-xs">Indemnites</td>
-                                <td class="text-left py-3 px-3 text-xs">{{ indemnites ? indemnites : "0 GNF" }}</td>
+                                <td class="text-left py-3 px-3 text-xs">{{ formatedNumber(indemnites ? indemnites : 0) }}</td>
                                 <td class="text-left py-3 px-3 text-xs">{{ formatedNumber(0) }}</td>
                               </tr>
                               <!-- Cotisations -->
@@ -76,20 +76,20 @@
                                 <td class="text-left py-3 px-3 text-xs uppercase " >{{ 707 }} </td>
                                 <td class="text-left py-3 px-3 text-xs">Retenu pour cotisation sociale</td>
                                 <td class="text-left py-3 px-3 text-xs">{{ formatedNumber(0) }}</td>
-                                <td class="text-left py-3 px-3 text-xs">{{ cotisation ? cotisation : "0 GNF" }}</td>
+                                <td class="text-left py-3 px-3 text-xs">{{ cotisation ? formatedNumber(cotisation) : "0 GNF" }}</td>
                               </tr>
                               <!-- Bon et autre -->
                               <tr class="border-b border-gray-400 max-h-2 overflow-y-scroll striped"  >
                                 <td class="text-left py-3 px-3 text-xs uppercase " >{{ 901 }} </td>
                                 <td class="text-left py-3 px-3 text-xs">Retenu pour Bon et avance sur S</td>
                                 <td class="text-left py-3 px-3 text-xs">{{ formatedNumber(0) }}</td>
-                                <td class="text-left py-3 px-3 text-xs">{{ antecedant ? antecedant : "0 GNF" }}</td>
+                                <td class="text-left py-3 px-3 text-xs">{{ antecedant ?formatedNumber( antecedant) : "0 GNF" }}</td>
                               </tr>
                               <!-- TOTAL -->
                               <tr class="border-b  border-gray-500 max-h-2 overflow-y-scroll bg-gray-400"  >
                                 <td class="text-left py-3 px-3 text-xs uppercase font-bold border-r border-gray-500" colspan="2">TOTAL </td>
                                 <td class="text-left py-3 px-3 text-xs font-bold border-r border-gray-500">{{ mtTotal ? formatedNumber(mtTotal) : "0 GNF" }}</td>
-                                <td class="text-left py-3 px-3 text-xs font-bold ">{{ antecedant ? antecedant : "0 GNF" }}</td>
+                                <td class="text-left py-3 px-3 text-xs font-bold ">{{ antecedant ? formatedNumber(antecedant) : "0 GNF" }}</td>
                               </tr>
                               <tr class="border-b  border-gray-500 max-h-2 overflow-y-scroll bg-gray-400"  >
                                 <td class="text-left py-3 px-3 text-xs uppercase font-bold border-r border-gray-500" colspan="2"> </td>
@@ -98,48 +98,78 @@
                               </tr>
                               <tr class="border-b  border-gray-500 max-h-2 overflow-y-scroll bg-gray-400"  >
                                 <td class="text-left py-3 px-3 text-xs uppercase font-bold border-r border-gray-500" colspan="2"> </td>
-                                <td class="text-left py-3 px-3 text-xs font-bold border-r border-gray-500">{{ salaireBase }}</td>
-                                <td class="text-left py-3 px-3 text-xs font-bold ">{{ salaireNet ? salaireNet : "0 GNF"}}</td>
+                                <td class="text-left py-3 px-3 text-xs font-bold border-r border-gray-500">{{ formatedNumber(salaireBase ? salaireBase : 0) }}</td>
+                                <td class="text-left py-3 px-3 text-xs font-bold ">{{ salaireNet ? formatedNumber(salaireNet) : "0 GNF"}}</td>
                               </tr>
                             </tbody>
                           </table>
-                        <!-- <div class="input flex justify-between items-center m-1 gap-3">
-                          <label for="nom">Nom</label>
-                          <input type="text" name="nom" id="nom" placeholder="Nom complet" v-model="nom" disabled>
-                        </div> -->
-                        <!-- <div class="input flex justify-between items-center m-1 gap-3">
-                          <label for="contact">Contact</label>
-                          <input type="text" name="contact" id="contact" placeholder="Contact" v-model="contact" disabled>
-                        </div> -->
-                        <!-- <div class="input flex justify-between items-center m-1 gap-3">
-                          <label for="nom">Salaire Base</label>
-                          <input type="text" name="salaireBase" id="salaireBase" placeholder="Salaire de Base" v-model="salaireBase" disabled>
-                        </div> -->
-                        <!-- <div class="input flex justify-between items-center m-1 gap-3">
-                          <label for="nom">Primes</label>
-                          <input type="text" name="indemnites" id="indemnites" placeholder="indemnites" v-model="indemnites" disabled>
-                        </div> -->
-                        <!-- <div class="input flex justify-between items-center m-1 gap-3">
-                          <label for="nom">Antecedant</label>
-                          <input type="text" name="antecedant" id="antecedant" placeholder="antecedant" v-model="antecedant" disabled>
-                        </div> -->
-                        <!-- <div class="input flex justify-between items-center m-1 gap-3">
-                          <label for="nom">Mois à payer</label>
-                          <select name="moisAafficher" id="moisAafficher" v-model="moisAafficher" required>
-                            <option value="" selected>Selectionner le mois</option>
-                            <option :value="mois" v-for="mois in listeMois" :key="mois">{{ mois }}</option>
-                          </select>
-                        </div> -->
-                        <!-- <div class="input flex justify-between items-center m-1 gap-3">
-                          <label for="nom">Montant Net</label>
-                          <input type="text" name="salaireNet" id="salaireNet" placeholder="salaireNet" v-model="salaireNet" disabled>
-                        </div> -->
-                      <button class="border-2 border-green-600 bg-transparent  text-sm hover:bg-green-600 hover:text-gray-800">Imprimer</button>
+                      <button class="border-2 border-green-600 bg-transparent  text-sm hover:bg-green-600 hover:text-gray-800" @click.prevent="exportPDF">Imprimer</button>
                       <p class="error">{{ createError }}</p>
                       </div>
                     </div>
+
                 </div>
+                <!-- A Imprimer -->
+                <div  class="hidden">
+                    <table class="min-w-full bg-white divider-y divide-gray-400" id="bulletin">
+                      <thead class="bg-gray-800 text-white">
+                        <tr >
+                          <th class="text-left py-3 px-3 uppercase  text-xs">Code</th>
+                          <th class="text-left py-3 px-3 uppercase  text-xs">Libelle</th>
+                          <th class="text-left py-3 px-3 uppercase  text-xs">MT Gain</th>
+                          <th class="text-left py-3 px-3 uppercase  text-xs">MT Retenu</th>
+                        </tr>
+                      </thead>
+                      <tbody class="text-gray-700">
+                        <tr class="border-b border-gray-400 max-h-2 overflow-y-scroll"  >
+                          <td class="text-left py-3 px-3 text-xs uppercase " >{{ 102 }} </td>
+                          <td class="text-left py-3 px-3 text-xs">Salaire de base indiciaire</td>
+                          <td class="text-left py-3 px-3 text-xs">{{ numberFormatter.format(salaireBase ? salaireBase : 0) }}</td>
+                          <td class="text-left py-3 px-3 text-xs">{{ numberFormatter.format(0) }}</td>
+                        </tr>
+                        <!-- Indemnites -->
+                        <tr class="border-b border-gray-400 max-h-2 overflow-y-scroll striped"  >
+                          <td class="text-left py-3 px-3 text-xs uppercase " >{{ 280 }} </td>
+                          <td class="text-left py-3 px-3 text-xs">Indemnites</td>
+                          <td class="text-left py-3 px-3 text-xs">{{ indemnites ? numberFormatter.format(indemnites) : "0 GNF" }}</td>
+                          <td class="text-left py-3 px-3 text-xs">{{ numberFormatter.format(0) }}</td>
+                        </tr>
+                        <!-- Cotisations -->
+                        <tr class="border-b border-gray-400 max-h-2 overflow-y-scroll "  >
+                          <td class="text-left py-3 px-3 text-xs uppercase " >{{ 707 }} </td>
+                          <td class="text-left py-3 px-3 text-xs">Retenu pour cotisation sociale</td>
+                          <td class="text-left py-3 px-3 text-xs">{{ numberFormatter.format(0) }}</td>
+                          <td class="text-left py-3 px-3 text-xs">{{ cotisation ? numberFormatter.format(cotisation) : "0 GNF" }}</td>
+                        </tr>
+                        <!-- Bon et autre -->
+                        <tr class="border-b border-gray-400 max-h-2 overflow-y-scroll striped"  >
+                          <td class="text-left py-3 px-3 text-xs uppercase " >{{ 901 }} </td>
+                          <td class="text-left py-3 px-3 text-xs">Retenu pour Bon et avance sur S</td>
+                          <td class="text-left py-3 px-3 text-xs">{{ numberFormatter.format(0) }}</td>
+                          <td class="text-left py-3 px-3 text-xs">{{ antecedant ? numberFormatter.format(antecedant) : "0 GNF" }}</td>
+                        </tr>
+                      </tbody>
+                      <tfoot>
+                        <!-- TOTAL -->
+                        <tr class="border-b  border-gray-500 max-h-2 overflow-y-scroll bg-gray-400"  >
+                          <td class="text-left py-3 px-3 text-xs uppercase font-bold border-r border-gray-500" colspan="2">TOTAL </td>
+                          <td class="text-left py-3 px-3 text-xs font-bold border-r border-gray-500">{{ mtTotal ? numberFormatter.format(mtTotal) : "0 GNF" }}</td>
+                          <td class="text-left py-3 px-3 text-xs font-bold ">{{ antecedant ? antecedant : "0 GNF" }}</td>
+                        </tr>
+                        <tr class="border-b  border-gray-500 max-h-2 overflow-y-scroll bg-gray-400"  >
+                          <td class="text-left py-3 px-3 text-xs uppercase font-bold border-r border-gray-500" colspan="2"> </td>
+                          <td class="text-left py-3 px-3 text-xs font-bold border-r border-gray-500">IMPOSABLE</td>
+                          <td class="text-left py-3 px-3 text-xs font-bold ">NET A PAYER</td>
+                        </tr>
+                        <tr class="border-b  border-gray-500 max-h-2 overflow-y-scroll bg-gray-400"  >
+                          <td class="text-left py-3 px-3 text-xs uppercase font-bold border-r border-gray-500" colspan="2"> </td>
+                          <td class="text-left py-3 px-3 text-xs font-bold border-r border-gray-500">{{ numberFormatter.format(salaireBase) }}</td>
+                          <td class="text-left py-3 px-3 text-xs font-bold ">{{ salaireNet ? numberFormatter.format(salaireNet) : "0 GNF"}}</td>
+                        </tr>
+                      </tfoot>
+                    </table>
                 </div>
+              </div>
             </form>
         </div>
     </div>
@@ -154,6 +184,7 @@
   import { auth, db } from "../../firebase/config"
   import createDocument from "../../controllers/createDocument"
 import { collection, onSnapshot, orderBy, query, serverTimestamp } from '@firebase/firestore'
+import genererPDF from '../../controllers/genererPDF'
   export default {
     setup() {
       const router = useRouter()
@@ -181,6 +212,7 @@ import { collection, onSnapshot, orderBy, query, serverTimestamp } from '@fireba
       const listeSalaires = ref([])
       const listeMois = ref([])
       const listeBulletins = ref([])
+      const { makeBulletin } = genererPDF()
       const options = { year: 'numeric', month: 'short', day: 'numeric', timeZone:'UTC' }
 
       const formatedDate = (strDate) => {
@@ -191,6 +223,16 @@ import { collection, onSnapshot, orderBy, query, serverTimestamp } from '@fireba
       const formatedNumber = (strNumber) => {
         return strNumber.toLocaleString('fr-fr', {style: "currency", currency: "GNF", minimumFractionDigits: 0})
       }
+
+      const numberFormatter = new Intl.NumberFormat('de-DE', {
+        style: 'currency',
+        currency: 'GNF',
+
+        // These options are needed to round to whole numbers if that's what you want.
+        //minimumFractionDigits: 0, // (this suffices for whole numbers, but will print 2500.10 as $2,500.1)
+        //maximumFractionDigits: 0, // (causes 2500.99 to be printed as $2,501)
+      })
+
 
       const getMois = () => {
         let months = ['Janv', 'Fevr', 'Mars', 'Avril', 'Mai', 'Juin', 'Juil', 'Aout', 'Sept', 'Oct', 'Nov', 'Dec']
@@ -262,11 +304,11 @@ import { collection, onSnapshot, orderBy, query, serverTimestamp } from '@fireba
           listeBulletins.value.forEach(salaire => {
 
             if(salaire.personnelId == id.value && salaire.mois == moisAafficher.value) {
-              indemnites.value = formatedNumber (salaire.indemnites)
-              antecedant.value = formatedNumber( salaire.antecedant)
-              salaireNet.value = formatedNumber(salaire.montantNet)
-              salaireBase.value = formatedNumber(salaire.salaireBase)
-              mtTotal.value = formatedNumber((salaire.salaireBase)+(salaire.indemnites))
+              indemnites.value =  (salaire.indemnites)
+              antecedant.value = ( salaire.antecedant)
+              salaireNet.value = (salaire.montantNet)
+              salaireBase.value = (salaire.salaireBase)
+              mtTotal.value = ((salaire.salaireBase)+(salaire.indemnites))
             }
         })
       }
@@ -371,9 +413,26 @@ import { collection, onSnapshot, orderBy, query, serverTimestamp } from '@fireba
         // }
 
       }
+      const exportPDF = () => {
+        /// Generation du bulletin de salaire pdf
+        let options = {
+          personnelId : id.value,
+          nom: nom.value,
+          fonction: fonction.value,
+          mois: moisAafficher.value,
+          contact: contact.value,
+              // dateA: dateA,
+              // facture: factureSelected.value,
+          gerant: auth.currentUser.displayName
+        }
+        makeBulletin({title : 'BULLETIN DE SALAIRE  '  , orientation : "p", format : "a4", id : 'bulletin', option: options})
+
+      }
 
       return {
         auth,
+        numberFormatter,
+        exportPDF,
         documents,
         getError,
         createError,

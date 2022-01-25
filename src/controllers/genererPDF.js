@@ -59,7 +59,10 @@ const makeFacture = ( {title = '',  orientation = 'p',  format = 'a4',  data = [
     // Generation du tableau en fonction du tableau html fournis
     autotable(doc, {
         styles: { font: "times"},
-        footStyles: { fillColor: "#777b7e"},
+        headStyles: { fontSize: 15, halign: 'center'},
+        footStyles: { fillColor: "#777b7e", fontSize: 15},
+        columnStyles: { 1: { halign: 'center',}, 2: { halign: 'center',}, 3: { halign: 'center',}, 4: { halign: 'center',},},
+        bodyStyles: { fontSize: '13', fontStyle: 'bold'},
         html: table,
         startY: 50,
         margin : { top: 20},
@@ -168,6 +171,86 @@ const makeCommande = ( {title = '',  orientation = 'p',  format = 'a4',  data = 
 
     doc.text("Acheteur principal ", doc.internal.pageSize.width * 0.8 , tableFinalHeight + 50, {align: 'center'})
     doc.text(option.acheteur, doc.internal.pageSize.width * 0.8 , tableFinalHeight + 72, {align: 'center'})
+
+
+    // console.log("last row : ",doc.internal.getNumberOfPages())
+
+    setSpecFooters(doc)
+    doc.save(title+".pdf")
+
+
+}
+const makeBulletin = ( {title = '',  orientation = 'p',  format = 'a4',  data = [], id = '', option = {}}) => {
+    let table = document.getElementById(id)
+    let tableFinalHeight = 0
+
+    // using jsPDF & autotable
+    const doc = new jsPDF({ orientation: orientation, format: format})
+
+    let img = document.getElementById('navLogo')
+    console.log("fonts : ", doc.getFontList())
+
+    // Entête de la page
+    setEntete(doc, img)
+
+    doc.setTextColor('black')
+    doc.setFontSize(15)
+    doc.setFont("Times","bold")
+    doc.text(title, doc.internal.pageSize.width / 2, 42, { align: "center"})
+    doc.text(option.mois, doc.internal.pageSize.width / 2, 47, { align: "center"})
+
+    doc.setFontSize(10)
+    doc.setFont("courrier","bold")
+    doc.text("Identifiant : " + option.personnelId, 15 , 55, { align: "left"})
+    doc.text("Nom : " + option.nom, 15 , 60, { align: "left"})
+    doc.text("Fonction : " + option.fonction, 15 , 65, { align: "left"})
+    doc.text("Contact : " + option.contact, 15 , 70, { align: "left"})
+
+    doc.setFontSize(9)
+    doc.setFont("Times","bold, italic")
+    doc.text("Siguiri, le " + dateFormatter.format(new Date().now), doc.internal.pageSize.width * 0.8 , 70, { align: "center"})
+
+
+    // Generation du tableau en fonction du tableau html fournis
+    autotable(doc, {
+        styles: { font: "times"},
+        headStyles: { fontSize: 14 },
+        footStyles: { fillColor: "#777b7e", textColor: "#222021", lineColor: 10, lineWidth: 0.5, fontSize: 14, fontStyle: 'bold'},
+        bodyStyles: { fontSize: '13'},
+        html: table,
+        startY: 73,
+        margin : { top: 20},
+        didDrawPage: (d) => {
+            // console.log("final height : ", Math.round(Number(d.cursor.y)))
+            tableFinalHeight = Math.round(Number(d.cursor.y))
+        },
+    })
+
+    doc.setFontSize(15)
+    doc.setFont("courrier","bold")
+    // doc.setTextColor("#0e4c92")
+    // doc.text("Montant Total :  " + numberFormatter.format(option.totalHT)  , 20, tableFinalHeight + 14)
+    // // doc.setLineWidth(0.5)
+    // doc.setDrawColor("#88807b")
+    // doc.line(18, tableFinalHeight + 16, 138, tableFinalHeight + 16)
+
+    // doc.setTextColor("#0b6633")
+    // doc.text("Montant Payé :  "+ numberFormatter.format(option.montantRegle.toString()), 20, tableFinalHeight + 22)
+    // doc.line(18, tableFinalHeight + 24, 138, tableFinalHeight + 24)
+
+    // doc.setTextColor("#ed2939")
+    // doc.text("Montant Restant :  "+ numberFormatter.format(option.restant), 20, tableFinalHeight + 30)
+    // doc.line(18, tableFinalHeight + 32, 138, tableFinalHeight + 32)
+
+    // doc.setTextColor("black")
+    // doc.text("Règlement en "+ option.modeReglement, 20, tableFinalHeight + 38)
+
+    // doc.setLineWidth(1)
+    // doc.setDrawColor("black")
+    // doc.rect(18, tableFinalHeight + 8 , 120, 32);
+
+    doc.text("Le Gestionnaire Principal ", doc.internal.pageSize.width * 0.8 , tableFinalHeight + 30, {align: 'center'})
+    doc.text(option.gerant, doc.internal.pageSize.width * 0.8 , tableFinalHeight + 52, {align: 'center'})
 
 
     // console.log("last row : ",doc.internal.getNumberOfPages())
@@ -298,9 +381,10 @@ const setEntete = (doc, img='') => {
     doc.setFontSize(15)
     doc.setFont("Courier","bold")
     doc.text("Achat et vente de marchandise", 55,20)
-    doc.setFontSize(10)
-    doc.setFont("symbol","bold, italic")
+    doc.setFontSize(14)
+    doc.setFont("symbol","bold")
     doc.text("Contact : 622 22 91 41 / 621 79 02 82 / 663 63 05 66 ", doc.internal.pageSize.width / 2, 25, {align: 'center'})
+    doc.setFontSize(14)
     doc.setTextColor('skyblue')
     doc.setFont("Times","italic")
     doc.text("Email : younoussa41@gmail.com", doc.internal.pageSize.width / 2, 30, {align: 'center'})
@@ -344,7 +428,7 @@ const setSpecFooters = doc => {
 
 
 const genererPDF = () => {
-    return { makeFacture, makeDocument, makeCommande }
+    return { makeFacture, makeDocument, makeCommande, makeBulletin }
 }
 
 export default genererPDF
