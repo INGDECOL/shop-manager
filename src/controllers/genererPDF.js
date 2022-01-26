@@ -15,7 +15,7 @@ const numberFormatter = new Intl.NumberFormat('de-DE', {
 const dateFormatter = new Intl.DateTimeFormat('FR-fr', {
     dateStyle: 'long',
     timeStyle: 'short'
- })
+})
 
 const makeFacture = ( {title = '',  orientation = 'p',  format = 'a4',  data = [], id = '', option = {}}) => {
     let table = document.getElementById(id)
@@ -60,7 +60,7 @@ const makeFacture = ( {title = '',  orientation = 'p',  format = 'a4',  data = [
     autotable(doc, {
         styles: { font: "times"},
         headStyles: { fontSize: 15, halign: 'center'},
-        footStyles: { fillColor: "#777b7e", fontSize: 15},
+        footStyles: { fillColor: "#777b7e", fontSize: 15, halign: 'center'},
         columnStyles: { 1: { halign: 'center',}, 2: { halign: 'center',}, 3: { halign: 'center',}, 4: { halign: 'center',},},
         bodyStyles: { fontSize: '13', fontStyle: 'bold'},
         html: table,

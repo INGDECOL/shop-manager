@@ -166,10 +166,10 @@
                         </tbody>
                         <tfoot>
                             <tr class="border-b border-gray-400 bg-gray-300">
-                                <td class="text-left py-3 px-4 text-sm  font-bold uppercase" colspan="2">Totaux </td>
-                                <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{ numberFormatter.format(totalPVU)}} </td>
+                                <td class="text-left py-3 px-4 text-sm  font-bold uppercase" colspan="3">Totaux </td>
+                                <!-- <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{ numberFormatter.format(totalPVU)}} </td> -->
                                 <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{totalQte}} </td>
-                                <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{ numberFormatter.format(totalTTC)}} </td>
+                                <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{ simpleNumberFormatter.format(totalTTC)}} </td>
                             </tr>
                         </tfoot>
                     </table>
@@ -243,14 +243,20 @@ export default {
         }
 
         const numberFormatter = new Intl.NumberFormat('de-DE', {
-        style: 'currency',
-        currency: 'GNF',
-
-        // These options are needed to round to whole numbers if that's what you want.
-        //minimumFractionDigits: 0, // (this suffices for whole numbers, but will print 2500.10 as $2,500.1)
-        //maximumFractionDigits: 0, // (causes 2500.99 to be printed as $2,501)
+            style: 'currency',
+            currency: 'GNF',
+            // These options are needed to round to whole numbers if that's what you want.
+            //minimumFractionDigits: 0, // (this suffices for whole numbers, but will print 2500.10 as $2,500.1)
+            //maximumFractionDigits: 0, // (causes 2500.99 to be printed as $2,501)
         })
- 
+        const simpleNumberFormatter = new Intl.NumberFormat('de-DE', {
+            // style: 'currency',
+            // currency: '',
+            // These options are needed to round to whole numbers if that's what you want.
+            //minimumFractionDigits: 0, // (this suffices for whole numbers, but will print 2500.10 as $2,500.1)
+            //maximumFractionDigits: 0, // (causes 2500.99 to be printed as $2,501)
+        })
+
 
 
         const showPop = () =>{
@@ -545,8 +551,8 @@ export default {
             // Nouvelle vente
             let day = new Date().getDate()
             let month = new Date().getMonth() < 10 ? new Date().getMonth() < 1 ? "01": "0" + new Date().getMonth() : new Date().getMonth()
-            let year = new Date().getFullYear()
-            const factureId = day + month + year + new Date().getHours() + new Date().getMinutes() + "010" + new Date().getSeconds()
+            let year = new Date().getYear()
+            const factureId =  month + year + new Date().getMinutes()+  new Date().getSeconds()
             // console.log(factureId)
 
             if(clientVenteId.value =="CltDiv" || clientVenteId.value =='') {
@@ -683,6 +689,7 @@ export default {
             modeReglement,
             formatedNumber,
             numberFormatter,
+            simpleNumberFormatter,
 
         }
   }

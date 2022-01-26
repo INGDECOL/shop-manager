@@ -21,6 +21,7 @@
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">N° Facture</th>
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Client</th>
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Impayé</th>
+                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Avance</th>
                     <!-- <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Solvabilité</th> -->
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Actions</th>
                   </tr>
@@ -31,6 +32,7 @@
                     <td class="text-left py-3 px-4 font-semibold uppercase text-xs">{{ formatedDate(facture.createdAt.seconds)}} </td>
                     <td class="text-left py-3 px-4 text-xs text-blue-400 underline hover:text-blue-500 cursor-pointer" title="Cliquer pour aller au payement" @click="payerFacture(facture.id)">{{ facture.id}}</td>
                     <td class="text-left py-3 px-4 text-xs">{{  getClient(facture.clientId) }}</td>
+                    <td class="text-left py-3 px-4 text-xs font-semibold text-pink-400 hover:text-pink-300 cursor-pointer" title="Montant restant">{{ formatedNumber(facture.impayer ? facture.impayer : 0) }}</td>
                     <td class="text-left py-3 px-4 text-xs font-semibold text-pink-400 hover:text-pink-300 cursor-pointer" title="Montant restant">{{ formatedNumber(facture.impayer ? facture.impayer : 0) }}</td>
                     <!-- <td class="text-left py-3 px-4 text-xs font-semibold underline text-blue-400 hover:text-blue-300 cursor-pointer" title="Montant Total dû" >0</td> -->
                     <td class="text-left py-3 px-4 flex justify-between items-center">
@@ -129,7 +131,7 @@ export default {
           //     return facture.clientId == route.params.id
           // })
 
-          listeFactures.value = documents.value
+          // listeFactures.value = documents.value
       })
   }
 
@@ -181,13 +183,13 @@ export default {
       })
   })
 
-    watch(listeFactures, () => {
+    watch(documents, () => {
         // console.log("watch doc : ", listeFactures.value.length, soldeClients.value.length)
 
-        if(listeFactures.value.length ) {
+        if(documents.value.length ) {
           const lstFact = listeFactures
         // Calculer le solde total par facture
-            lstFact.value.map(facture => {
+            documents.value.map(facture => {
                 let soldeTotal =0
                 facture.articles.forEach(solde => {
                     soldeTotal += Number(solde.pvu * solde.qtecmd)
@@ -201,7 +203,7 @@ export default {
                 })
                 // facture.client = getClient(facture.clientId)
             })
-            listeFactures.value = lstFact.value.filter(facture => {
+            listeFactures.value = documents.value.filter(facture => {
               return facture.impayer >0
             })
         }

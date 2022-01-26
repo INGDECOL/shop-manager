@@ -14,6 +14,7 @@
 
           </div>
         </div>
+
         <div v-if="filteredClients.length">
             <table class="min-w-full bg-white divider-y divide-gray-400">
                 <thead class="bg-gray-800 text-white">
@@ -41,6 +42,53 @@
                     </td>
                   </tr>
                 </tbody>
+                <tfoot>
+                  <tr class="border-b border-gray-400 bg-gray-300">
+                      <td class="text-left py-3 px-4 text-sm  font-bold uppercase" colspan="5">Totaux </td>
+                      <!-- <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{ numberFormatter.format(totalPAU)}} </td> -->
+                      <!-- <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{totalQte}} </td> -->
+                      <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{ formatedNumber(totalTTC)}} </td>
+                      <td class="text-center py-3 px-4 text-sm  font-bold uppercase" > </td>
+                  </tr>
+                </tfoot>
+            </table>
+        </div>
+        <div class="flex justify-center mb-1" v-if="filteredClients.length">
+          <button class="bg-transparent border border-green-400 hover:bg-green-400 hover:text-gray-700" @click="exportPDF">Imprimer la liste</button>
+        </div>
+        <!-- A Imprimer -->
+        <div v-if="filteredClients.length" hidden>
+            <table class="min-w-full bg-white divider-y divide-gray-400" id="client">
+                <thead class="bg-gray-800 text-white">
+                  <tr >
+                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">#</th>
+                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Nom</th>
+                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Prénoms</th>
+                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Contact</th>
+                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Adresse</th>
+                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Solvabilité</th>
+                    <!-- <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Actions</th> -->
+                  </tr>
+                </thead>
+                <tbody class="text-gray-700">
+                  <tr class="border-b border-gray-400 max-h-2 overflow-y-scroll" :class="{ striped : n % 2 ===0}" v-for="(client, n) in filteredClients" :key="client.id">
+                    <td class="text-left py-3 px-4 font-semibold uppercase">{{ n + 1}} </td>
+                    <td class="text-left py-3 px-4 font-semibold uppercase">{{ client.nom}} </td>
+                    <td class="text-left py-3 px-4">{{ client.prenom}}</td>
+                    <td class="text-left py-3 px-4">{{ client.contact}}</td>
+                    <td class="text-left py-3 px-4">{{ client.adresse }}</td>
+                    <td class="text-left py-3 px-4 font-semibold underline text-blue-400 hover:text-blue-300 cursor-pointer" title="Montant Total dû" @click="detailDette(client)">{{ numberFormatter.format(client.solvabilite) }}</td>
+
+                  </tr>
+                </tbody>
+                <tfoot>
+                  <tr class="border-b border-gray-400 bg-gray-300">
+                      <td class="text-left py-3 px-4 text-sm  font-bold uppercase" colspan="5">Totaux </td>
+                      <!-- <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{ numberFormatter.format(totalPAU)}} </td> -->
+                      <!-- <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{totalQte}} </td> -->
+                      <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{ numberFormatter.format(totalTTC)}} </td>
+                  </tr>
+                </tfoot>
             </table>
         </div>
         <div v-else>
@@ -62,6 +110,7 @@ import { onMounted, watch } from '@vue/runtime-core'
 import AddClient from "./NewClient.vue"
 import Spinner from "../../components/Spinner.vue"
 import { collection, onSnapshot, orderBy, query } from '@firebase/firestore';
+import genererPDF from '../../controllers/genererPDF';
 export default {
   components: { AddClient, Spinner },
   setup() {
@@ -71,6 +120,18 @@ export default {
     const getError = ref('')
     const searchQuery = ref("")
     const editclientId = ref(null)
+    const totalTTC = ref(null)
+
+    const numberFormatter = new Intl.NumberFormat('de-DE', {
+    style: 'currency',
+    currency: 'GNF',
+
+    // These options are needed to round to whole numbers if that's what you want.
+    //minimumFractionDigits: 0, // (this suffices for whole numbers, but will print 2500.10 as $2,500.1)
+    //maximumFractionDigits: 0, // (causes 2500.99 to be printed as $2,501)
+})
+
+    const { makeDocument } = genererPDF()
 
     const formatedNumber = (strNumber) => {
       return strNumber.toLocaleString('fr-fr', {style: "currency", currency: "GNF", minimumFractionDigits: 0})
@@ -89,7 +150,6 @@ export default {
                 //doc.data().createdAt = doc.data().createdAt.seconds
                 return {...doc.data(), id : doc.id}
             })
-        // console.log("solde : ", soldeClients.value)
         })
     }
     const loadClients =async () => {
@@ -115,18 +175,16 @@ export default {
     }
 
     watch(documents, () => {
-      console.log("watch doc : ", documents.value.length, soldeClients.value.length)
+      // console.log("watch doc : ", documents.value.length, soldeClients.value.length)
       // Calculer le solde total par client
       if(soldeClients.value.length ) {
-        soldeClients.value.forEach(solde => {
-          // console.log("liste solde : ", solde.id, "=>", solde.clientId, solde.montantDette)
-        })
         documents.value.map(client => {
           let soldeTotal =0
           soldeClients.value.forEach(solde => {
             if( solde.clientId == client.id ) {
               // console.log("corespondance")
               soldeTotal += solde.montantDette
+              totalTTC.value += solde.montantDette
             }
           })
           client.solvabilite = soldeTotal
@@ -199,6 +257,18 @@ export default {
           }) : []
     })
 
+    const exportPDF = () => {
+      let options = {
+          // totalTTC : totalTTC.value.toString(),
+          // totalPAU : totalPAU.value,
+          // totalQte : totalQte.value,
+          // dateDe: dateDe,
+          // dateA: dateA,
+          // facture: factureSelected.value,
+          gerant: auth.currentUser.displayName
+      }
+      makeDocument({title : 'LISTE DES CLIENTS  '  , orientation : "p", format : "a4", id : 'client', option: options})
+    }
     return {
       auth,
       isAdmin,
@@ -211,9 +281,12 @@ export default {
       filteredClients,
       editclientId,
       soldeClients,
+      totalTTC,
       formatedDate,
       formatedNumber,
+      numberFormatter,
       detailDette,
+      exportPDF,
     }
   }
 }

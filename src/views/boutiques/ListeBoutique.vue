@@ -21,9 +21,6 @@
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">#</th>
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Désignation</th>
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Gérant(e) principal(e)</th>
-                    <!-- <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Contact</th>
-                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Adresse</th>
-                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Email</th> -->
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Actions</th>
                   </tr>
                 </thead>
@@ -39,6 +36,35 @@
                       <span class="material-icons " :class="{ disabled: !isAdmin }" @click="edit(boutique.id)">edit</span>
                       <span class="material-icons strash text-red-300" :class="{ disabled: !isAdmin }" @click="destroy(boutique.id)">delete</span>
                     </td>
+                  </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="flex justify-center mb-1" v-if="filteredBoutiques.length">
+          <button class="bg-transparent border border-green-400 hover:bg-green-400 hover:text-gray-700" @click="exportPDF">Imprimer la liste</button>
+        </div>
+
+        <!-- A Imprimer -->
+        <div v-if="filteredBoutiques.length" class="hidden">
+            <table class="min-w-full bg-white divider-y divide-gray-400" id="boutique">
+                <thead class="bg-gray-800 text-white">
+                  <tr >
+                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">#</th>
+                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Désignation</th>
+                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Gérant(e) principal(e)</th>
+                    <!-- <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Actions</th> -->
+                  </tr>
+                </thead>
+                <tbody class="text-gray-700">
+                  <tr class="border-b border-gray-400 max-h-2 overflow-y-scroll" :class="{ striped : n % 2 ===0}" v-for="(boutique, n) in filteredBoutiques" :key="boutique.id">
+                    <td class="text-left py-3 px-4 font-semibold uppercase">{{ n + 1}} </td>
+                    <td class="text-left py-3 px-4 font-semibold uppercase">{{ boutique.designationBoutique}} </td>
+                    <td class="text-left py-3 px-4">{{ boutique.gerantBoutique}}</td>
+
+                    <!-- <td class="text-left py-3 px-4 flex justify-between items-center">
+                      <span class="material-icons " :class="{ disabled: !isAdmin }" @click="edit(boutique.id)">edit</span>
+                      <span class="material-icons strash text-red-300" :class="{ disabled: !isAdmin }" @click="destroy(boutique.id)">delete</span>
+                    </td> -->
                   </tr>
                 </tbody>
             </table>
@@ -62,14 +88,19 @@ import { onMounted } from '@vue/runtime-core'
 import AddBoutique from "./NewBoutique.vue"
 import Spinner from "../../components/Spinner.vue"
 import { collection, onSnapshot } from '@firebase/firestore';
+import genererPDF from '../../controllers/genererPDF';
+
 export default {
   components: { AddBoutique, Spinner },
   setup() {
+
     const router = useRouter()
     const {documents, getError, load} = getDocuments()
     const searchQuery = ref("")
     const listeBoutiques = ref(null)
     const editboutiqueId = ref(null)
+    const { makeDocument } = genererPDF()
+
     onMounted( async () => {
       //await load("boutiques")
       const docRef = collection(db, "boutiques")
@@ -142,6 +173,18 @@ export default {
           }) : []
     })
 
+    const exportPDF = () => {
+       let options = {
+          // totalTTC : totalTTC.value.toString(),
+          // totalPAU : totalPAU.value,
+          // totalQte : totalQte.value,
+          // dateDe: dateDe,
+          // dateA: dateA,
+          // facture: factureSelected.value,
+          gerant: auth.currentUser.displayName
+      }
+      makeDocument({title : 'LISTE DES BOUTIQUES  '  , orientation : "p", format : "a4", id : 'boutique', option: options})
+    }
 
 
     return {
@@ -155,6 +198,7 @@ export default {
       searchQuery,
       filteredBoutiques,
       editboutiqueId,
+      exportPDF,
     }
   }
 }
