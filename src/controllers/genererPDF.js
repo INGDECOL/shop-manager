@@ -73,7 +73,7 @@ const makeFacture = ( {title = '',  orientation = 'p',  format = 'a4',  data = [
     })
 
     doc.setFontSize(14)
-    doc.setFont("courrier","bold")
+    doc.setFont("courier","bold")
     doc.setTextColor("#0e4c92")
     doc.text("Montant Total :  " + numberFormatter.format(option.totalTTC)  , 20, tableFinalHeight + 14)
     // doc.setLineWidth(0.5)
@@ -153,7 +153,7 @@ const makeCommande = ( {title = '',  orientation = 'p',  format = 'a4',  data = 
     })
 
     doc.setFontSize(14)
-    doc.setFont("Courier","bold")
+    doc.setFont("Courier","Bold")
     doc.setTextColor("#0e4c92")
     doc.text("Montant Total :  " + numberFormatter.format(option.totalHT)  , 20, tableFinalHeight + 14)
     // doc.setLineWidth(0.5)
@@ -420,9 +420,9 @@ const setFooters = doc => {
     doc.setPage(i)
     doc.setLineWidth(0.5)
     doc.setDrawColor("#88807b")
-    doc.line(0, 282, 300, 282)
-    doc.text("Les articles vendus ne sont ni echangés ni retournés !", 10, 287, { align: 'left'})
-    doc.text('Page ' + String(i) + ' sur ' + String(pageCount), doc.internal.pageSize.width * 0.9, 287, {
+    doc.line(0, doc.internal.pageSize.height * 0.92, 300, doc.internal.pageSize.height * 0.92)
+    doc.text("Les articles vendus ne sont ni echangés ni retournés !", 10,  doc.internal.pageSize.height * 0.94, { align: 'left'})
+    doc.text('Page ' + String(i) + ' sur ' + String(pageCount), doc.internal.pageSize.width * 0.9, doc.internal.pageSize.height * 0.94, {
       align: 'center'
     })
   }
@@ -437,9 +437,9 @@ const setSpecFooters = doc => {
     doc.setPage(i)
     doc.setLineWidth(0.5)
     doc.setDrawColor("#88807b")
-    doc.line(0, 282, 300, 282)
-    doc.text("Ets N'NAHAWA Multi-Services Rep de Guinée - Region : KANKAN- Pref.: Siguiri - Contact :  22 22 91 41 / 621 79 02 82", 5, 287, { align: 'left'})
-    doc.text('Page ' + String(i) + ' sur ' + String(pageCount), doc.internal.pageSize.width * 0.9, 287, {
+    doc.line(0, doc.internal.pageSize.height * 0.92, 300, doc.internal.pageSize.height * 0.92)
+    doc.text("Ets N'NAHAWA Multi-Services Rep de Guinée - Region : KANKAN- Pref.: Siguiri - Contact :  22 22 91 41 / 621 79 02 82", 5, doc.internal.pageSize.height * 0.94, { align: 'left'})
+    doc.text('Page ' + String(i) + ' sur ' + String(pageCount), doc.internal.pageSize.width * 0.9, doc.internal.pageSize.height * 0.94, {
       align: 'center'
     })
   }

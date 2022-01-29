@@ -235,10 +235,10 @@ export default {
             alert("Veuillez selectionner une opération à effectuer !")
             return
         }
-        if(typeOperation.value =='Retrait' && montantOperation.value > soldeActuel.value ) {
-            alert("Solde insuffisant pour le montant demandé !")
-            return
-        }
+        // if(typeOperation.value =='Retrait' && montantOperation.value > soldeActuel.value ) {
+        //     alert("Solde insuffisant pour le montant demandé !")
+        //     return
+        // }
 
         const mouvement = {
                 compteId : accountId.value,
