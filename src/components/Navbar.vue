@@ -48,7 +48,10 @@
                     </div>
                 </div>
             </a> -->
-            <span @click="signOut" v-if="user" class="pl-0"><span class="material-icons border-none -mb-8 mr-0  pb-0 text-sm">logout</span> Logout</span>
+            <span @click="signOut" v-if="user" class="pl-0">
+                
+                <span class="material-icons border-none -mb-8 mr-0  pb-0 text-sm">logout</span> Logout
+            </span>
         </nav>
     </header>
 </template>

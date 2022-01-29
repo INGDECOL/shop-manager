@@ -4,6 +4,7 @@ import getUser from '../controllers/getUser'
 
 //Components import
   import Home from '../views/Home.vue'
+  import Profile from '../views/auth/Profile.vue'
 
   import ListeFournisseur from "../views/fournisseurs/ListeFournisseur.vue"
   import EditFournisseur from "../views/fournisseurs/EditFournisseur.vue"
@@ -31,6 +32,7 @@ import getUser from '../controllers/getUser'
   import DetailDette from "../views/ventes/DetailDetteClient.vue"
   import CompteClient from "../views/ventes/CompteClient.vue"
 
+   import NewPersonnel from '../views/auth/Signup.vue'
   import ListePersonnel from "../views/personnels/ListePersonnel.vue"
   import Indemnite from "../views/personnels/Indemnite.vue"
   import Bon from "../views/personnels/Bon.vue"
@@ -88,6 +90,12 @@ const routes = [
     path: '/',
     name: 'Home',
     component: Home
+  },
+  {
+    path: '/profil/:token',
+    name: 'Profil',
+    component: Profile,
+    beforeEnter: requireAuth
   },
 
   {
@@ -217,6 +225,13 @@ const routes = [
     path: "/admin/:token?",
     name: "Admin",
     component: Home,
+    beforeEnter: requireAuthAdmin
+  },
+  // Nouveau Personnel
+  {
+    path: "/admin/gestion_personnel/:token?",
+    name: "AdminNewPersonnel",
+    component: NewPersonnel,
     beforeEnter: requireAuthAdmin
   },
   // Liste personnels

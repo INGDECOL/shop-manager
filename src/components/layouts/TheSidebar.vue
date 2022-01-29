@@ -307,6 +307,72 @@
             </DisclosurePanel>
           </Disclosure>
         </li>
+        <!-- PROFIL -->
+        <li>
+          <Disclosure v-slot="{ open }" :default-open="isUserManagementActive">
+            <DisclosureButton
+              class="disclosure rounded-none px-4 py-1 flex items-center w-full hover:bg-gray-700"
+              :class="open ? 'open': ''"
+            >
+              <span class="material-icons  w-5 mr-2">
+                account_circle
+              </span>
+
+              PROFIL
+              <span class="ml-auto material-icons"  :class="open ? 'transform rotate-90' : ''">
+                arrow_forward_ios
+              </span>
+            </DisclosureButton>
+            <DisclosurePanel>
+              <ul>
+                <!-- Mot de passe -->
+                <li>
+                  <Disclosure v-slot="{ open }" :default-open="isUserActive">
+                        <router-link :to="{ name: 'Profil', params: { token: auth.currentUser.accessToken}}">
+                          <p
+                            class="pl-6 pr-4  flex items-center w-full hover:bg-gray-700"
+                            :class="open ? 'open': ''"
+                          >
+                          <span class="material-icons w-5 mr-2">settings_suggest</span>Modifier Mot de passe
+                          </p>
+                        </router-link>
+
+                  </Disclosure>
+                </li>
+
+                <!-- STOCKAGE -->
+                <!-- <li>
+                  <Disclosure v-slot="{ open }" :default-open="isUserActive">
+                        <router-link :to="{ name: 'Stockage', params: { token: auth.currentUser.accessToken}}">
+                          <p
+                            class="pl-6 pr-4  flex items-center w-full hover:bg-gray-700"
+                            :class="open ? 'open': ''"
+                          >
+                          <span class="material-icons w-5 mr-2">call_received</span>Réception
+                          </p>
+                        </router-link>
+
+                  </Disclosure>
+                </li> -->
+
+                <!-- DESINTEGRER -->
+                <!-- <li>
+                  <Disclosure v-slot="{ open }" :default-open="isUserActive">
+                        <router-link :to="{ name: 'Desintegration', params: { token: auth.currentUser.accessToken}}">
+                          <p
+                            class="pl-6 pr-4  flex items-center w-full hover:bg-gray-700"
+                            :class="open ? 'open': ''"
+                          >
+                          <span class="material-icons w-5 mr-2">content_cut</span>Désintégration
+                          </p>
+                        </router-link>
+
+                  </Disclosure>
+                </li> -->
+              </ul>
+            </DisclosurePanel>
+          </Disclosure>
+        </li>
 
       <!-- Reports -->
         <!-- <li class="px-4 hover:bg-gray-700">

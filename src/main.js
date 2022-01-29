@@ -6,9 +6,11 @@ import  './assets/main.css'
 // import "./controllers/mui.js"
 import { auth } from "./firebase/config"
 let app
+
 auth.onAuthStateChanged( () => {
     if( !app) {
         app = createApp(App).use(router).mount('#app')
 
     }
+    // app.provide("appTitle", appTitle)
 })

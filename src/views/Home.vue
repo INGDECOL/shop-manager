@@ -26,6 +26,7 @@
 import { ref } from '@vue/reactivity'
 // @ is an alias to /src
 import Login from "./auth/Login.vue"
+import { inject } from '@vue/runtime-core'
 export default {
   name: 'Home',
   components: {
@@ -33,7 +34,6 @@ export default {
   },
   setup() {
     const open = ref(false)
-
     return { open }
   }
 }

@@ -1,6 +1,6 @@
 <template>
   <div class="md:px-2 py-8 w-full">
-      <NewPersonnel />
+      <!-- <NewPersonnel /> -->
       <!-- <Bon /> -->
       <div class="shadow overflow-hidden rounded border-b border-gray-200">
         <div class="flex justify-between items-center">
@@ -11,7 +11,7 @@
             </span>
           </div>
           <div>
-            <button class="my-0 mx-2 py-0 flex justify-between items-center" @click="toggleForm('create')"><span class="material-icons text-center py-1 m-0">add</span>Ajouter</button>
+            <button class="my-0 mx-2 py-0 flex justify-between items-center" @click="toggleForm"><span class="material-icons text-center py-1 m-0">add</span>Ajouter</button>
 
           </div>
         </div>
@@ -138,8 +138,9 @@ export default {
 
     })
 
-    const toggleForm = (str) => {
-        document.querySelector("." +str).classList.toggle("open")
+    const toggleForm = () => {
+      router.push({ name: 'AdminNewPersonnel', params: { token: auth.currentUser.accessToken}})
+        // document.querySelector("." +str).classList.toggle("open")
         // document.querySelectorAll(".create .modal").forEach(form => {
         //     form.classList.add("active")
         // })
@@ -270,8 +271,6 @@ export default {
       makeDocument({title : 'LISTE DU PERSONNEL  '  , orientation : "p", format : "a4", id : 'personnel', option: options})
         /// End of Generate facture in pdf
     }
-
-
 
     return {
       auth,

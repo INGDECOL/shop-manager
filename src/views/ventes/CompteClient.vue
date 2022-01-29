@@ -195,32 +195,32 @@ export default {
       })
   })
 
-    watch(documents, () => {
-        // console.log("watch doc : ", listeFactures.value.length, soldeClients.value.length)
+  watch(documents, () => {
+      // console.log("watch doc : ", listeFactures.value.length, soldeClients.value.length)
 
-        if(documents.value.length ) {
-          const lstFact = listeFactures
-        // Calculer le solde total par facture
-            documents.value.map(facture => {
-                let soldeTotal =0
-                facture.articles.forEach(solde => {
-                    soldeTotal += Number(solde.pvu * solde.qtecmd)
-                })
-                facture.total = soldeTotal
-                // Total dette de la facture
-                soldeClients.value.forEach(solde => {
-                    if(solde.factureId == facture.id) {
-                        facture.impayer = solde.montantDette
-                    }
-                })
-                // facture.client = getClient(facture.clientId)
-            })
-            listeFactures.value = documents.value.filter(facture => {
-              return facture.impayer >0
-            })
-        }
+      if(documents.value.length ) {
+        const lstFact = listeFactures
+      // Calculer le solde total par facture
+          documents.value.map(facture => {
+              let soldeTotal =0
+              facture.articles.forEach(solde => {
+                  soldeTotal += Number(solde.pvu * solde.qtecmd)
+              })
+              facture.total = soldeTotal
+              // Total dette de la facture
+              soldeClients.value.forEach(solde => {
+                  if(solde.factureId == facture.id) {
+                      facture.impayer = solde.montantDette
+                  }
+              })
+              // facture.client = getClient(facture.clientId)
+          })
+          listeFactures.value = documents.value.filter(facture => {
+            return facture.impayer >0
+          })
+      }
 
-    })
+  })
 
     onMounted( async () => {
       getBoutiques()

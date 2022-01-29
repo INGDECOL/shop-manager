@@ -1,7 +1,7 @@
 <template>
-    <div class="create -mt-8" @click="hideModal">
+    <div class="ml-auto mr-auto mt-8" @click="hideModal">
         <div class="modal active">
-            <h2>Nouveau Personnel</h2>
+            <h2 class="font-bold m-2 text-base">Nouveau Personnel</h2>
             <form class="register" @submit.prevent="handleSignUp">
             <input type="text" name="name" placeholder="Nom complet" v-model="name">
             <input type="tel" name="phone" placeholder="Contact" v-model="phone">
@@ -32,6 +32,7 @@
     import useSingUp from "../../controllers/useSignUp"
     import { useRouter } from 'vue-router'
 import { ref } from '@vue/reactivity'
+import { auth } from '../../firebase/config'
     export default {
 
         setup() {
@@ -45,6 +46,7 @@ import { ref } from '@vue/reactivity'
             const salaireBase = ref()
             const indemnites = ref()
             const salaireNet = ref()
+            const router = useRouter()
 
         const hideModal = (e) => {
             if(e.target.classList.contains("create")){
@@ -53,7 +55,7 @@ import { ref } from '@vue/reactivity'
         }
 
         const toggleForm = () => {
-            document.querySelector(".create").classList.toggle("open")
+            router.push({name: 'ListePersonnel', params: { token: auth.currentUser.accessToken}})
         }
 
             const handleSignUp = async () => {

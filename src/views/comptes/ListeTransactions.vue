@@ -174,13 +174,6 @@ export default {
       })
     })
 
-    // watch(boutiqueVente, async()=>{
-    //     if(boutiqueVente.value =='') {
-    //         return
-    //     }
-    //     await getBoutiqueFactures()
-    //     await loadBoutiqueVentes()
-    // })
 
     const getAccounts =async () => {
         const docRef =  collection(db, "comptes")
@@ -196,21 +189,6 @@ export default {
         })
     }
 
-    // const getAccounts =async () => {
-    //     const docRef =  collection(db, "facturesFournisseurs")
-    //     const q = query( docRef, orderBy("createdAt", "desc"))
-    //     const res = onSnapshot(q, ( snap ) =>{
-    //         // console.log("sanap facture", snap.docs)
-    //         accountList.value = []
-    //         accountList.value = snap.docs.map(doc =>{
-    //                 return {...doc.data(), id : doc.id}
-    //         })
-    //         filteredAccounts.value = accountList.value.filter (facture => {
-    //           return facture.fournisseurId === fournisseurCmdId.value
-    //         })
-    //         // console.log("Liste boutique facture : ", accountList.value, fournisseurCmdId.value)
-    //     })
-    // }
 
     const getSoldes = async () =>{
         const docRef =  collection(db, "mouvements")
@@ -234,7 +212,7 @@ export default {
             }
         })
         solde = versement - retrait
-        console.log("solde : ", versement, retrait)
+        // console.log("solde : ", versement, retrait)
         return solde
     }
     const getMouvements =  (id) =>{
@@ -254,46 +232,7 @@ export default {
 
     }
 
-    const getBoutiqueFactures =async () => {
-        const docRef =  collection(db, "factures")
-        const q = query( docRef, orderBy("createdAt", "desc"))
-        const res = onSnapshot(q, ( snap ) =>{
-            // console.log("sanap facture", snap.docs)
-            listeFactures.value = []
-            listeFactures.value = snap.docs.map(doc =>{
-                    return {...doc.data(), id : doc.id}
-            })
-            filteredFactures.value = listeFactures.value.filter (facture => {
-              return facture.boutiqueId == boutiqueVente.value
-            })
-            // console.log("Liste boutique facture : ", listeFactures.value, boutiqueVente.value)
-        })
-    }
 
-    // const getAccounts =async () => {
-    //     const docRef =  collection(db, "ventes")
-    //     const q = query( docRef, orderBy("createdAt", "desc"))
-    //     const res = onSnapshot(q, ( snap ) =>{
-    //         // console.log("snap vente", snap.docs)
-    //         listeVentes.value = snap.docs.map(doc =>{
-    //             return {...doc.data(), id : doc.id}
-    //         })
-    //         loadBoutiqueVentes()
-    //         getBoutiqueFactures()
-    //         // filteredMouvements.value = listeVentes.value
-    //         getTotal()
-    //     })
-    //     await getAccounts()
-    // }
-
-    // const loadBoutiqueVentes =async () => {
-
-    //     filteredMouvements.value = listeVentes.value.filter(vente => {
-    //       return vente.boutiqueId == boutiqueVente.value
-    //     })
-    //     // filteredMouvements.value = listeVentes.value
-    //     getTotal()
-    // }
 
     const getTotal = () => {
       totalTTC.value = 0
@@ -312,14 +251,15 @@ export default {
     }
 
     const getVenteByDate = (facture) => {
-       if(boutiqueVente.value ==''){
-        alert("Veuillez selectionner une boutique !")
-        return
-      }
+       if(boutiqueVente.value =='') {
+         alert("Veuillez selectionner une boutique !")
+          return
+       }
 
       filteredMouvements.value = listeVentes.value.filter(vente => {
-        return new Date(vente.createdAt.seconds *1000) >= new Date(dateDebut.value) && new Date(vente.createdAt.seconds *1000) <= new Date(dateFin.value) && vente.boutiqueId == boutiqueVente.value
+          return new Date(vente.createdAt.seconds *1000) >= new Date(dateDebut.value) && new Date(vente.createdAt.seconds *1000) <= new Date(dateFin.value) && vente.boutiqueId == boutiqueVente.value
       })
+
       getTotal()
     }
 
@@ -366,21 +306,10 @@ export default {
       //console.log(" destroy id :::: ",id)
        alert("Vous ne pouvez pas supprimer ou modifier sur cette page")
       return
-      // if( isAdmin) {
-      //     const { destroy, error } = destroyDocument()
-      //     if( confirm("Voulez-vous retourner cette vente et redefinir tous le montants vendus ?? \n Cette action est definitive et irreversible !!") ) {
-      //       await destroy("produits", id)
-
-      //   }
-      //   if(error.value){
-      //     alert(error.value)
-      //   }
-      // }else {
-      //   alert("Vous n'êtes pas autorisé à effectuer cette action")
-      // }
     }
+
     const filteredAccount = computed( () =>{
-        console.log(searchQuery.value)
+        // console.log(searchQuery.value)
           return filteredAccounts.value.length ? filteredAccounts.value.filter( (account) => {
             return account.prenom.toLowerCase().indexOf( searchQuery.value.toLowerCase()) != -1
           }): []
