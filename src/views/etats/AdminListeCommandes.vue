@@ -120,12 +120,12 @@
                 </tbody>
                   <tfoot>
                     <tr class="border-b border-gray-400 bg-gray-300">
-                        <td class="text-left py-3 px-4 text-sm  font-bold uppercase" colspan="3">Totaux </td>
-                        <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{ numberFormatter.format(totalPAU)}} </td>
+                        <td class="text-left py-3 px-4 text-sm  font-bold uppercase" colspan="4">Totaux </td>
+                        <!-- <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{ numberFormatter.format(totalPAU)}} </td> -->
                         <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{totalQte}} </td>
                         <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{ numberFormatter.format(totalTTC)}} </td>
                     </tr>
-                </tfoot>
+                  </tfoot>
 
             </table>
             <!-- Total de la liste -->

@@ -39,13 +39,18 @@
             <div class="error">{{ receptionError }}</div>
             <div class="produit border flex justify-center flex-col  gap-0.5 mt-0 p-2">
                 <!-- Total de la facture -->
-                <div class="flex justify-between ">
+                <div class="flex justify-between items-center">
                     <div class="ml-5">
                         <p class="font-bold text-2xl ">{{ routeid ? "Remboursement facture": "Etablir une commande" }}</p>
+
+                        <span class="flex justify-center gap-4 bg-green-300 text-gray-600 text-base font-bold ml-4  rounded-md cursor-pointer hover:bg-green-200" v-if="avance">
+                       <span class="mx-3 my-4"> Avance </span>
+                        <span class="mx-3 my-4">{{formatedNumber( montantRegle ? (avance.montantAvance - montantRegle)>=0 ? (avance.montantAvance - montantRegle): 0  : avance.montantAvance) }}</span>
+                    </span>
                     </div>
                     <span class="flex justify-center gap-4 bg-green-300 text-gray-600 text-base font-bold mr-8  rounded-md cursor-pointer hover:bg-green-200">
-                       <span class="mx-3 my-6"> Montant HT</span>
-                        <span class="mx-3 my-6">{{ totalHT ? (totalHT).toLocaleString('fr-fr', {style: "currency", currency: "GNF", minimumFractionDigits: 0})  : 0 +"  GNF "}}</span>
+                       <span class="mx-3 my-5"> Montant HT</span>
+                        <span class="mx-3 my-5">{{ formatedNumber(totalHT ? totalHT:0) }}</span>
                     </span>
                 </div>
                 <div class="produit  flex justify-center  gap-0.5 m-0 shadow-none">
@@ -122,7 +127,7 @@
                             </div>
                             <div class="input flex justify-between items-center m-1 gap-3">
                                 <label class="w-1/2">Montant Total HT </label>
-                                <input type="text" name="montanttotalttc" id="montanttotalttc" class="h-1" v-model="totalHT" disabled>
+                                <input type="text" name="montanttotalHT" id="montanttotalHT" class="h-1" v-model="totalHT" disabled>
                             </div>
                             <div class="input flex justify-between items-center m-1 gap-3">
                                 <label class="w-1/2">Montant Total Règlé </label>
@@ -134,9 +139,9 @@
                         <p class="error">{{ createError }}</p>
                         <!-- Montant restant ou Montant à rendre -->
                         <div class="flex justify-center ">
-                            <span class="flex justify-center gap-4 bg-green-300 text-gray-600 text-base font-bold  mb-2  rounded-md cursor-pointer hover:bg-green-200" :class="{ 'text-red-500' : (totalHT - montantRegle)>0 }" >
-                            <span class="mx-3 my-4" :class="{'text-gray-600' : !montantRegle}"> {{ montantRegle ? (totalHT - montantRegle)>0 ? "Reste dû " : "Monnaie à rendre" : "Monnaie à rendre"}}</span>
-                            <span class="mx-3 my-4" :class="{'text-gray-600' : !montantRegle}">{{montantRegle ? (totalHT - montantRegle).toLocaleString('fr-fr', {style: "currency", currency: "GNF", minimumFractionDigits: 0})  : 0 +"  GNF "}}</span>
+                            <span class="flex justify-center gap-4 bg-green-300 text-gray-600 text-base font-bold  mb-2  rounded-md cursor-pointer hover:bg-green-200" :class="{ 'text-red-500' : (totalHT -  (montantRegle.value + avance ? avance.montantAvance : 0))>0 }" >
+                            <span class="mx-3 my-4" :class="{'text-gray-600' : !montantRegle}"> {{ montantRegle ? (totalHT - montantRegle)>=0 ? "Reste dû " : "Avance" : "Monnaie à rendre"}}</span>
+                            <span class="mx-3 my-4" :class="{'text-gray-600' : !montantRegle}">{{formatedNumber(montantRegle ? (reste()) :0) }}</span>
                             </span>
                         </div>
                     </div>
@@ -191,6 +196,7 @@ import { onMounted, watch } from '@vue/runtime-core'
 import { db, auth } from '../../firebase/config'
 import { getAuth } from '@firebase/auth'
 import receptionArticles from '../../controllers/receptionArticles'
+import avancesFournisseur from '../../controllers/avanceFournisseurs'
 import genererPDF from '../../controllers/genererPDF'
 
 export default {
@@ -228,6 +234,7 @@ export default {
         const options = { year: 'numeric', month: 'long', day: 'numeric' }
 
         const { receptionError,stock, getStock, updateStock } = receptionArticles()
+        const { setAvanceFournisseur, updateAvanceFournisseur, getAvance, avance } = avancesFournisseur()
         const  dateDuJour = new Date().toLocaleDateString(undefined, options)
 
         const { createError, create } = createDocument()
@@ -246,15 +253,33 @@ export default {
         //minimumFractionDigits: 0, // (this suffices for whole numbers, but will print 2500.10 as $2,500.1)
         //maximumFractionDigits: 0, // (causes 2500.99 to be printed as $2,501)
         })
+        const simpleNumberFormatter = new Intl.NumberFormat('de-DE', {
+        // style: 'currency',
+        // currency: 'GNF',
 
+        // These options are needed to round to whole numbers if that's what you want.
+        //minimumFractionDigits: 0, // (this suffices for whole numbers, but will print 2500.10 as $2,500.1)
+        //maximumFractionDigits: 0, // (causes 2500.99 to be printed as $2,501)
+        })
+
+        const reste = ()=>{
+            let reste =0
+            if(avance.value){
+                reste = totalHT.value - (Number(montantRegle.value) + avance.value.montantAvance)
+            }else {
+                reste = totalHT.value - Number(montantRegle.value)
+            }
+            return reste
+        }
 
         const showPop = () =>{
           document.querySelector(" .searchList").classList.toggle("active")
         }
         const selectedFournisseur = (fss) => {
             fournisseurId.value = fss.id
-             fournisseurNom.value = fss.nom +" " + fss.prenom + " " + fss.contact
-            // console.log("fss : ", fournisseurId.value)
+            fournisseurNom.value = fss.nom +" " + fss.prenom + " " + fss.contact
+            avance.value=null
+           getAvance(fss.id)
 
         }
 
@@ -535,7 +560,7 @@ export default {
             let day = new Date().getDate()
             let month = new Date().getMonth() < 10 ? new Date().getMonth() < 1 ? "01": "0" + new Date().getMonth() : new Date().getMonth()
             let year = new Date().getFullYear()
-            const factureId = day + month + year + new Date().getHours() + new Date().getMinutes() + "010" + new Date().getSeconds()
+            const factureId = month + year + new Date().getMinutes()+  new Date().getSeconds()
 
             //verification fournisseur enregistrer
             if(fournisseurCmdId.value =="FssDiv" || fournisseurCmdId.value =='') {
@@ -585,7 +610,7 @@ export default {
             insert("facturesFournisseurs", facture, facture.id)
 
             // Save dette
-            if((totalHT.value - montantRegle.value) > 0 ) {
+            if(reste() > 0 ) {
                 let dette = {
                     fournisseurId: fournisseurCmdId.value ? fournisseurId.value : "FssDiv",
                     factureId: factureId,
@@ -593,18 +618,83 @@ export default {
                     createdAt: serverTimestamp()
                 }
                 create("detteFournisseurs", dette)
-            }
-             /// Generate facture in pdf
-            let options = {
-                totalHT : totalHT.value.toString(),
-                montantRegle: montantRegle.value.toString(),
-                restant : (totalHT.value - montantRegle.value),
-                modeReglement : modeReglement.value,
-                fournisseur: fournisseurNom.value ? fournisseurNom.value  : "Fournisseur divers",
-                acheteur: auth.currentUser.displayName
+                 // s'il yavait une avance
+                if(avance.value){
+                    if((avance.value.montantAvance - montantRegle.value) >=0){
+                        let avanceFss = {
+                            fournisseurId: fournisseurCmdId.value ? fournisseurId.value : "FssDiv",
+                            montantAvance: Number(avance.value.montantAvance - montantRegle.value),
+                            boutiqueVente: boutiqueVente.value,
+                            updatedAt: serverTimestamp()
+                        }
+                        updateAvanceFournisseur(avanceFss, fournisseurId.value)
+                    }else {
+                        let avanceFss = {
+                            fournisseurId: fournisseurCmdId.value ? fournisseurId.value : "FssDiv",
+                            montantAvance: 0,
+                            boutiqueVente: boutiqueVente.value,
+                            updatedAt: serverTimestamp()
+                        }
+                        updateAvanceFournisseur(avanceFss, fournisseurId.value)
+                    }
+                }
+            } else if(reste() < 0 ) {
+                // console.log("reste < 0")
+                let avanceFss = {
+                    fournisseurId: fournisseurCmdId.value ? fournisseurId.value : "FssDiv",
+                    montantAvance: Number(totalHT.value - montantRegle.value)*-1,
+                    // boutiqueVente: boutiqueVente.value,
+                    createdAt: serverTimestamp()
+                }
+                console.log("avnc fss : ",avanceFss)
+                setAvanceFournisseur(avanceFss, fournisseurId.value)
+            } else {
+                 if(avance.value){
+                    if((avance.value.montantAvance - montantRegle.value) >=0){
+                        let avanceFss = {
+                            fournisseurId: fournisseurCmdId.value ? fournisseurId.value : "FssDiv",
+                            montantAvance: Number(avance.value.montantAvance - montantRegle.value),
+                            // boutiqueVente: boutiqueVente.value,
+                            updatedAt: serverTimestamp()
+                        }
+                        updateAvanceFournisseur(avanceFss, fournisseurId.value)
+                    }else {
+                        let avanceFss = {
+                            fournisseurId: fournisseurCmdId.value ? fournisseurId.value : "FssDiv",
+                            montantAvance: 0,
+                            boutiqueVente: boutiqueVente.value,
+                            updatedAt: serverTimestamp()
+                        }
+                        updateAvanceFournisseur(avanceFss, fournisseurId.value)
+                    }
+                }
             }
 
-            makeCommande({title : 'Bon de Commande N° ' + factureId, orientation : "p", format : "a4",data : articleFacture, id : 'commande', option: options})
+             /// Generate facture in pdf
+             if((totalHT.value - montantRegle.value) < 0 ) {
+                let options = {
+                    totalHT : totalHT.value.toString(),
+                    montantRegle: montantRegle.value.toString(),
+                    avance : (totalHT.value - montantRegle.value)*-1,
+                    modeReglement : modeReglement.value,
+                    fournisseur: fournisseurNom.value ? fournisseurNom.value  : "Fournisseur divers",
+                    acheteur: auth.currentUser.displayName
+                }
+
+                makeCommande({title : 'Bon de Commande N° ' + factureId, orientation : "p", format : "a4",data : articleFacture, id : 'commande', option: options})
+             } else if(reste() >= 0 ) {
+                let options = {
+                    totalHT : totalHT.value.toString(),
+                    montantRegle: montantRegle.value.toString(),
+                    restant : reste(),
+                    modeReglement : modeReglement.value,
+                    fournisseur: fournisseurNom.value ? fournisseurNom.value  : "Fournisseur divers",
+                    acheteur: auth.currentUser.displayName
+                }
+
+                makeCommande({title : 'Bon de Commande N° ' + factureId, orientation : "p", format : "a4",data : articleFacture, id : 'commande', option: options})
+
+             }
             /// End of Generate facture in pdf
             if(!createError.value) {
                 alert("Commande Enregistrée avec succès ! ")
@@ -659,6 +749,9 @@ export default {
             goBack,
             selectedFournisseur,
             numberFormatter,
+            formatedNumber,
+            avance,
+            reste,
 
         }
   }

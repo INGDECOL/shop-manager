@@ -83,18 +83,24 @@ const makeFacture = ( {title = '',  orientation = 'p',  format = 'a4',  data = [
     doc.setTextColor("#0b6633")
     doc.text("Montant Payé :  "+ numberFormatter.format(option.montantRegle.toString()), 20, tableFinalHeight + 22)
     doc.line(18, tableFinalHeight + 24, 138, tableFinalHeight + 24)
+    if(option.restant || option.restant ==0) {
+        doc.setTextColor("#ed2939")
+        doc.text("Montant Restant :  "+ numberFormatter.format(option.restant), 20, tableFinalHeight + 30)
+        doc.line(18, tableFinalHeight + 32, 138, tableFinalHeight + 32)
+    }else if(option.avance) {
+        doc.setTextColor("black")
+        doc.text("Montant en Avance :  "+ numberFormatter.format(option.avance), 20, tableFinalHeight + 30)
+        doc.line(18, tableFinalHeight + 32, 138, tableFinalHeight + 32)
+    }
 
-    doc.setTextColor("#ed2939")
-    doc.text("Montant Restant :  "+ numberFormatter.format(option.restant), 20, tableFinalHeight + 30)
-    doc.line(18, tableFinalHeight + 32, 138, tableFinalHeight + 32)
-
-    doc.setTextColor("black")
+    doc.setTextColor("#222021")
     doc.text("Règlement en "+ option.modeReglement, 20, tableFinalHeight + 38)
 
     doc.setLineWidth(1)
     doc.setDrawColor("black")
     doc.rect(18, tableFinalHeight + 8 , 120, 32);
 
+     doc.setTextColor("black")
     doc.text("Le Gérant principal ", doc.internal.pageSize.width * 0.8 , tableFinalHeight + 50, {align: 'center'})
     doc.text(option.gerant, doc.internal.pageSize.width * 0.8 , tableFinalHeight + 72, {align: 'center'})
 
@@ -129,13 +135,13 @@ const makeCommande = ( {title = '',  orientation = 'p',  format = 'a4',  data = 
     doc.text("Fournisseur : " + option.fournisseur, 15 , 47, { align: "left"})
 
     doc.setFontSize(9)
-    doc.setFont("Times","bold, italic")
+    doc.setFont("Times","bold")
     doc.text("Siguiri, le " + dateFormatter.format(new Date().now), doc.internal.pageSize.width * 0.8 , 47, { align: "center"})
 
 
     // Generation du tableau en fonction du tableau html fournis
     autotable(doc, {
-        styles: { font: "times"},
+        styles: { font: "Times"},
         footStyles: { fillColor: "#777b7e"},
         html: table,
         startY: 50,
@@ -147,7 +153,7 @@ const makeCommande = ( {title = '',  orientation = 'p',  format = 'a4',  data = 
     })
 
     doc.setFontSize(14)
-    doc.setFont("courrier","bold")
+    doc.setFont("Courier","bold")
     doc.setTextColor("#0e4c92")
     doc.text("Montant Total :  " + numberFormatter.format(option.totalHT)  , 20, tableFinalHeight + 14)
     // doc.setLineWidth(0.5)
@@ -158,12 +164,24 @@ const makeCommande = ( {title = '',  orientation = 'p',  format = 'a4',  data = 
     doc.text("Montant Payé :  "+ numberFormatter.format(option.montantRegle.toString()), 20, tableFinalHeight + 22)
     doc.line(18, tableFinalHeight + 24, 138, tableFinalHeight + 24)
 
-    doc.setTextColor("#ed2939")
-    doc.text("Montant Restant :  "+ numberFormatter.format(option.restant), 20, tableFinalHeight + 30)
-    doc.line(18, tableFinalHeight + 32, 138, tableFinalHeight + 32)
+    // doc.setTextColor("#ed2939")
+    // doc.text("Montant Restant :  "+ numberFormatter.format(option.restant), 20, tableFinalHeight + 30)
+    // doc.line(18, tableFinalHeight + 32, 138, tableFinalHeight + 32)
+     if(option.restant || option.restant ==0) {
+        doc.setTextColor("#ed2939")
+        doc.text("Montant Restant :  "+ numberFormatter.format(option.restant), 20, tableFinalHeight + 30)
+        doc.line(18, tableFinalHeight + 32, 138, tableFinalHeight + 32)
+    }else if(option.avance) {
+        doc.setTextColor("black")
+        doc.text("Montant en Avance :  "+ numberFormatter.format(option.avance), 20, tableFinalHeight + 30)
+        doc.line(18, tableFinalHeight + 32, 138, tableFinalHeight + 32)
+    }
 
-    doc.setTextColor("black")
+    doc.setTextColor("#222021")
     doc.text("Règlement en "+ option.modeReglement, 20, tableFinalHeight + 38)
+
+    // doc.setTextColor("black")
+    // doc.text("Règlement en "+ option.modeReglement, 20, tableFinalHeight + 38)
 
     doc.setLineWidth(1)
     doc.setDrawColor("black")

@@ -43,7 +43,7 @@
                                   <!-- <td class="text-left py-3 px-4">{{ personnel.adresse}}</td> -->
                                   <!-- <td class="text-left py-3 px-4 text-blue-400 underline cursor-pointer">{{ personnel.email }}</td> -->
                                   <td class="text-left py-3 px-3 text-xs">{{ personnel.fonction }}</td>
-                                  
+
                                 </tr>
                               </tbody>
                           </table>
@@ -306,7 +306,7 @@ import genererPDF from '../../controllers/genererPDF'
         fonction.value = personnel.fonction
         ante.value = getAntecedants(personnel.id) ? getAntecedants(personnel.id) : 0
         antecedant.value = numberFormatter.format(ante.value)
-        console.log("ids : ", listeBonsId.value)
+        // console.log("ids : ", listeBonsId.value)
 
          salaireN.value = ((salaireB.value) + (indem.value)) - (ante.value ? ante.value : 0)
         salaireNet.value = numberFormatter.format(salaireN.value)

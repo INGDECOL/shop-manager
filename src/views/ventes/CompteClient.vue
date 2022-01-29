@@ -32,8 +32,8 @@
                     <td class="text-left py-3 px-4 font-semibold uppercase text-xs">{{ formatedDate(facture.createdAt.seconds)}} </td>
                     <td class="text-left py-3 px-4 text-xs text-blue-400 underline hover:text-blue-500 cursor-pointer" title="Cliquer pour aller au payement" @click="payerFacture(facture.id)">{{ facture.id}}</td>
                     <td class="text-left py-3 px-4 text-xs">{{  getClient(facture.clientId) }}</td>
-                    <td class="text-left py-3 px-4 text-xs font-semibold text-pink-400 hover:text-pink-300 cursor-pointer" title="Montant restant">{{ formatedNumber(facture.impayer ? facture.impayer : 0) }}</td>
-                    <td class="text-left py-3 px-4 text-xs font-semibold text-pink-400 hover:text-pink-300 cursor-pointer" title="Montant restant">{{ formatedNumber(facture.impayer ? facture.impayer : 0) }}</td>
+                    <td class="text-left py-3 px-4 text-xs font-semibold text-pink-400 hover:text-pink-300 cursor-pointer" title="Montant en avance">{{ formatedNumber(facture.impayer ? facture.impayer : 0) }}</td>
+                    <td class="text-left py-3 px-4 text-xs font-semibold text-pink-400 hover:text-pink-300 cursor-pointer" title="Montant restant">{{ formatedNumber(bringAvance(facture.clientId)) }}</td>
                     <!-- <td class="text-left py-3 px-4 text-xs font-semibold underline text-blue-400 hover:text-blue-300 cursor-pointer" title="Montant Total dû" >0</td> -->
                     <td class="text-left py-3 px-4 flex justify-between items-center">
                       <span class="material-icons " :class="{ disabled: !isAdmin }" >edit</span>
@@ -61,6 +61,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { onMounted, watch } from '@vue/runtime-core'
 import Spinner from "../../components/Spinner.vue"
 import { collection, onSnapshot, orderBy, query } from '@firebase/firestore';
+import avancesClient from '../../controllers/avanceClients';
 export default {
   components: { Spinner },
   setup() {
@@ -79,6 +80,7 @@ export default {
     const searchQuery = ref("")
     const editclientId = ref(null)
     const options = { year: 'numeric', month: 'short', day: 'numeric', timeZone:'UTC' }
+    const { getAvances, getAvance, avnc } = avancesClient()
 
   const formatedNumber = (strNumber) => {
     return strNumber.toLocaleString('fr-fr', {style: "currency", currency: "GNF", minimumFractionDigits: 0})
@@ -116,6 +118,16 @@ export default {
           })
       // console.log("solde : ", soldeClients.value)
       })
+  }
+
+  const bringAvance = (id) => {
+    let av = 0
+     avnc.value.map(avance => {
+       if(avance.id == id ){
+         av = avance.montantAvance
+       }
+     })
+    return av
   }
 
   const loadFactures =async () => {
@@ -215,7 +227,8 @@ export default {
       await loadClients()
       await getSolde()
       await loadFactures()
-      //console.log(" clients : ", documents.value)
+      await getAvances()
+      // console.log(" clients : ", avnc.value)
     })
 
     const isAdmin = ref(async () =>{
@@ -298,7 +311,8 @@ export default {
       getClient,
       payerFacture,
       nom,
-      prenom
+      prenom,
+      bringAvance,
     }
   }
 }

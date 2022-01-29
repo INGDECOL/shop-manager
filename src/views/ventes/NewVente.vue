@@ -38,10 +38,14 @@
             <div class="error">{{ receptionError }}</div>
             <div class="produit border flex justify-center flex-col  gap-0.5 mt-0 p-2">
                 <!-- Total de la facture -->
-                <div class="flex justify-end ">
+                <div class="flex justify-end " :class="{'flex justify-between': (avance)}">
+                    <span class="flex justify-center gap-4 bg-green-300 text-gray-600 text-base font-bold ml-8  rounded-md cursor-pointer hover:bg-green-200" v-if="avance">
+                       <span class="mx-3 my-4"> Avance </span>
+                        <span class="mx-3 my-4">{{formatedNumber( montantRegle ? (avance.montantAvance - montantRegle)>=0 ? (avance.montantAvance - montantRegle): 0  : avance.montantAvance) }}</span>
+                    </span>
                     <span class="flex justify-center gap-4 bg-green-300 text-gray-600 text-base font-bold mr-8  rounded-md cursor-pointer hover:bg-green-200">
-                       <span class="mx-3 my-6"> Montant TTC</span>
-                        <span class="mx-3 my-6">{{ totalTTC ? (totalTTC).toLocaleString('fr-fr', {style: "currency", currency: "GNF", minimumFractionDigits: 0})  : 0 +"  GNF "}}</span>
+                       <span class="mx-3 my-4"> Montant TTC</span>
+                        <span class="mx-3 my-4">{{formatedNumber( totalTTC ? totalTTC  : 0) }}</span>
                     </span>
                 </div>
                 <div class="produit  flex justify-center  gap-0.5 m-0 shadow-none">
@@ -76,7 +80,7 @@
                     </div>
                     <!-- <button class="mb-1" @click.prevent="addCommande">Valider</button> -->
                     <div class="mt-5 mb-2">
-                    <span class=" font-bold bg-yellow-400 rounded-lg p-2.5 cursor-pointer hover:text-gray-600 hover:bg-yellow-300" @click="addCommande">Valider</span>
+                    <span class="mb-2 font-bold bg-yellow-400 rounded-lg p-2.5 cursor-pointer hover:text-gray-600 hover:bg-yellow-300" @click="addCommande">Valider</span>
 
                     </div>
                   </div>
@@ -132,9 +136,9 @@
                         <p class="error">{{ createError }}</p>
                         <!-- Montant restant ou Montant à rendre -->
                         <div class="flex justify-center ">
-                            <span class="flex justify-center gap-4 bg-green-300 text-gray-600 text-base font-bold  mb-2  rounded-md cursor-pointer hover:bg-green-200" :class="{ 'text-red-500' : (totalTTC - montantRegle)>0 }" >
-                            <span class="mx-3 my-4" :class="{'text-gray-600' : !montantRegle}"> {{ montantRegle ? (totalTTC - montantRegle)>0 ? "Reste dû " : "Monnaie à rendre" : "Monnaie à rendre"}}</span>
-                            <span class="mx-3 my-4" :class="{'text-gray-600' : !montantRegle}">{{montantRegle ? (totalTTC - montantRegle).toLocaleString('fr-fr', {style: "currency", currency: "GNF", minimumFractionDigits: 0})  : 0 +"  GNF "}}</span>
+                            <span class="flex justify-center gap-4 bg-green-300 text-gray-600 text-base font-bold  mb-2  rounded-md cursor-pointer hover:bg-green-200" :class="{ 'text-red-500' : (totalTTC -  (montantRegle.value + avance ? avance.montantAvance : 0))>0 }" >
+                            <span class="mx-3 my-4" :class="{'text-gray-600' : !montantRegle}"> {{ montantRegle ? (totalTTC - montantRegle)>=0 ? "Reste dû " : "Avance" : "Monnaie à rendre"}}</span>
+                            <span class="mx-3 my-4" :class="{'text-gray-600' : !montantRegle}">{{formatedNumber(montantRegle ? (reste()) :0) }}</span>
                             </span>
                         </div>
                     </div>
@@ -188,11 +192,12 @@ import { useRoute, useRouter } from 'vue-router'
 import createDocument from '../../controllers/createDocument'
 import setDocument from '../../controllers/setDocument'
 import destroyDocument from '../../controllers/destroyDocument'
-import { collection, doc, getDoc, onSnapshot, orderBy, query, serverTimestamp } from '@firebase/firestore'
+import { collection, doc, getDoc, onSnapshot, orderBy, query, serverTimestamp, setDoc } from '@firebase/firestore'
 import { onMounted, watch } from '@vue/runtime-core'
 import { db, auth } from '../../firebase/config'
 import { getAuth } from '@firebase/auth'
 import receptionArticles from '../../controllers/receptionArticles'
+import avancesClient from '../../controllers/avanceClients'
 import genererPDF from '../../controllers/genererPDF'
 // import fontConv from '../../controllers/fontConverter'
 
@@ -225,11 +230,14 @@ export default {
         const vendeur = ref(getAuth().currentUser)
         const soldeClients = ref([])
         const oldDette = ref()
+        // const reste = ref()
+        // const avance = ref()
         const router = useRouter()
         const route = useRoute()
         const options = { year: 'numeric', month: 'long', day: 'numeric' }
 
         const { receptionError,stock, getStock, updateStock } = receptionArticles()
+        const { setAvanceClient, updateAvanceClient, getAvance, avance} = avancesClient()
         const  dateDuJour = new Date().toLocaleDateString(undefined, options)
 
         const { createError, create } = createDocument()
@@ -256,8 +264,15 @@ export default {
             //minimumFractionDigits: 0, // (this suffices for whole numbers, but will print 2500.10 as $2,500.1)
             //maximumFractionDigits: 0, // (causes 2500.99 to be printed as $2,501)
         })
-
-
+        const reste = ()=>{
+            let reste =0
+            if(avance.value){
+                reste = totalTTC.value - (Number(montantRegle.value) + avance.value.montantAvance)
+            }else {
+                reste = totalTTC.value - Number(montantRegle.value)
+            }
+            return reste
+        }
 
         const showPop = () =>{
           document.querySelector(" .searchList").classList.toggle("active")
@@ -265,6 +280,8 @@ export default {
         const selectedClient = (client) => {
             clientId.value = client.id
             clientNom.value = client.nom +" " + client.prenom + " " + client.contact
+            avance.value=null
+            getAvance(client.id)
 
         }
 
@@ -378,6 +395,12 @@ export default {
                 })
             }
         })
+
+        // watch(clientVenteId, () => {
+        //     if(clientVenteId.value != 'CltDiv') {
+        //         console.log(clientVenteId.value)
+        //     }
+        // })
 
         const filteredArticles = computed(()=>{
             return listeArticles.value && listeArticles.value.filter((article)=>{
@@ -559,6 +582,9 @@ export default {
                 if((totalTTC.value - montantRegle.value) > 0 ) {
                     alert("Le montant Total de la facture est supérieur au montant règlé, or le client divers n'est pas autorisé à effectuer des ventes à crédit. \n Pensez à Enregistrer cet client !")
                     return
+                }else if( (totalTTC.value - montantRegle.value) < 0) {
+                    alert("Les avances sur vente ne sont pas autorisés pour les clients divers. \n Pensez à Enregistrer cet client !")
+                    return
                 }
             }
              createError.value = null
@@ -614,7 +640,7 @@ export default {
             // console.log("facture vente : ", facture)
 
             // Save dette
-            if((totalTTC.value - montantRegle.value) > 0 ) {
+            if(reste() > 0 ) {
                 let dette = {
                     clientId: clientVenteId.value ? clientId.value : "CltDiv",
                     factureId: factureId,
@@ -623,17 +649,81 @@ export default {
                     createdAt: serverTimestamp()
                 }
                 create("dettes", dette)
+                // s'il yavait une avance
+                if(avance.value){
+                    if((avance.value.montantAvance - montantRegle.value) >=0){
+                        let avanceClt = {
+                            clientId: clientVenteId.value ? clientId.value : "CltDiv",
+                            montantAvance: Number(avance.value.montantAvance - montantRegle.value),
+                            boutiqueVente: boutiqueVente.value,
+                            updatedAt: serverTimestamp()
+                        }
+                        updateAvanceClient(avanceClt, clientId.value)
+                    }else {
+                        let avanceClt = {
+                            clientId: clientVenteId.value ? clientId.value : "CltDiv",
+                            montantAvance: 0,
+                            boutiqueVente: boutiqueVente.value,
+                            updatedAt: serverTimestamp()
+                        }
+                        updateAvanceClient(avanceClt, clientId.value)
+                    }
+                }
+            } else if(reste() < 0 ) {
+                // console.log("reste < 0")
+                let avanceClt = {
+                    clientId: clientVenteId.value ? clientId.value : "CltDiv",
+                    montantAvance: Number(totalTTC.value - montantRegle.value)*-1,
+                    boutiqueVente: boutiqueVente.value,
+                    createdAt: serverTimestamp()
+                }
+                setAvanceClient(avanceClt, clientId.value)
+            }else {
+                 if(avance.value){
+                    if((avance.value.montantAvance - montantRegle.value) >=0){
+                        let avanceClt = {
+                            clientId: clientVenteId.value ? clientId.value : "CltDiv",
+                            montantAvance: Number(avance.value.montantAvance - montantRegle.value),
+                            boutiqueVente: boutiqueVente.value,
+                            updatedAt: serverTimestamp()
+                        }
+                        updateAvanceClient(avanceClt, clientId.value)
+                    }else {
+                        let avanceClt = {
+                            clientId: clientVenteId.value ? clientId.value : "CltDiv",
+                            montantAvance: 0,
+                            boutiqueVente: boutiqueVente.value,
+                            updatedAt: serverTimestamp()
+                        }
+                        updateAvanceClient(avanceClt, clientId.value)
+                    }
+                }
             }
+
             /// Generate facture in pdf
-            let reglement = {
-                totalTTC : totalTTC.value.toString(),
-                montantRegle: montantRegle.value.toString(),
-                restant : (totalTTC.value - montantRegle.value),
-                modeReglement : modeReglement.value,
-                client: clientNom.value ? clientNom.value  : "Client divers",
-                gerant: auth.currentUser.displayName
-            }
-            makeFacture({title : 'Facture N° ' + factureId, orientation : "p", format : "a4",data : articleFacture, id : 'commande', option: reglement})
+             if((totalTTC.value - montantRegle.value) < 0 ) {
+                let reglement = {
+                    totalTTC : totalTTC.value.toString(),
+                    montantRegle: montantRegle.value.toString(),
+                    avance : (totalTTC.value - montantRegle.value)*-1,
+                    modeReglement : modeReglement.value,
+                    client: clientNom.value ? clientNom.value  : "Client divers",
+                    gerant: auth.currentUser.displayName
+                }
+                makeFacture({title : 'Facture N° ' + factureId, orientation : "p", format : "a4",data : articleFacture, id : 'commande', option: reglement})
+
+             }else if(reste() >= 0 ) {
+                 let reglement = {
+                    totalTTC : totalTTC.value.toString(),
+                    montantRegle: montantRegle.value.toString(),
+                    restant : reste(),
+                    modeReglement : modeReglement.value,
+                    client: clientNom.value ? clientNom.value  : "Client divers",
+                    gerant: auth.currentUser.displayName
+                }
+                // console.log(reglement)
+                makeFacture({title : 'Facture N° ' + factureId, orientation : "p", format : "a4",data : articleFacture, id : 'commande', option: reglement})
+             }
             /// End of Generate facture in pdf
 
             if(!createError.value) {
@@ -645,6 +735,8 @@ export default {
                 codeFamille.value=""
                 montantRegle.value =""
                 commandes.value.splice(0, commandes.value.length)
+                avance.value=null
+
             }
 
         }
@@ -690,6 +782,8 @@ export default {
             formatedNumber,
             numberFormatter,
             simpleNumberFormatter,
+            avance,
+            reste,
 
         }
   }

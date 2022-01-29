@@ -14,11 +14,11 @@ import { collection, addDoc, setDoc, updateDoc, deleteDoc, getDoc, doc, incremen
             // const docRef = doc( db, "boutiques" , id)
             const docRef = doc( db, "boutiques", id)
             const docId = stock.articleId.toString()
-            console.log("Destination Id : ", stock.articleId.toString())
+            // console.log("Destination Id : ", stock.articleId.toString())
             const res = await setDoc(docRef, {
                 [docId]: {articleId: stock.articleId, quantiteStock: increment(stock.quantiteStock), updatedAt: stock.updatedAt}
             }, {merge: true})
-            console.log("res : ", res)
+            // console.log("res : ", res)
         }
         catch (err) {
         receptionError.value = err.message
