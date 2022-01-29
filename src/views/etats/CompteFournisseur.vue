@@ -21,6 +21,7 @@
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">N° Facture</th>
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Fournisseurs</th>
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Impayé</th>
+                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Avance</th>
                     <!-- <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Solvabilité</th> -->
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Actions</th>
                   </tr>
@@ -31,8 +32,10 @@
                     <td class="text-left py-3 px-4 font-semibold uppercase text-xs">{{ formatedDate(facture.createdAt.seconds)}} </td>
                     <td class="text-left py-3 px-4 text-xs text-blue-400 underline hover:text-blue-500 cursor-pointer" title="Cliquer pour aller au payement" @click="payerFacture(facture.id)">{{ facture.id}}</td>
                     <td class="text-left py-3 px-4 text-xs">{{  getFournisseur(facture.fournisseurId) }}</td>
-                    <td class="text-left py-3 px-4 text-xs font-semibold text-pink-400 hover:text-pink-300 cursor-pointer" title="Montant restant">{{ formatedNumber(facture.impayer ? facture.impayer : 0) }}</td>
-                    <!-- <td class="text-left py-3 px-4 text-xs font-semibold underline text-blue-400 hover:text-blue-300 cursor-pointer" title="Montant Total dû" >0</td> -->
+                    <td class="text-left py-3 px-4 text-xs font-bold text-pink-400 hover:text-pink-300 cursor-pointer" title="Montant restant">{{ formatedNumber(facture.impayer ? facture.impayer : 0) }}</td>
+
+                    <td class="text-left py-3 px-4 text-xs font-bold hover:text-pink-300 cursor-pointer" title="Montant restant">{{ formatedNumber(bringAvance(facture.fournisseurId)) }}</td>
+
                     <td class="text-left py-3 px-4 flex justify-between items-center">
                       <span class="material-icons " :class="{ disabled: !isAdmin }" >edit</span>
                       <span class="material-icons strash text-red-300" :class="{ disabled: !isAdmin }">delete</span>
@@ -54,6 +57,7 @@
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">N° Facture</th>
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Fournisseurs</th>
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Impayé</th>
+                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Avance</th>
                   </tr>
                 </thead>
                 <tbody class="text-gray-700">
@@ -63,6 +67,7 @@
                     <td class="text-left py-3 px-4 text-xs text-blue-400 underline hover:text-blue-500 cursor-pointer" title="Cliquer pour aller au payement" @click="payerFacture(facture.id)">{{ facture.id}}</td>
                     <td class="text-left py-3 px-4 text-xs">{{  getFournisseur(facture.fournisseurId) }}</td>
                     <td class="text-left py-3 px-4 text-xs font-semibold text-pink-400 hover:text-pink-300 cursor-pointer" title="Montant restant">{{ (facture.impayer ? facture.impayer : 0) }}</td>
+                    <td class="text-left py-3 px-4 text-xs font-semibold text-pink-400 hover:text-pink-300 cursor-pointer" title="Montant restant">{{ bringAvance(facture.fournisseurId) }}</td>
                     <!-- <td class="text-left py-3 px-4 text-xs font-semibold underline text-blue-400 hover:text-blue-300 cursor-pointer" title="Montant Total dû" >0</td> -->
                   </tr>
                 </tbody>
@@ -72,6 +77,7 @@
                         <!-- <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{ numberFormatter.format(totalPVU)}} </td> -->
                         <!-- <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{totalQte}} </td> -->
                         <td class=" py-3 px-4 text-sm  font-bold uppercase" >{{ numberFormatter.format(totalImpayer)}} </td>
+                        <td class=" py-3 px-4 text-sm  font-bold uppercase" ></td>
                     </tr>
                 </tfoot>
 
@@ -96,6 +102,7 @@ import { onMounted, watch } from '@vue/runtime-core'
 import Spinner from "../../components/Spinner.vue"
 import { collection, onSnapshot, orderBy, query } from '@firebase/firestore';
 import genererPDF from '../../controllers/genererPDF';
+import avancesFournisseur from '../../controllers/avanceFournisseurs';
 export default {
   components: { Spinner },
   setup() {
@@ -117,6 +124,7 @@ export default {
     const options = { year: 'numeric', month: 'short', day: 'numeric', timeZone:'UTC' }
 
     const { makeDocument } = genererPDF()
+    const { getAvances, avnc } = avancesFournisseur()
 
     const formatedNumber = (strNumber) => {
       return strNumber.toLocaleString('fr-fr', {style: "currency", currency: "GNF", minimumFractionDigits: 0})
@@ -175,8 +183,8 @@ export default {
                 return {...doc.data(), id : doc.id}
             })
 
-            listeFactures.value = documents.value
-            listeFacturesBoutique.value = listeFactures.value
+            // listeFactures.value = documents.value
+            // listeFacturesBoutique.value = listeFactures.value
         })
     }
 
@@ -217,6 +225,16 @@ export default {
       }else return "Inconnue"
     }
 
+    const bringAvance = (id) => {
+      let av = 0
+      avnc.value.map(avance => {
+        if(avance.id == id ){
+          av = avance.montantAvance
+        }
+      })
+      return av
+    }
+
     watch(boutiqueVente, async()=>{
         if(boutiqueVente.value =='') {
             return
@@ -228,12 +246,12 @@ export default {
         })
     })
 
-    watch(listeFactures, () => {
+    watch(documents, () => {
 
-        if(listeFactures.value.length ) {
+        if(documents.value.length ) {
           const lstFact = listeFactures
         // Calculer le solde total par facture
-            lstFact.value.map(facture => {
+            documents.value.map(facture => {
                 let soldeTotal =0
                 facture.articles.forEach(solde => {
                     soldeTotal += Number(solde.pvu * solde.qtecmd)
@@ -247,10 +265,10 @@ export default {
                 })
                 // facture.client = getFournisseur(facture.clientId)
             })
-            listeFactures.value = lstFact.value.filter(facture => {
+            listeFacturesBoutique.value = documents.value.filter(facture => {
               return facture.impayer >0
             })
-            listeFacturesBoutique.value = listeFactures.value
+            // listeFacturesBoutique.value = listeFactures.value
             totalImpayer.value = 0
             listeFacturesBoutique.value.map(fact => {
               totalImpayer.value += fact.impayer
@@ -264,6 +282,7 @@ export default {
       await loadFournisseurs()
       await getSolde()
       await loadFactures()
+      await getAvances()
       //console.log(" clients : ", documents.value)
     })
 
@@ -333,7 +352,7 @@ export default {
           boutique: boutiqueVente.value,
           gerant: auth.currentUser.displayName
       }
-      makeDocument({title : 'LISTE DES FACTURES FOURNISSEUR IMPAYEES  ' , orientation : "p", format : "a4", id : 'listeImpayer', option: options})
+      makeDocument({title : 'LISTE DES FACTURES FOURNISSEUR IMPAYEES  ' , orientation : "l", format : "a4", id : 'listeImpayer', option: options})
         /// End of Generate facture in pdf
     }
 
@@ -365,6 +384,7 @@ export default {
       prenom,
       exportPDF,
       numberFormatter,
+      bringAvance,
     }
   }
 }

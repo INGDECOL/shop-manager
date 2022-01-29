@@ -186,7 +186,8 @@ const makeCommande = ( {title = '',  orientation = 'p',  format = 'a4',  data = 
     doc.setLineWidth(1)
     doc.setDrawColor("black")
     doc.rect(18, tableFinalHeight + 8 , 120, 32);
-
+    doc.setTextColor("black")
+    doc.setFont("Times","bold")
     doc.text("Acheteur principal ", doc.internal.pageSize.width * 0.8 , tableFinalHeight + 50, {align: 'center'})
     doc.text(option.acheteur, doc.internal.pageSize.width * 0.8 , tableFinalHeight + 72, {align: 'center'})
 
@@ -315,7 +316,7 @@ const makeDocument = ({title = '',  orientation = 'p',  format = 'a4',  data = [
     }
 
     doc.setFontSize(9)
-    doc.setFont("Times","bold, italic")
+    doc.setFont("Times","bold")
     doc.text("Siguiri, le " + dateFormatter.format(new Date().now), doc.internal.pageSize.width * 0.8 , 47, { align: "center"})
 
     // Generation du tableau en fonction du tableau html fournis
@@ -334,7 +335,7 @@ const makeDocument = ({title = '',  orientation = 'p',  format = 'a4',  data = [
 
     if(option.totalTTC && option.totalQte && option.totalPAU ) {
         doc.setFontSize(14)
-        doc.setFont("courrier","bold")
+        doc.setFont("courier","bold")
         doc.setTextColor("#black")//doc.setTextColor("#0e4c92")
         doc.text("Montant Total :  " + numberFormatter.format(option.totalTTC)  , 20, tableFinalHeight + 14)
         // doc.setLineWidth(0.5)
@@ -345,7 +346,7 @@ const makeDocument = ({title = '',  orientation = 'p',  format = 'a4',  data = [
         doc.text("Total des Quantités :  "+ option.totalQte.toString(), 20, tableFinalHeight + 22)
         doc.line(18, tableFinalHeight + 24, 138, tableFinalHeight + 24)
 
-        doc.setTextColor("#black")//doc.setTextColor("#ed2939")
+        doc.setTextColor("black")//doc.setTextColor("#ed2939")
         doc.text("Total PAU :  "+ numberFormatter.format(option.totalPAU), 20, tableFinalHeight + 30)
         // doc.line(18, tableFinalHeight + 32, 138, tableFinalHeight + 32)
 
@@ -359,21 +360,21 @@ const makeDocument = ({title = '',  orientation = 'p',  format = 'a4',  data = [
         }
     }else if(title.includes('IMPAYEES')){
         doc.setFontSize(15)
-        doc.setFont("courrier","bold")
+        doc.setFont("courier","bold")
         doc.setTextColor("#ed2939")
-        option.totalTTC && doc.text("Montant Total :  " + numberFormatter.format(option.totalTTC)  , 20, tableFinalHeight + 14)
+        option.totalTTC && doc.text("Montant Total à payer:  " + numberFormatter.format(option.totalTTC)  , 20, tableFinalHeight + 14)
         // doc.setDrawColor("#ed2939")
         // doc.line(20, tableFinalHeight + 15, Math.round(doc.getTextWidth("Montant Total :  " + numberFormatter.format(option.totalTTC))), tableFinalHeight + 15, 'FD')
         // console.log("text width : ", Math.round(doc.getTextWidth("Montant Total :  " + numberFormatter.format(option.totalTTC))))
 
     }else if (option.gerant) {
          doc.setFontSize(14)
-        doc.setFont("courrier","bold")
+        doc.setFont("courier","bold")
         doc.text("Gérant principal ", doc.internal.pageSize.width * 0.8 , tableFinalHeight + 30, {align: 'center'})
         doc.text(option.gerant, doc.internal.pageSize.width * 0.8 , tableFinalHeight + 52, {align: 'center'})
     }else {
         doc.setFontSize(14)
-        doc.setFont("courrier","bold")
+        doc.setFont("courier","bold")
         doc.setTextColor("#0e4c92")
         option.totalTTC && doc.text("Montant Total :  " + numberFormatter.format(option.totalTTC)  , 20, tableFinalHeight + 14)
     }
@@ -395,10 +396,10 @@ const setEntete = (doc, img='') => {
     // console.log('img : ', img)
     doc.setFontSize(30)
     doc.setFont("Times","bold")
-    doc.text("ETS N'NA HAWA MS", 50,15, null, null, )
+    doc.text("ETS N'NA HAWA MS", doc.internal.pageSize.width / 2,15, {align: 'center'} )
     doc.setFontSize(15)
     doc.setFont("Courier","bold")
-    doc.text("Achat et vente de marchandise", 55,20)
+    doc.text("Achat et vente de marchandise", doc.internal.pageSize.width / 2,20, {align: 'center'})
     doc.setFontSize(14)
     doc.setFont("symbol","bold")
     doc.text("Contact : 622 22 91 41 / 621 79 02 82 / 663 63 05 66 ", doc.internal.pageSize.width / 2, 25, {align: 'center'})
