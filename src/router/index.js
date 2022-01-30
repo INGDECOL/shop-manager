@@ -45,6 +45,7 @@ import getUser from '../controllers/getUser'
   import AdminNewCommande from "../views/etats/CommandeFournisseurs.vue"
   import AdminListeCommandes from "../views/etats/AdminListeCommandes.vue"
   import AdminCompteFournisseur from "../views/etats/CompteFournisseur.vue"
+  import AdminGrandLivre from "../views/etats/GrandLivre.vue"
 
   import AdminGestionCompte from "../views/comptes/GestionCompte.vue"
   import AdminOperations from "../views/comptes/Operations.vue"
@@ -290,6 +291,13 @@ const routes = [
     component: AdminInventaire,
     beforeEnter: requireAuthAdmin
   },
+  {
+    path: "/rapports/etats/GrandLivre_des_comptes/:token/",
+    name: "AdminGrandLivre",
+    component: AdminGrandLivre,
+    beforeEnter: requireAuthAdmin
+  },
+
 // Etats fournisseurs
   {
     path: "/commandes/new_commande_fournisseur/:token/:id?",

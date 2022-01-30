@@ -19,7 +19,7 @@
             <!-- Solde actuel -->
           <div v-if="soldeActuel">
             <div class="flex justify-center my-2 mr-2">
-                <span class="flex justify-center gap-4 bg-green-300 text-gray-600 text-base font-bold  mb-2  rounded-md cursor-pointer hover:bg-green-200"  >
+                <span class="flex justify-center gap-4 bg-red-400 text-gray-600 text-base font-bold  mb-2  rounded-md cursor-pointer hover:bg-green-200" :class="{' bg-green-400 ': Number(soldeActuel) > 0 }" >
                 <span class="mx-3 my-4" >Solde actuel</span>
                 <span class="mx-3 my-4">{{soldeActuel ? (soldeActuel ).toLocaleString('fr-fr', {style: "currency", currency: "GNF", minimumFractionDigits: 0})  : 0 }}</span>
                 </span>

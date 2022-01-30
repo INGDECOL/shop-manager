@@ -9,27 +9,27 @@
             <!-- INFO DATE Vendeur CLIENT -->
             <div class="flex justify-center items-center border rounded-md py-1.5 ">
               <!-- Date du jour -->
-              <span class="flex justify-between items-center bg-blue-100 text-blue-600 text-sm font-bold mx-2 pr-2.5 py-0.5 rounded-md cursor-pointer hover:bg-blue-200" title="Aujourd'hui">
-                <span class="material-icons mr-1">date_range</span>
+              <span class="flex justify-between items-center bg-blue-100 text-blue-600 text-xs  mx-1 pr-2 py-0.5 rounded-md cursor-pointer  hover:bg-blue-200 md:font-bold md:mx-2 md:pr-2.5 md:text-sm"  title="Aujourd'hui">
+                <span class="text-xs material-icons mr-1 md:text-sm">date_range</span>
                 {{dateDuJour}}
 
               </span>
               <!-- Vendeur -->
-              <span class="flex justify-between items-center bg-green-100 text-green-600 text-sm font-bold mr-2 pr-2.5 py-0.5 rounded-md cursor-pointer hover:bg-green-200" title="Vendeur">
+              <span class="text-xs flex justify-between items-center bg-green-100 text-green-600 md:text-sm md:font-bold mr-2 pr-2.5 py-0.5 rounded-md cursor-pointer hover:bg-green-200" title="Vendeur">
                 <span class="material-icons mr-1">people</span>
                 {{vendeur.displayName}}
 
               </span>
               <!-- Boutique -->
               <div class="mr-2 pr-2.5">
-                  <select name="magasin"  id="magasin" v-model="boutiqueVente" class=" font-bold mr-2 pr-2.5 cursor-pointer"  required title="Magasin">
+                  <select name="magasin"  id="magasin" v-model="boutiqueVente" class=" md:font-bold md:text-sm text-xs mr-2 pr-2.5 cursor-pointer"  required title="Magasin">
                       <option value="">Selectionner la boutique</option>
                       <option v-for="boutique in filteredBoutiques" :key="boutique.id" :value="boutique.id">{{ boutique.designationBoutique }}</option>
                   </select>
               </div>
               <!-- CLIENT -->
               <div class="mr-2 pr-2.5">
-                  <select name="magasin"  id="magasin" v-model="clientVenteId" class=" font-bold  cursor-pointer"  title="Client" >
+                  <select name="magasin"  id="magasin" v-model="clientVenteId" class="text-xs md:font-bold md:text-sm  cursor-pointer"  title="Client" >
                       <option value="">CltDiv</option>
                       <option v-for="client in filteredClients" :key="client.id" :value="client.nom +'_'+client.prenom" @click="selectedClient(client)">{{client.nom +" "+client.prenom }}</option>
                   </select>
@@ -38,26 +38,26 @@
             <div class="error">{{ receptionError }}</div>
             <div class="produit border flex justify-center flex-col  gap-0.5 mt-0 p-2">
                 <!-- Total de la facture -->
-                <div class="flex justify-end " :class="{'flex justify-between': (avance)}">
-                    <span class="flex justify-center gap-4 bg-green-300 text-gray-600 text-base font-bold ml-8  rounded-md cursor-pointer hover:bg-green-200" v-if="avance">
-                       <span class="mx-3 my-4"> Avance </span>
-                        <span class="mx-3 my-4">{{formatedNumber( montantRegle ? (avance.montantAvance - montantRegle)>=0 ? (avance.montantAvance - montantRegle): 0  : avance.montantAvance) }}</span>
+                <div class="flex justify-end " :class="{'flex justify-between gap-2': (avance)}">
+                    <span class="flex justify-center gap-4 bg-green-300 text-gray-600 text-base md:font-bold ml-8  rounded-md cursor-pointer hover:bg-green-200" v-if="avance">
+                       <span class="mx-1 my-2 font-semibold md:mx-3 md:my-4"> Avance </span>
+                        <span class="mx-1 my-2 font-semibold md:mx-3 md:my-4">{{formatedNumber( montantRegle ? (avance.montantAvance - montantRegle)>=0 ? (avance.montantAvance - montantRegle): 0  : avance.montantAvance) }}</span>
                     </span>
-                    <span class="flex justify-center gap-4 bg-green-300 text-gray-600 text-base font-bold mr-8  rounded-md cursor-pointer hover:bg-green-200">
-                       <span class="mx-3 my-4"> Montant TTC</span>
-                        <span class="mx-3 my-4">{{formatedNumber( totalTTC ? totalTTC  : 0) }}</span>
+                    <span class="flex justify-center gap-4 bg-green-300 text-gray-600 md:text-base md:font-bold mr-8  rounded-md cursor-pointer hover:bg-green-200">
+                       <span class="mx-1 my-2 font-semibold md:mx-3 md:my-4"> Montant TTC</span>
+                        <span class="mx-1 my-2 font-semibold md:mx-3 md:my-4">{{formatedNumber( totalTTC ? totalTTC  : 0) }}</span>
                     </span>
                 </div>
-                <div class="produit  flex justify-center  gap-0.5 m-0 shadow-none">
+                <div class="produit  md:flex justify-center  gap-0.5 m-0 shadow-none">
                   <!-- cote gauche -->
-                  <div class="rounded border mb-2 px-1 mx-1 w-full ">
+                  <div class="rounded border mb-2 px-1 mx-1 md:w-full ">
                     <!-- Rechercher -->
                     <div class="flex justify-center items-center">
                         <div class="border flex justify-center items-center w-full m-1">
-                            <span class="flex justify-between items-center bg-green-100 text-green-600 text-sm font-bold mx-2 px-2 py-1 rounded-md cursor-pointer hover:bg-green-200" title="Qté en Stock">{{ quantiteStock ? quantiteStock : "0000"}}</span>
-                            <div class="input-field searchbar mx-1 mt-0  flex justify-start     w-full">
+                            <span class="flex justify-between items-center bg-green-100 text-green-600 md:text-sm font-bold md:mx-2 px-2 py-1 rounded-md cursor-pointer hover:bg-green-200" title="Qté en Stock">{{ quantiteStock ? quantiteStock : "0000"}}</span>
+                            <div class="input-field searchbar mx-1 mt-0  flex justify-start   w-full">
                                 <input id="searchInput" type="text"  placeholder="Rechercher" @click="showPop" v-model="searchQuery">
-                                <span class="material-icons  -mx-9 p-4">
+                                <span class=" material-icons  -mx-9 p-4">
                                     search
                                 </span>
                             </div>
@@ -396,12 +396,6 @@ export default {
             }
         })
 
-        // watch(clientVenteId, () => {
-        //     if(clientVenteId.value != 'CltDiv') {
-        //         console.log(clientVenteId.value)
-        //     }
-        // })
-
         const filteredArticles = computed(()=>{
             return listeArticles.value && listeArticles.value.filter((article)=>{
                 return article.designation.toLowerCase().indexOf( searchQuery.value.toLowerCase()) != -1
@@ -455,6 +449,7 @@ export default {
             pvu.value=""
             qtecmd.value=1
             codeFamille.value=""
+             searchQuery.value = ''
 
         }
 
@@ -736,6 +731,7 @@ export default {
                 montantRegle.value =""
                 commandes.value.splice(0, commandes.value.length)
                 avance.value=null
+
 
             }
 

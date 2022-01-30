@@ -413,9 +413,9 @@ const setEntete = (doc, img='') => {
 const setFooters = doc => {
   const pageCount = doc.internal.getNumberOfPages()
 
-  doc.setFont('helvetica', 'italic')
+  doc.setFont('helvetica', 'bold')
   doc.setTextColor("black")
-  doc.setFontSize(8)
+  doc.setFontSize(9)
   for (var i = 1; i <= pageCount; i++) {
     doc.setPage(i)
     doc.setLineWidth(0.5)
@@ -430,9 +430,9 @@ const setFooters = doc => {
 const setSpecFooters = doc => {
   const pageCount = doc.internal.getNumberOfPages()
 
-  doc.setFont('helvetica', 'italic')
+  doc.setFont('helvetica', 'bold')
   doc.setTextColor("black")
-  doc.setFontSize(8)
+  doc.setFontSize(9)
   for (var i = 1; i <= pageCount; i++) {
     doc.setPage(i)
     doc.setLineWidth(0.5)

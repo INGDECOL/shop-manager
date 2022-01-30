@@ -2,6 +2,12 @@ module.exports = {
   purge: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
   darkMode: false, // or 'media' or 'class'
   theme: {
+    screens: {
+      sm: '640px',
+      md: '950px',
+      lg: '1200px',
+      xl: '1536px',
+    },
     extend: {
         colors: {
           'primary': '#4f515a',

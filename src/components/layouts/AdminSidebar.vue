@@ -290,6 +290,20 @@
 
                   </Disclosure>
                 </li>
+                <!-- Inventaire -->
+                <li>
+                  <Disclosure v-slot="{ open }" :default-open="isUserActive">
+                        <router-link :to="{ name: 'AdminGrandLivre', params: { token: auth.currentUser.accessToken}}">
+                          <p
+                            class="pl-6 pr-4  flex items-center w-full hover:bg-gray-700"
+                            :class="open ? 'open': ''"
+                          >
+                          <span class="material-icons w-5 mr-2">inventory</span>Grand Livre des comptes
+                          </p>
+                        </router-link>
+
+                  </Disclosure>
+                </li>
               </ul>
             </DisclosurePanel>
           </Disclosure>
