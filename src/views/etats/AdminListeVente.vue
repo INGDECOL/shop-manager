@@ -316,20 +316,20 @@ export default {
     }
     const destroy = async (id) => {
       //console.log(" destroy id :::: ",id)
-       alert("Vous ne pouvez pas supprimer ou modifier sur cette page")
-      return
-      // if( isAdmin) {
-      //     const { destroy, error } = destroyDocument()
-      //     if( confirm("Voulez-vous retourner cette vente et redefinir tous le montants vendus ?? \n Cette action est definitive et irreversible !!") ) {
-      //       await destroy("produits", id)
+      //  alert("Vous ne pouvez pas supprimer ou modifier sur cette page")
+      // return
+      if( isAdmin) {
+          const { destroy, error } = destroyDocument()
+          if( confirm("Voulez-vous retourner cette vente et redefinir tous les montants vendus ?? \n Cette action est definitive et irreversible !!") ) {
+            await destroy("ventes", id)
 
-      //   }
-      //   if(error.value){
-      //     alert(error.value)
-      //   }
-      // }else {
-      //   alert("Vous n'êtes pas autorisé à effectuer cette action")
-      // }
+        }
+        if(error.value){
+          alert(error.value)
+        }
+      }else {
+        alert("Vous n'êtes pas autorisé à effectuer cette action")
+      }
     }
     const filteredfacture = computed( () =>{
         // console.log("factures in filtered facture fx : ", listeFactures.value)

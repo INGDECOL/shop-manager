@@ -109,7 +109,7 @@ export default {
       // console.log(" destroy id :::: ",id)
       if( isAdmin) {
           const { destroy, error } = destroyDocument()
-          if( confirm("Voulez-vous supprimer cet rayon et tous les sous documents liés ?? Cette action est definitive et irreversible !!") ) {
+          if( confirm("Voulez-vous supprimer cette famille de produit et tous les sous documents liés ?? Peut - être il ya des articles liés \n Cette action est definitive et irreversible !!") ) {
             await destroy("familles", id)
 
         }

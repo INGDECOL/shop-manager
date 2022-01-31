@@ -8,8 +8,9 @@ const findUser = async (id) =>{
         try {
             const docRef = doc( db, 'users', id)
             const res = await getDoc(docRef)
-            user.value = {...res.data(), id: id}
-            if(!res.exists()) {
+            if(res.exists()) {
+                user.value = {...res.data(), id: id}
+            } else {
                 throw Error("Impossible de retrouver cet utilisateur ")
             }
         }

@@ -372,20 +372,19 @@ export default {
     }
     const destroy = async (id) => {
       //console.log(" destroy id :::: ",id)
-       alert("Vous ne pouvez pas supprimer ou modifier sur cette page")
-      return
-      // if( isAdmin) {
-      //     const { destroy, error } = destroyDocument()
-      //     if( confirm("Voulez-vous retourner cette vente et redefinir tous le montants vendus ?? \n Cette action est definitive et irreversible !!") ) {
-      //       await destroy("produits", id)
 
-      //   }
-      //   if(error.value){
-      //     alert(error.value)
-      //   }
-      // }else {
-      //   alert("Vous n'êtes pas autorisé à effectuer cette action")
-      // }
+      if( isAdmin) {
+          const { destroy, error } = destroyDocument()
+          if( confirm("Voulez-vous annuller cette commande et redefinir tous les montants  ?? \n Cette action est definitive et irreversible !!") ) {
+            await destroy("commandeFournisseurs", id)
+
+        }
+        if(error.value){
+          alert(error.value)
+        }
+      }else {
+        alert("Vous n'êtes pas autorisé à effectuer cette action")
+      }
     }
     const filteredfacture = computed( () =>{
         // console.log("factures in filtered facture fx : ", listeFactures.value)

@@ -9,8 +9,8 @@ import { doc, getDoc } from 'firebase/firestore'
         try {
             const docRef = doc( db, collectionName, id)
             const res =  await getDoc(docRef)
+                // console.log("REs data : ", res.data())
             if(res.exists()){
-                //console.log("REs data : ", res.data())
                 document.value = {...res.data(), id: id}
 
             }

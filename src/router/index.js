@@ -5,9 +5,11 @@ import getUser from '../controllers/getUser'
 //Components import
   import Home from '../views/Home.vue'
   import Profile from '../views/auth/Profile.vue'
+  import Login from '../views/auth/Login.vue'
 
   import ListeFournisseur from "../views/fournisseurs/ListeFournisseur.vue"
   import EditFournisseur from "../views/fournisseurs/EditFournisseur.vue"
+  import NewFournisseur from "../views/fournisseurs/NewFournisseur.vue"
 
   import ListeRayon from "../views/familles/ListeRayon.vue"
   import EditRayon from "../views/familles/EditRayon.vue"
@@ -17,6 +19,7 @@ import getUser from '../controllers/getUser'
 
   import ListeBoutique from "../views/boutiques/ListeBoutique.vue"
   import EditBoutique from "../views/boutiques/EditBoutique.vue"
+  import NewBoutique from "../views/boutiques/NewBoutique.vue"
 
   import ListeProduit from "../views/produits/ListeProduit.vue"
   import NewProduit from "../views/produits/NewProduit.vue"
@@ -31,6 +34,7 @@ import getUser from '../controllers/getUser'
   import ListeVente from "../views/ventes/ListeVente.vue"
   import DetailDette from "../views/ventes/DetailDetteClient.vue"
   import CompteClient from "../views/ventes/CompteClient.vue"
+  import RemboursementClient from "../views/ventes/RemboursementClient.vue"
 
    import NewPersonnel from '../views/auth/Signup.vue'
   import ListePersonnel from "../views/personnels/ListePersonnel.vue"
@@ -58,6 +62,17 @@ import getUser from '../controllers/getUser'
     // console.log("reequireAuth");
     let user = auth.currentUser
     if(!user){
+      next({ name: 'Home'})
+    } else {
+      next()
+    }
+    //console.log(" current : ", user.accessToken)
+  }
+
+  const requireUnauthenticated = ( to, from, next) =>{
+    // console.log("reequireAuth");
+    let user = auth.currentUser
+    if(user){
       next({ name: 'Home'})
     } else {
       next()
@@ -93,16 +108,28 @@ const routes = [
     component: Home
   },
   {
+    path: '/Sign_in',
+    name: 'Login',
+    component: Login,
+    beforeEnter: requireUnauthenticated
+  },
+  {
     path: '/profil/:token',
     name: 'Profil',
     component: Profile,
     beforeEnter: requireAuth
   },
-
+  // Fournisseur
   {
     path: "/fournisseurs/:token",
     name: "Fournisseurs",
     component: ListeFournisseur,
+    beforeEnter: requireAuth
+  },
+  {
+    path: "/create_fournisseurs/:token",
+    name: "NewFournisseur",
+    component: NewFournisseur,
     beforeEnter: requireAuth
   },
   {
@@ -111,7 +138,7 @@ const routes = [
     component: EditFournisseur,
     beforeEnter: requireAuthAdmin
   },
-
+  // Familles
   {
     path: "/familles/:token",
     name: "Familles",
@@ -124,7 +151,13 @@ const routes = [
     component: EditRayon,
     beforeEnter: requireAuth
   },
-
+  // Boutique
+  {
+    path: "/create_boutiques/:token",
+    name: "NewBoutique",
+    component: NewBoutique,
+    beforeEnter: requireAuthAdmin
+  },
   {
     path: "/boutiques/:token",
     name: "Boutiques",
@@ -217,6 +250,12 @@ const routes = [
     path: "/vente/listeCompteClient/:token",
     name: "CompteClient",
     component: CompteClient,
+    beforeEnter: requireAuth
+  },
+  {
+    path: "/vente/remboursement_client/:id/:token",
+    name: "RemboursementClient",
+    component: RemboursementClient,
     beforeEnter: requireAuth
   },
 

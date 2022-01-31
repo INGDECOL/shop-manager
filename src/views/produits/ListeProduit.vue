@@ -70,10 +70,11 @@ export default {
     const searchQuery = ref("")
     const editproduitId = ref(null)
     const listeFournisseurs = ref([])
+
     onMounted( async () => {
       await load("produits")
       await loadFournisseur()
-      getFournisseur("hrFBd6hzdLQvUqFQaVDk")
+      // getFournisseur("hrFBd6hzdLQvUqFQaVDk")
       // console.log("fournisseur with id : ", getFournisseur("hrFBd6hzdLQvUqFQaVDk"))
       //console.log(" produits : ", documents.value)
     })
@@ -150,8 +151,7 @@ export default {
       }
     }
     const filteredproduits = computed( () =>{
-
-          return documents.value.length ? documents.value.filter( (produit) => {
+          return documents.value ? documents.value.filter( (produit) => {
             return produit.designation.toLowerCase().indexOf( searchQuery.value.toLowerCase()) != -1
           }): []
 

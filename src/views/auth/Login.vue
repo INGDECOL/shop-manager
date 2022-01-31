@@ -1,18 +1,18 @@
 <template>
-    <div class="auth ">
+    <div class=" ml-auto mr-auto mt-8">
       <div class="modal active">
-        <h2 class="mb-2">CONNECTEZ VOUS</h2>
+        <h2 class="mb-2 font-bold text-lg">CONNECTEZ VOUS</h2>
         <form class="login" @submit.prevent="handleSubmit">
           <input type="email" name="email" placeholder="Email" required v-model="email">
           <input type="password" name="password" placeholder="Password" required v-model="password">
           <button>Se connecter</button>
           <p class="error">{{ signError }}</p>
         </form>
-        <div>
-            No account? <a class="switch" @click="toggleForm">Register instead</a>
+        <div class="font-semibold">
+            No account? <a class="switch underline text-blue-400 hover:text-blue-500 cursor-pointer" @click="toggleForm">Register instead</a>
         </div>
       </div>
-    <SignUp />
+    <!-- <SignUp /> -->
     </div>
 </template>
 
@@ -37,7 +37,7 @@ export default {
             // document.querySelectorAll(".auth .modal").forEach(form => {
             //     form.classList.toggle("active")
             // })
-            alert("Pour avoir un nouveau compte, veuillez contacter l'administrateur au : \n Tel : 622 22 91 14 \n Email : admin@shopmanager.com")
+            alert("Pour avoir un nouveau compte, veuillez contacter l'administrateur au : \n Tel : 622 22 91 14 \n Email : younoussa41@gmail.com")
         }
 
         const handleSubmit = async () => {
@@ -48,8 +48,8 @@ export default {
                 // console.log( "user logged In ...")
                 // console.log("auth : ", auth.currentUser)
                  document.querySelectorAll(".auth form").forEach(form => form.reset())
-                 document.querySelector(".auth").classList.remove("open")
-                // router.push( { name: 'Home'})
+                //  document.querySelector(".auth").classList.remove("open")
+                router.push( { name: 'Home'})
             }else  console.log(" console.error() :" , signError.value)
         }
 

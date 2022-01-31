@@ -1,5 +1,5 @@
 <template>
-      <div class="mx-auto w-4/5" @click="hideModal">
+      <div class="mx-auto w-full" @click="hideModal">
         <div class=" active">
             <form class="produit"  @submit.prevent="handleSubmit">
             <div class="flex justify-end -mr-5  ml-auto">

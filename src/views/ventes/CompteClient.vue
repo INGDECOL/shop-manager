@@ -36,7 +36,7 @@
                     <td class="text-left py-3 px-4 text-xs font-semibold text-pink-400 hover:text-pink-300 cursor-pointer" title="Montant restant">{{ formatedNumber(bringAvance(facture.clientId)) }}</td>
                     <!-- <td class="text-left py-3 px-4 text-xs font-semibold underline text-blue-400 hover:text-blue-300 cursor-pointer" title="Montant Total dû" >0</td> -->
                     <td class="text-left py-3 px-4 flex justify-between items-center">
-                      <span class="material-icons " :class="{ disabled: !isAdmin }" >edit</span>
+                      <span class="material-icons " :class="{ disabled: !isAdmin }"  >edit</span>
                       <span class="material-icons strash text-red-300" :class="{ disabled: !isAdmin }">delete</span>
                     </td>
                   </tr>
@@ -168,7 +168,7 @@ export default {
   }
 
   const payerFacture = (idfacture) => {
-    router.push({ name: 'Vente', params: { token: auth.currentUser.accessToken, id: idfacture}})
+    router.push({ name: 'RemboursementClient', params: { token: auth.currentUser.accessToken, id: idfacture}})
   }
 
   const getClient = (id) => {

@@ -303,9 +303,18 @@ export default {
       // }
     }
     const destroy = async (id) => {
-      //console.log(" destroy id :::: ",id)
-       alert("Vous ne pouvez pas supprimer ou modifier sur cette page")
-      return
+      if( isAdmin) {
+          const { destroy, error } = destroyDocument()
+          if( confirm("Voulez-vous supprimer cette transaction et tous les sous documents liés ?? Cette action est definitive et irreversible !!") ) {
+            await destroy("mouvements", id)
+
+        }
+        if(error.value){
+          alert(error.value)
+        }
+      }else {
+        alert("Vous n'êtes pas autorisé à effectuer cette action")
+      }
     }
 
     const filteredAccount = computed( () =>{

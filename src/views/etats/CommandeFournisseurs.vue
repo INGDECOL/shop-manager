@@ -1,5 +1,5 @@
 <template>
-      <div class="mx-auto w-4/5" @click="hideModal">
+      <div class="mx-auto" @click="hideModal">
         <div class=" active">
             <form class="produit"  @submit.prevent="handleSubmit">
               <!-- Bouton fermer -->
@@ -9,13 +9,13 @@
             <!-- INFO DATE Vendeur CLIENT -->
             <div class="flex justify-between items-center border rounded-md py-1.5 ">
               <!-- Date du jour -->
-              <span class="flex justify-between items-center bg-blue-100 text-blue-600 text-sm font-bold mx-2 pr-2.5 py-0.5 rounded-md cursor-pointer hover:bg-blue-200" title="Aujourd'hui">
-                <span class="material-icons mr-1">date_range</span>
+              <span class="flex justify-between items-center bg-blue-100 text-blue-600 text-xs  mx-1 pr-2 py-0.5 rounded-md cursor-pointer  hover:bg-blue-200 md:font-bold md:mx-2 md:pr-2.5 md:text-sm" title="Aujourd'hui">
+                <span class=" material-icons mr-1 ">date_range</span>
                 {{dateDuJour}}
 
               </span>
               <!-- Acheteur -->
-              <span class="flex justify-between items-center bg-green-100 text-green-600 text-sm font-bold mr-2 pr-2.5 py-0.5 rounded-md cursor-pointer hover:bg-green-200" title="Acheteur">
+              <span class="text-xs flex justify-between items-center bg-green-100 text-green-600 md:text-sm md:font-bold mr-2 pr-2.5 py-0.5 rounded-md cursor-pointer hover:bg-green-200" title="Acheteur">
                 <span class="material-icons mr-1">people</span>
                 {{vendeur.displayName}}
 
@@ -29,10 +29,10 @@
               </div> -->
               <!-- fournisseurs -->
               <div class="mr-2 pr-2.5">
-                  <select name="magasin"  id="magasin" v-model="fournisseurCmdId" class=" font-bold  cursor-pointer"  title="Fournisseur" required>
+                  <select name="magasin"  id="magasin" v-model="fournisseurCmdId" class="text-xs md:font-bold md:text-sm  cursor-pointer"  title="Fournisseur" required @change="changedFournisseur">
                       <option value="">Selectionner le fournisseur</option>
                       <option value="FssDiv">FssDiv</option>
-                      <option v-for="fournisseur in filteredFournisseurs" :key="fournisseur.id" :value="fournisseur.nom +'_'+fournisseur.prenom" @click="selectedFournisseur(fournisseur)">{{fournisseur.nom +" "+fournisseur.prenom }}</option>
+                      <option v-for="fournisseur in filteredFournisseurs" :key="fournisseur.id" :value="fournisseur.id +'_'+fournisseur.prenom" @click="selectedFournisseur(fournisseur)">{{fournisseur.nom +" "+fournisseur.prenom }}</option>
                   </select>
               </div>
             </div>
@@ -43,23 +43,23 @@
                     <div class="ml-5">
                         <p class="font-bold text-2xl ">{{ routeid ? "Remboursement facture": "Etablir une commande" }}</p>
 
-                        <span class="flex justify-center gap-4 bg-green-300 text-gray-600 text-base font-bold ml-4  rounded-md cursor-pointer hover:bg-green-200" v-if="avance">
-                       <span class="mx-3 my-4"> Avance </span>
-                        <span class="mx-3 my-4">{{formatedNumber( montantRegle ? (avance.montantAvance - montantRegle)>=0 ? (avance.montantAvance - montantRegle): 0  : avance.montantAvance) }}</span>
+                        <span class="flex justify-center gap-4 bg-green-300 text-gray-600 text-base md:font-bold ml-8  rounded-md cursor-pointer hover:bg-green-200" v-if="avance">
+                       <span class="mx-1 my-2 font-semibold md:mx-3 md:my-4"> Avance </span>
+                        <span class="mx-1 my-2 font-semibold md:mx-3 md:my-4">{{formatedNumber( montantRegle ? (avance.montantAvance - montantRegle)>=0 ? (avance.montantAvance - montantRegle): 0  : avance.montantAvance) }}</span>
                     </span>
                     </div>
-                    <span class="flex justify-center gap-4 bg-green-300 text-gray-600 text-base font-bold mr-8  rounded-md cursor-pointer hover:bg-green-200">
-                       <span class="mx-3 my-5"> Montant HT</span>
-                        <span class="mx-3 my-5">{{ formatedNumber(totalHT ? totalHT:0) }}</span>
+                    <span class="flex justify-center gap-4 bg-green-300 text-gray-600 md:text-base md:font-bold mr-8  rounded-md cursor-pointer hover:bg-green-200">
+                       <span class="mx-1 my-2 font-semibold md:mx-3 md:my-4"> Montant HT</span>
+                        <span class="mx-1 my-2 font-semibold md:mx-3 md:my-4">{{ formatedNumber(totalHT ? totalHT:0) }}</span>
                     </span>
                 </div>
-                <div class="produit  flex justify-center  gap-0.5 m-0 shadow-none">
+                <div class="produit  md:flex justify-center  gap-0.5 m-0 shadow-none">
                   <!-- cote gauche -->
-                  <div class="rounded border mb-2 px-1 mx-1 w-full ">
+                  <div class="rounded border mb-2 px-1 mx-1 md:w-full">
                     <div class="flex justify-center items-center">
                         <!-- Rechercher -->
                         <div class="border flex justify-center items-center w-full m-1">
-                            <span class="flex justify-between items-center bg-green-100 text-green-600 text-sm font-bold mx-2 px-2 py-1 rounded-md cursor-pointer hover:bg-green-200" title="Qté en Stock">{{ quantiteStock ? quantiteStock : "0000"}}</span>
+                            <span class="flex justify-between items-center bg-green-100 text-green-600 md:text-sm font-bold mx-2 px-2 py-1 rounded-md cursor-pointer hover:bg-green-200" title="Qté en Stock">{{ quantiteStock ? quantiteStock : "0000"}}</span>
                             <div class="input-field searchbar mx-1 mt-0  flex justify-start     w-full">
                                 <input id="searchInput" type="text"  placeholder="Rechercher" @click="showPop" v-model="searchQuery">
                                 <span class="material-icons  -mx-9 p-4">
@@ -139,7 +139,7 @@
                         <p class="error">{{ createError }}</p>
                         <!-- Montant restant ou Montant à rendre -->
                         <div class="flex justify-center ">
-                            <span class="flex justify-center gap-4 bg-green-300 text-gray-600 text-base font-bold  mb-2  rounded-md cursor-pointer hover:bg-green-200" :class="{ 'text-red-500' : (totalHT -  (montantRegle.value + avance ? avance.montantAvance : 0))>0 }" >
+                            <span class="flex justify-center gap-4 bg-green-300 text-gray-600 text-base font-bold  mb-2  rounded-md cursor-pointer hover:bg-green-200" :class="{ 'text-red-500' : (totalHT -  montantRegle)>0 }" >
                             <span class="mx-3 my-4" :class="{'text-gray-600' : !montantRegle}"> {{ montantRegle ? (totalHT - montantRegle)>=0 ? "Reste dû " : "Avance" : "Monnaie à rendre"}}</span>
                             <span class="mx-3 my-4" :class="{'text-gray-600' : !montantRegle}">{{formatedNumber(montantRegle ? (reste()) :0) }}</span>
                             </span>
@@ -265,7 +265,7 @@ export default {
         const reste = ()=>{
             let reste =0
             if(avance.value){
-                reste = totalHT.value - (Number(montantRegle.value) + avance.value.montantAvance)
+                reste = totalHT.value - (Number(montantRegle.value) )
             }else {
                 reste = totalHT.value - Number(montantRegle.value)
             }
@@ -274,6 +274,12 @@ export default {
 
         const showPop = () =>{
           document.querySelector(" .searchList").classList.toggle("active")
+        }
+        const changedFournisseur = () => {
+            let fss =  listeFournisseurs.value.filter((f)=>{
+                return f.id == fournisseurCmdId.value.split("_")[0]
+            })
+            selectedFournisseur(fss[0])
         }
         const selectedFournisseur = (fss) => {
             fournisseurId.value = fss.id
@@ -436,6 +442,7 @@ export default {
                 pau : Number(pau.value),
                 qtecmd : Number(qtecmd.value),
                 montantTotal: Number(qtecmd.value * pau.value),
+
                 // stockRestant: Number(quantiteStock.value - qtecmd.value)
 
             }
@@ -446,6 +453,7 @@ export default {
             pau.value=""
             qtecmd.value=1
             codeFamille.value=""
+            searchQuery.value=""
 
         }
 
@@ -714,6 +722,7 @@ export default {
         }
         return {
             dateDuJour,
+            changedFournisseur,
             receptionError,
             vendeur,
             showPop,

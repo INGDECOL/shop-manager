@@ -1,6 +1,6 @@
 <template>
   <div class="md:px-2 py-8 w-full">
-      <NewFournisseur />
+      <!-- <NewFournisseur /> -->
       <div class="shadow overflow-hidden rounded border-b border-gray-200">
         <div class="flex justify-between items-center">
           <div class="searchbar mx-1 w-2/4 flex justify-start ">
@@ -94,11 +94,8 @@ export default {
     })
 
     const toggleForm = () => {
-            document.querySelector(".create").classList.toggle("open")
-            // document.querySelectorAll(".create .modal").forEach(form => {
-            //     form.classList.add("active")
-            // })
-        }
+      router.push({ name: "NewFournisseur", params: { token: auth.currentUser.accessToken}})
+    }
 
     const edit = (id) => {
       //console.log(" id :::: ",id)

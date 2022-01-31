@@ -520,7 +520,7 @@ export default {
         // console.log("userssss : ", _user.uid)
         if(_user) {
             await findUser(_user.uid)
-            //console.log("requireAuthAdmin : ", user.value.fonction)
+            // console.log("requireAuthAdmin : ", user.value)
             if(user.value.fonction !== 'Administrateur'){
               admin.value = false
 
@@ -534,6 +534,7 @@ export default {
     })
 
     onMounted(() => {
+      // console.log("sidebar : ", auth.currentUser.uid)
       isAdmin()
     })
 

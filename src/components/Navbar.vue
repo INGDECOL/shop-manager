@@ -49,7 +49,7 @@
                 </div>
             </a> -->
             <span @click="signOut" v-if="user" class="pl-0">
-                
+
                 <span class="material-icons border-none -mb-8 mr-0  pb-0 text-sm">logout</span> Logout
             </span>
         </nav>
@@ -70,8 +70,10 @@ export default {
         const  token = ref(null)
         const router = useRouter()
         const openLogin = () => {
-            context.emit('open')
+            // context.emit('open')
+            router.push({ name: 'Login'})
         }
+
         auth.onAuthStateChanged((_user) =>{
             user.value = _user
             token.value = user.value && user.value.accessToken

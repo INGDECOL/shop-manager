@@ -63,8 +63,8 @@
                     <td class="text-center text-xs py-2 px-3">{{ vente.qtecmd}}</td>
                     <td class="text-center text-xs py-2 px-3 " title="Montant Total">{{ formatedNumber(vente.payer) }}</td>
                     <td class="text-left text-xs py-2 px-3 flex justify-between items-center">
-                      <span class="material-icons " title="Modifier" :class="{ disabled: !isAdmin }" @click="edit(produit.id)">edit</span>
-                      <span class="material-icons strash text-red-300" title="Supprimer" :class="{ disabled: !isAdmin }" @click="destroy(produit.id)">delete</span>
+                      <!-- <span class="material-icons " title="Modifier" :class="{ disabled: !isAdmin }" @click="edit(produit.id)">edit</span> -->
+                      <span class="material-icons strash text-red-300" title="Supprimer" :class="{ disabled: !isAdmin }" @click="destroy(vente.id)">delete</span>
                     </td>
                   </tr>
                 </tbody>
@@ -294,8 +294,8 @@ export default {
       //console.log(" destroy id :::: ",id)
       if( isAdmin) {
           const { destroy, error } = destroyDocument()
-          if( confirm("Voulez-vous retourner cette vente et redefinir tous le montants vendus ?? \n Cette action est definitive et irreversible !!") ) {
-            await destroy("produits", id)
+          if( confirm("Voulez-vous retourner cette vente et redefinir tous les montants vendus ?? \n Cette action est definitive et irreversible !!") ) {
+            await destroy("ventes", id)
 
         }
         if(error.value){

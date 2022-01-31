@@ -1,5 +1,5 @@
 <template>
-    <Login />
+    <!-- <Login /> -->
     <div class="wrapper overflow-hidden">
 
     <div class="scroll-text">

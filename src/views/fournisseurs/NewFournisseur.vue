@@ -1,8 +1,12 @@
 <template>
-      <div class="create " @click="hideModal">
-        <div class="modal active">
-            <h2 class="mb-2">NOUVEAU FOURNISSEUR</h2>
-            <form  @submit.prevent="handleSubmit">
+      <div class="mx-auto w-3/4  " @click="hideModal">
+        <div class=" active">
+            <form class="produit"  @submit.prevent="handleSubmit">
+                <div class="flex justify-end -mr-5  ml-auto">
+                    <span class="material-icons close row-auto mr-0 ml-auto pr-0" @click="goBack">close</span>
+                </div>
+            <h2 class="mb-2 font-bold">NOUVEAU FOURNISSEUR</h2>
+
                 <!-- <input type="hidden" name="id" v-model="id"> -->
                 <!-- <div class="form-field__control"> -->
                     <!-- <label for="nom" class="form-field__label" >Nom du fournisseur</label> -->

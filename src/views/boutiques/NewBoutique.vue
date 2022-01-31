@@ -1,5 +1,5 @@
 <template>
-      <div class="create " @click="hideModal">
+      <div class="create open" @click="hideModal">
         <div class="modal active">
             <h2 class="mb-2">NOUVELLE BOUTIQUE</h2>
             <form  @submit.prevent="handleSubmit">
@@ -29,6 +29,7 @@ import getDocuments from "../../controllers/getDocuments"
 import { onMounted, onUnmounted } from '@vue/runtime-core'
 import { collection, onSnapshot, serverTimestamp } from '@firebase/firestore'
 import { db } from '../../firebase/config'
+import { useRouter } from 'vue-router'
 export default {
     // props: [ 'editclientId'],
     setup(props) {
@@ -40,6 +41,7 @@ export default {
         const email = ref('')
         const { createError, create } = createDocument()
         const { documents, getError, load } = getDocuments()
+        const router = useRouter()
 
         const getGerants = async () => {
             const docRef = collection(db, "users")
@@ -75,7 +77,7 @@ export default {
                 document.querySelector(".create form").reset()
                 designationBoutique.value=''
                 gerantBoutique.value = ''
-
+                
             }
         }
         return {
