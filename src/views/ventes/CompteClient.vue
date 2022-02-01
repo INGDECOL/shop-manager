@@ -37,13 +37,14 @@
                     <!-- <td class="text-left py-3 px-4 text-xs font-semibold underline text-blue-400 hover:text-blue-300 cursor-pointer" title="Montant Total dû" >0</td> -->
                     <td class="text-left py-3 px-4 flex justify-between items-center">
                       <span class="material-icons " :class="{ disabled: !isAdmin }"  >edit</span>
-                      <span class="material-icons strash text-red-300" :class="{ disabled: !isAdmin }">delete</span>
+                      <span class="material-icons strash text-red-300" :class="{ disabled: !isAdmin }" @click="destroy(facture.id)">delete</span>
                     </td>
                   </tr>
                 </tbody>
             </table>
         </div>
         <div v-else>
+          <p class="text-center">Aucune donnée trouvée pour le moment</p>
           <Spinner />
         </div>
 
@@ -138,12 +139,13 @@ export default {
           documents.value = snap.docs.map(doc =>{
               return {...doc.data(), id : doc.id}
           })
-          // listeFactures.value = documents.value.filter(facture => {
-          //     // console.log("list fact : ", facture, facture.clientId == route.params.id, facture.clientId, " =>", route.params.id)
-          //     return facture.clientId == route.params.id
-          // })
-
-          // listeFactures.value = documents.value
+          listeFactures.value = documents.value.filter(facture => {
+            return facture.impayer >0
+          })
+          listeFacturesBoutique.value = listeFactures.value.filter(facture => {
+        // console.log("facture :: ", facture.boutiqueId, boutiqueVente.value)
+        return facture.boutiqueId == boutiqueVente.value
+      })
       })
   }
 
@@ -271,8 +273,8 @@ export default {
       //console.log(" destroy id :::: ",id)
       if( isAdmin) {
           const { destroy, error } = destroyDocument()
-          if( confirm("Voulez-vous supprimer cet client et tous les sous documents liés ?? Cette action est definitive et irreversible !!") ) {
-            // await destroy("clients", id)
+          if( confirm("Voulez-vous supprimer cette facture ?? Elle ne sera plus comptabilisée \n Cette action est definitive et irreversible !!") ) {
+            await destroy("factures", id)
 
         }
         if(error.value){

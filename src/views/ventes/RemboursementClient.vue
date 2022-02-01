@@ -35,22 +35,21 @@
               </div> -->
               <!-- CLIENT -->
               <div class="mr-2 pr-2.5 ">
-                  <div name="magasin"   class="text-xs md:font-bold md:text-sm  cursor-pointer p-2"  title="Client" >
-                      <option v-if="document">{{document.nom + " " + document.prenom + " " + document.contact}}</option>
-
+                  <div name="magasin"   class="font-bold cursor-pointer p-2"  title="Client" >
+                      <option v-if="document" class="font-bold">{{document.nom + " " + document.prenom + " " + document.contact}}</option>
                   </div>
               </div>
             </div>
             <div class="produit border flex justify-center flex-col  gap-0.5 mt-0 p-2">
                 <!-- Total de la facture -->
-                <div class="flex justify-end " :class="{'flex justify-between gap-2': (avance)}">
-                    <span class="flex justify-center gap-4 bg-green-300 text-gray-600 text-base md:font-bold ml-8  rounded-md cursor-pointer hover:bg-green-200" v-if="avance">
+                <div class="flex justify-center " :class="{'flex justify-between gap-2': (avance)}">
+                    <!-- <span class="flex justify-center gap-4 bg-green-300 text-gray-600 text-base md:font-bold ml-8  rounded-md cursor-pointer hover:bg-green-200" v-if="avance">
                        <span class="mx-1 my-2 font-semibold md:mx-3 md:my-4"> Avance </span>
                         <span class="mx-1 my-2 font-semibold md:mx-3 md:my-4">{{formatedNumber( montantRegle ? (avance.montantAvance - montantRegle)>=0 ? (avance.montantAvance - montantRegle): 0  : avance.montantAvance) }}</span>
-                    </span>
+                    </span> -->
                     <span class="flex justify-center gap-4 bg-red-300 text-gray-600 md:text-base md:font-bold mr-8  rounded-md cursor-pointer hover:bg-green-200">
-                       <span class="mx-1 my-2 font-semibold md:mx-3 md:my-4"> Total Dettes</span>
-                        <span class="mx-1 my-2 font-semibold md:mx-3 md:my-4">{{formatedNumber( totalTTC ? totalTTC  : 0) }}</span>
+                       <span class="mx-1 my-2 font-bold md:mx-3 md:my-4"> Total Dettes</span>
+                        <span class="mx-1 my-2 font-semibold md:mx-3 md:my-4">{{formatedNumber( totalTTC ? (totalTTC - montantRegle  ) > 0 ? (totalTTC - montantRegle) :0  : 0) }}</span>
                     </span>
                 </div>
                 <div class="produit  md:flex justify-center  gap-0.5 m-0 shadow-none">
@@ -62,9 +61,9 @@
                                 <label class="w-1/2">Montant Total TTC </label>
                                 <input type="text" name="montanttotalttc" id="montanttotalttc" class="h-1" v-model="totalTTC" disabled>
                             </div>
-                            <div class="input flex justify-between items-center m-1 gap-3">
+                            <div class="input flex justify-between items-center m-1 gap-3 text-blue-700">
                                 <label class="w-1/2">Total Reçu </label>
-                                <input type="text" name="montanttotal" id="montanttotal" class="h-1" v-model="montantRegle">
+                                <input type="text" name="montanttotal" id="montanttotal" class="h-1.5 font-bold" v-model="montantRegle">
 
                             </div>
                         </div>
@@ -219,11 +218,12 @@ export default {
           })
 
         }
-        watch(boutiqueVente, async()=>{
-            if(boutiqueVente.value =='') {
+        watch(soldeClients, async()=>{
+            if(soldeClients.value =='') {
                 return
             }
-            await getStock(boutiqueVente.value)
+            // console.log("watch :",soldeClients.value, document.value.id)
+             getTotal()
         })
 
         watch(commandes.value, () => {
@@ -255,25 +255,6 @@ export default {
             }
         })
 
-        const pullStock =  ( id) => {
-            if(stock.value ) {
-            // console.log("in pullStock : ", stock.value)
-            for(let element in stock.value) {
-              if(element.toString() == id){
-                // console.log("stock : ", stock.value[element].quantiteStock)
-                return stock.value[element].quantiteStock
-              }
-            }
-
-            }
-
-            // return stock
-        }
-
-        const bringStock = (id) => {
-             quantiteStock.value =  pullStock( id) ? pullStock( id) : 0
-
-        }
 
         const addCommande = () => {
             if(!route.params.id) {
@@ -309,19 +290,18 @@ export default {
 
         onMounted( async () => {
             // getFamilles()
-            // getFournisseurs()
-            getBoutiques()
-            getArticles()
-            getClients()
-            await getSolde()
-
             if(route.params.id) {
-                // console.log("Router params : ", route.params.id)
                 await getFacture(route.params.id)
-                boutiqueVente.value = facture.value.boutiqueId
                 await load("clients", facture.value.clientId)
+                await getBoutiques()
+                await getArticles()
+                await getClients()
+                await getSolde()
+                boutiqueVente.value = facture.value.boutiqueId
+                clientId.value = facture.value.clientId
                 // console.log("boutiquevente : ", facture.value)
                 // retrieveCommande(facture.value.articles)
+
             }
 
         })
@@ -347,12 +327,22 @@ export default {
             const docRef =  collection(db, "dettes")
             const q = query( docRef, orderBy("createdAt", "desc"))
             const res = onSnapshot(q, ( snap ) =>{
-                // console.log("snap vente", snap.docs)
+                //console.log("snap vente", snap.docs)
                 soldeClients.value = snap.docs.map(doc =>{
                     //doc.data().createdAt = doc.data().createdAt.seconds
                     return {...doc.data(), id : doc.id}
                 })
-            // console.log("solde : ", soldeClients.value)
+                // console.log("getSolde : ", soldeClients.value)
+            })
+        }
+
+        const getTotal = () => {
+            totalTTC.value =0
+            soldeClients.value.map(solde => {
+               if(solde.clientId === document.value.id) {
+                //    console.log("total : ", solde.clientId, document.value.id, solde.montantDette, solde.boutiqueVente)
+                   totalTTC.value += solde.montantDette
+               }
             })
         }
 
@@ -365,15 +355,24 @@ export default {
                 // Save dette
                 if((totalTTC.value - montantRegle.value) > 0 ) {
                     let dette = {
-                        clientId: clientVenteId.value ? clientId.value : "CltDiv",
+                        clientId: clientId.value ? clientId.value : "CltDiv",
                         factureId: factureId,
                         montantDette: Number(totalTTC.value - montantRegle.value),
                         boutiqueVente: boutiqueVente.value,
                         createdAt: serverTimestamp()
                     }
-                    insert("dettes", dette, oldDette.value.id)
-                    // console.log("Data to send : ", dette, oldDette.value.id)
+                    console.log("Data to send : ", dette)
 
+                    insert("dettes", dette, oldDette.value.id)
+
+                }else if(( totalTTC.value -montantRegle.value )< 0 ) {
+                     let avanceClt = {
+                    clientId: clientId.value ? clientId.value : "CltDiv",
+                    montantAvance: Number(totalTTC.value - montantRegle.value)*-1,
+                    boutiqueVente: boutiqueVente.value,
+                    createdAt: serverTimestamp()
+                }
+                setAvanceClient(avanceClt, clientId.value)
                 }else {
                     destroy("dettes", oldDette.value.id)
                 }
@@ -382,155 +381,16 @@ export default {
                         let restant = (totalTTC.value - montantRegle.value)
                         // console.log("restant ", restant)
                         alert("Remboursemente effectué avec succès, \n mais le client doit toujours " + formatedNumber(restant))
+                    }else if(  (totalTTC.value - montantRegle.value) < 0) {
+                         let restant = (totalTTC.value - montantRegle.value) * -1
+                        // console.log("restant ", restant)
+                        alert("Remboursemente effectué avec succès avec une avance de  " + formatedNumber(restant))
                     }else alert("Remboursement effectué avec succès ! ")
 
-                    commandes.value.splice(0, commandes.value.length)
-                    designation.value=""
-                    id.value=""
-                    pvu.value=""
-                    qtecmd.value=1
-                    codeFamille.value=""
-                    montantRegle.value =0
-                    montantRegle.value ="0"
-                    totalTTC.value =0
                 }
-                router.push({ name: 'Vente', params: { token: auth.currentUser.accessToken}})
+                router.push({ name: 'CompteClient', params: { token: auth.currentUser.accessToken}})
                 return
             }
-            if(!commandes.value.length) {
-                alert("Il n'ya aucune commande à enregistrer ! ")
-                return
-            }
-
-            // Nouvelle vente
-            let day = new Date().getDate()
-            let month = new Date().getMonth() < 10 ? new Date().getMonth() < 1 ? "01": "0" + new Date().getMonth() : new Date().getMonth()
-            let year = new Date().getYear()
-            const factureId =  month + year + new Date().getMinutes()+  new Date().getSeconds()
-            // console.log(factureId)
-
-            if(clientVenteId.value =="CltDiv" || clientVenteId.value =='') {
-                if((totalTTC.value - montantRegle.value) > 0 ) {
-                    alert("Le montant Total de la facture est supérieur au montant règlé, or le client divers n'est pas autorisé à effectuer des ventes à crédit. \n Pensez à Enregistrer cet client !")
-                    return
-                }else if( (totalTTC.value - montantRegle.value) < 0) {
-                    alert("Les avances sur vente ne sont pas autorisés pour les clients divers. \n Pensez à Enregistrer cet client !")
-                    return
-                }
-            }
-             createError.value = null
-            //  Save commande
-            commandes.value.forEach(vte => {
-                let vente = {
-                    articleId: vte.id,
-                    article: vte.designation,
-                    pvu: Number(vte.pvu),
-                    qtecmd: Number(vte.qtecmd),
-                    payer: Number(vte.montantTotal),
-                    clientId: clientVenteId.value ? clientVenteId.value: "CltDiv",
-                    vendeur: vendeur.value.displayName,
-                    factureId: factureId,
-                    reste: 0,
-                    boutiqueId: boutiqueVente.value,
-                    createdAt: serverTimestamp()
-                }
-                create("ventes", vente)
-                 if(createError.value) {
-                     alert("Impossible d'enregistrer cette vente !")
-                     return
-                 }
-                //  Diminuer le Stock
-                const stock = {
-                //boutiqueReception : boutiqueReception.value,
-                articleId : vte.id,
-                quantiteStock : Number(vte.stockRestant),
-                updatedAt: serverTimestamp()
-            }
-            updateStock(stock,boutiqueVente.value)
-            // console.log("cmd : ", vente)
-            })
-            // Save facture
-            let articleFacture = commandes.value.map(article => {
-                let data = {
-                    id: article.id,
-                    article: article.designation,
-                    pvu : article.pvu,
-                    qtecmd: article.qtecmd
-                }
-                return data
-            })
-
-            let facture = {
-                id: factureId,
-                clientId: clientVenteId.value ? clientId.value : "CltDiv",
-                articles: articleFacture,
-                boutiqueId: boutiqueVente.value,
-                createdAt: serverTimestamp()
-            }
-            insert("factures", facture, facture.id)
-            // console.log("facture vente : ", facture)
-
-            // Save dette
-            if(reste() > 0 ) {
-                let dette = {
-                    clientId: clientVenteId.value ? clientId.value : "CltDiv",
-                    factureId: factureId,
-                    montantDette: reste(),// Number(totalTTC.value - montantRegle.value),
-                    boutiqueVente: boutiqueVente.value,
-                    createdAt: serverTimestamp()
-                }
-                create("dettes", dette)
-                // s'il yavait une avance
-                if(avance.value){
-                    if((avance.value.montantAvance - montantRegle.value ? montantRegle.value : totalTTC.value) >=0){
-                        let avanceClt = {
-                            clientId: clientVenteId.value ? clientId.value : "CltDiv",
-                            montantAvance: Number(avance.value.montantAvance - montantRegle.value ? montantRegle.value : totalTTC.value),
-                            boutiqueVente: boutiqueVente.value,
-                            updatedAt: serverTimestamp()
-                        }
-                        updateAvanceClient(avanceClt, clientId.value)
-                    }else {
-                        let avanceClt = {
-                            clientId: clientVenteId.value ? clientId.value : "CltDiv",
-                            montantAvance: 0,
-                            boutiqueVente: boutiqueVente.value,
-                            updatedAt: serverTimestamp()
-                        }
-                        updateAvanceClient(avanceClt, clientId.value)
-                    }
-                }
-            } else if(reste() < 0 ) {
-                // console.log("reste < 0")
-                let avanceClt = {
-                    clientId: clientVenteId.value ? clientId.value : "CltDiv",
-                    montantAvance: Number(totalTTC.value - montantRegle.value)*-1,
-                    boutiqueVente: boutiqueVente.value,
-                    createdAt: serverTimestamp()
-                }
-                setAvanceClient(avanceClt, clientId.value)
-            }else {
-                 if(avance.value){
-                    if((avance.value.montantAvance - montantRegle.value ) >=0){
-                        let avanceClt = {
-                            clientId: clientVenteId.value ? clientId.value : "CltDiv",
-                            montantAvance: Number(avance.value.montantAvance - montantRegle.value),
-                            boutiqueVente: boutiqueVente.value,
-                            updatedAt: serverTimestamp()
-                        }
-                        updateAvanceClient(avanceClt, clientId.value)
-                    }else {
-                        let avanceClt = {
-                            clientId: clientVenteId.value ? clientId.value : "CltDiv",
-                            montantAvance: 0,
-                            boutiqueVente: boutiqueVente.value,
-                            updatedAt: serverTimestamp()
-                        }
-                        updateAvanceClient(avanceClt, clientId.value)
-                    }
-                }
-            }
-
             /// Generate facture in pdf
              if((totalTTC.value - montantRegle.value) < 0 ) {
                 let reglement = {
@@ -541,7 +401,7 @@ export default {
                     client: clientNom.value ? clientNom.value  : "Client divers",
                     gerant: auth.currentUser.displayName
                 }
-                makeFacture({title : 'Facture N° ' + factureId, orientation : "p", format : "a4",data : articleFacture, id : 'commande', option: reglement})
+                // makeFacture({title : 'Facture N° ' + factureId, orientation : "p", format : "a4",data : articleFacture, id : 'commande', option: reglement})
 
              }else if(reste() >= 0 ) {
                  let reglement = {
@@ -553,24 +413,9 @@ export default {
                     gerant: auth.currentUser.displayName
                 }
                 // console.log(reglement)
-                makeFacture({title : 'Facture N° ' + factureId, orientation : "p", format : "a4",data : articleFacture, id : 'commande', option: reglement})
+                // makeFacture({title : 'Facture N° ' + factureId, orientation : "p", format : "a4",data : articleFacture, id : 'commande', option: reglement})
              }
             /// End of Generate facture in pdf
-
-            if(!createError.value) {
-                alert("Vente Enregistrer avec succès ! ")
-                designation.value=""
-                id.value=""
-                pvu.value=""
-                qtecmd.value=1
-                codeFamille.value=""
-                montantRegle.value =""
-                commandes.value.splice(0, commandes.value.length)
-                avance.value=null
-
-
-            }
-
         }
         const goBack = () => {
             router.back()

@@ -1,6 +1,6 @@
 <template>
-  <div class="md:px-2 py-8 w-full">
-      <div class="shadow overflow-hidden rounded border-b border-gray-200">
+  <div class="mx-auto py-4">
+      <div class="mx-auto shadow  rounded border-b border-gray-200">
         <div class="text-center font-bold mb-2 text-lg underline title">
             GESTION DES FACTURES FOURNISSEURS IMPAYEES
         </div>
@@ -13,7 +13,7 @@
               </div>
         </div> -->
         <div v-if="listeFacturesBoutique.length">
-            <table class="min-w-full bg-white divider-y divide-gray-400">
+            <table class="table-auto  bg-white divider-y divide-gray-400">
                 <thead class="bg-gray-800 text-white">
                   <tr >
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">#</th>
@@ -27,7 +27,7 @@
                   </tr>
                 </thead>
                 <tbody class="text-gray-700">
-                  <tr class="border-b border-gray-400 max-h-2 overflow-y-scroll" :class="{ striped : n % 2 ===0}" v-for="(facture, n) in listeFacturesBoutique" :key="facture.id">
+                  <tr class="border-b border-gray-400 max-h-2 " :class="{ striped : n % 2 ===0}" v-for="(facture, n) in listeFacturesBoutique" :key="facture.id">
                     <td class="text-left py-3 px-4 font-semibold uppercase">{{ n + 1}} </td>
                     <td class="text-left py-3 px-4 font-semibold uppercase text-xs">{{ formatedDate(facture.createdAt.seconds)}} </td>
                     <td class="text-left py-3 px-4 text-xs text-blue-400 underline hover:text-blue-500 cursor-pointer" title="Cliquer pour aller au payement" @click="payerFacture(facture.id)">{{ facture.id}}</td>

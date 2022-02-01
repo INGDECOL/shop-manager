@@ -253,7 +253,7 @@ const routes = [
     beforeEnter: requireAuth
   },
   {
-    path: "/vente/remboursement_client/:id/:token",
+    path: "/vente/remboursement_client/:token/:id",
     name: "RemboursementClient",
     component: RemboursementClient,
     beforeEnter: requireAuth
