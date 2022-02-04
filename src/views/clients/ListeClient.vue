@@ -1,7 +1,7 @@
 <template>
   <div class="md:px-2 py-8 w-full">
       <AddClient />
-      <div class="shadow overflow-hidden rounded border-b border-gray-200">
+      <div class="shadow  rounded border-b border-gray-200">
         <div class="flex justify-between items-center">
           <div class="searchbar mx-1 w-2/4 flex justify-start ">
             <input type="text" placeholder="Rechercher..." class="w-full h-10" v-model="searchQuery" >
@@ -16,7 +16,7 @@
         </div>
 
         <div v-if="filteredClients.length">
-            <table class="min-w-full bg-white divider-y divide-gray-400">
+            <table class="table-auto bg-white divider-y divide-gray-400">
                 <thead class="bg-gray-800 text-white">
                   <tr >
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">#</th>
@@ -29,14 +29,14 @@
                   </tr>
                 </thead>
                 <tbody class="text-gray-700">
-                  <tr class="border-b border-gray-400 max-h-2 overflow-y-scroll" :class="{ striped : n % 2 ===0}" v-for="(client, n) in filteredClients" :key="client.id">
-                    <td class="text-left py-3 px-4 font-semibold uppercase">{{ n + 1}} </td>
-                    <td class="text-left py-3 px-4 font-semibold uppercase">{{ client.nom}} </td>
-                    <td class="text-left py-3 px-4">{{ client.prenom}}</td>
-                    <td class="text-left py-3 px-4">{{ client.contact}}</td>
-                    <td class="text-left py-3 px-4">{{ client.adresse }}</td>
-                    <td class="text-left py-3 px-4 font-semibold underline text-blue-400 hover:text-blue-300 cursor-pointer" title="Montant Total dû" @click="detailDette(client)">{{ formatedNumber(client.solvabilite) }}</td>
-                    <td class="text-left py-3 px-4 flex justify-between items-center">
+                  <tr class="border-b border-gray-400 max-h-2 " :class="{ striped : n % 2 ===0}" v-for="(client, n) in filteredClients" :key="client.id">
+                    <td class="text-left text-sm py-3 px-4 font-semibold uppercase">{{ n + 1}} </td>
+                    <td class="text-left text-sm py-3 px-4 font-semibold uppercase">{{ client.nom}} </td>
+                    <td class="text-left text-sm py-3 px-4">{{ client.prenom}}</td>
+                    <td class="text-left text-sm py-3 px-4">{{ client.contact}}</td>
+                    <td class="text-left text-sm py-3 px-4">{{ client.adresse }}</td>
+                    <td class="text-left text-sm py-3 px-4 font-semibold underline text-blue-400 hover:text-blue-300 cursor-pointer" title="Montant Total dû" @click="detailDette(client)">{{ formatedNumber(client.solvabilite) }}</td>
+                    <td class="text-left text-sm py-3 px-4 flex justify-between items-center">
                       <span class="material-icons " :class="{ disabled: !isAdmin }" @click="edit(client.id)" title="Modifier le client">edit</span>
                       <span class="material-icons strash text-red-300" :class="{ disabled: !isAdmin }" @click="destroy(client.id)" title="Supprimer le client">delete</span>
                     </td>

@@ -1,111 +1,114 @@
 <template>
-      <div class="mx-1.5 w-4/5" @click="hideModal">
-        <div class=" active">
-            <form class="produit"  @submit.prevent="handleSubmit">
+      <div class="mx-1.5 " @click="hideModal">
+        <div class=" active p0">
+            <form class="produit p0"  @submit.prevent="handleSubmit">
                 <div class="flex justify-end -mr-5  ml-auto">
                     <span class="material-icons close row-auto mr-0 ml-auto pr-0" @click="goBack">close</span>
                 </div>
-                <h2 class="mb-6 font-bold text-center text-base">TRANSFERT D'ARTICLES</h2>
-                    <div class="flex justify-between  gap-2 border rounded my-2 px-1">
-                      <div class="border rounded p-2 m-1 w-2/4">
-                          <div >
-                            <div class="flex justify-between items-center gap-2 ">
-                              <div class="input-field searchbar mx-1 mt-0  flex justify-start w-2/4">
-                                <input id="searchInput" type="text"  placeholder="Rechercher"  v-model="searchQuery">
-                                <span class="material-icons  -mx-9 p-4">
-                                    search
-                                </span>
-                               </div>
-                              <div class="w-2/4 mx-1 mt-0">
-                                  <select name="magasin" class="mt-0"  id="magasin" v-model="boutiqueReception" required>
-                                      <option value="">Selectionner la boutique</option>
-                                      <option v-for="boutique in filteredBoutiques" :key="boutique.id" :value="boutique.id">{{ boutique.designationBoutique }}</option>
-                                  </select>
-                              </div>
+                <h2 class="mb-6 font-bold text-center text-base">LIVRAISON D'ARTICLES</h2>
+                    <div class="border rounded my-2 px-1">
+                        <div class="flex justify-between  gap-1  my-2 px-1">
+                            <!-- Stock principal -->
+                        <div class="border rounded p-2 m-1 overflow-auto h-97">
+                            <div >
+                                <div class="flex justify-between items-center gap-2 ">
+                                    <div class="input-field searchbar mx-1 mt-0  flex justify-start w-2/4">
+                                        <input id="searchInput" type="text"  placeholder="Rechercher"  v-model="searchQuery">
+                                        <span class="material-icons  -mx-9 p-4">
+                                            search
+                                        </span>
+                                    </div>
+                                    <div class="w-2/4 mx-1 mt-0">
+                                        <select name="magasin" class="mt-0"  id="magasin" v-model="boutiqueReception" required>
+                                            <option value="">Selectionner la boutique</option>
+                                            <option v-for="boutique in filteredBoutiques" :key="boutique.id" :value="boutique.id">{{ boutique.designationBoutique }}</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
-                          </div>
-                        <table class="min-w-full bg-white divider-y divide-gray-400">
-                            <thead class="bg-gray-800 text-white">
-                                <tr>
-                                    <th class="text-left py-3 px-4 uppercase font-semibold text-xs">Désignation</th>
-                                    <th class="text-left py-3 px-4 uppercase font-semibold text-xs">code famille</th>
-                                    <th class="text-left py-3 px-4 uppercase font-semibold text-xs">pvu</th>
-                                    <th class="text-left py-3 px-4 uppercase font-semibold text-xs">Qté Stock</th>
-                                </tr>
-                            </thead>
-                            <tbody class="text-gray-700">
-                                <tr class="border-b border-gray-400 max-h-2 overflow-y-scroll" :class="{ striped : n % 2 ===0}" v-for="(article, n) in filteredArticles" :key="article.id">
-                                    <td class="text-left py-3 px-4 font-semibold uppercase text-xs underline hover:text-blue-400 cursor-pointer" @click="selectedArticle(article)">{{ article.designation}}</td>
-                                    <td class="text-center py-3 px-4 font-semibold uppercase text-xs">{{ article.codeFamille }}</td>
-                                    <td class="text-left py-3 px-4 font-semibold uppercase text-xs">{{ article.pvu}}</td>
-                                    <td class="text-center py-3 px-4 font-bold  text-xs ">{{boutiqueReception ? bringStock(article.id) : 0 }}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                      </div>
-                      <div class=" w-2/4 pt-1 -mt-3">
-                            <h2 class="my-4 font-bold text-center text-base">ARTICLE A TRANSFERER</h2>
-                        <div class="border rounded p-2 m-1" >
-                            <div class="flex justify-between items-center gap-2">
-                                <label for="designation" class="w-1/3">Article</label>
-                                <input type="text" name="designation" id="designation"  class="uppercase text-xs font-bold w-full text-center" placeholder="Désignation de l'article" required disabled v-model="designation" >
+                            <div class="overflow-auto ">
+                                <table class="table-auto overflow-auto bg-white divider-y divide-gray-400">
+                                    <thead class="bg-gray-800 text-white">
+                                        <tr>
+                                            <th class="text-left py-3 px-4 uppercase font-semibold text-xs">Désignation</th>
+                                            <th class="text-left py-3 px-4 uppercase font-semibold text-xs">code famille</th>
+                                            <th class="text-left py-3 px-4 uppercase font-semibold text-xs">pvu</th>
+                                            <th class="text-left py-3 px-4 uppercase font-semibold text-xs">Qté Stock</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="text-gray-700">
+                                        <tr class="border-b border-gray-400 max-h-2 overflow-y-scroll" :class="{ striped : n % 2 ===0}" v-for="(article, n) in filteredArticles" :key="article.id">
+                                            <td class="text-left  py-3 px-4 font-semibold uppercase text-xs underline hover:text-blue-400 cursor-pointer" @click="selectedArticle(article)">{{ article.designation}}</td>
+                                            <td class="text-center  py-3 px-4 font-semibold uppercase text-xs">{{ article.codeFamille }}</td>
+                                            <td class="text-left  py-3 px-4 font-semibold uppercase text-xs">{{ article.pvu}}</td>
+                                            <td class="text-center  py-3 px-4 font-bold  text-xs ">{{boutiqueReception ? bringStock(article.id) : 0 }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
-                            <div class="flex justify-between items-center gap-2">
-                                <label for="Famille" class="w-1/3">Code Famille</label>
-                            <input type="text" placeholder="Famille" id="Famille" class="uppercase text-xs text-center" v-model="codeFamille" disabled >
-                            </div>
-                            <div class="flex justify-between items-center gap-2">
-                                <label for="qteStock" class="w-1/3">Stock</label>
-                                <input type="text" name="qteStock" id="qteStock" class="uppercase text-xs text-center font-bold"  placeholder="Quantité en stock"  v-model="quantiteStock" disabled>
-                            </div>
-                            <div class="flex justify-between items-center gap-2">
-                                <label for="qteStock" class="w-1/3">Stock restant</label>
-                                <input type="text" name="qteStock" id="qteStock" class="uppercase text-xs text-center font-bold"  placeholder="Stock restant"  v-model="quantiteStockRestant" disabled>
-                            </div>
-                            <div class="flex justify-between items-center gap-2">
-                                <label for="qtedesintegre" class="w-1/3">Qté à transferer</label>
-                                <input type="text" id="qtedesintegre" class="uppercase text-xs text-center " :class="{ 'border-red-400 error': calcError}" placeholder="Qté à transferer"  v-model="quantiteTransfert" required @input="operation">
-                            </div>
-                            <div class="error">{{ calcError }}</div>
                         </div>
-                        <h2 class="my-4 font-bold text-center text-base">MAGASIN DE DESTINATION</h2>
-                        <div class="border rounded p-2 m-1" >
-                            <div class="mx-1 mt-0">
-                                  <select name="magasin" class="mt-0"  id="magasin" v-model="boutiqueDestination" required>
-                                      <option value="">Selectionner la boutique</option>
-                                      <option v-for="boutique in filteredBoutiques" :key="boutique.id" :value="boutique.id">{{ boutique.designationBoutique }}</option>
-                                  </select>
-                              </div>
-
-                            <!-- <div class="flex justify-between items-center gap-2">
-                                <label for="designation" class="w-1/3">Nouvel Article</label>
-                                <input type="text" name="designation" id="designation"  class="uppercase text-xs font-bold w-full text-center" placeholder="Désignation de l'article" required  v-model="newdesignation" >
+                        <!-- Stock destination -->
+                        <div class="border rounded p-2 m-1   overflow-auto">
+                            <h2 class="my-4 font-bold text-center text-base">ARTICLE A LIVRER</h2>
+                            <div class="border rounded p-2 m-1" >
+                                <div class="flex justify-between items-center gap-2">
+                                    <label for="designation" class="w-1/3">Article</label>
+                                    <input type="text" name="designation" id="designation"  class="uppercase text-xs font-bold w-full text-center" placeholder="Désignation de l'article" required disabled v-model="designation" >
+                                </div>
+                                <div class="flex justify-between items-center gap-2">
+                                    <label for="Famille" class="w-1/3">Code Famille</label>
+                                <input type="text" placeholder="Famille" id="Famille" class="uppercase text-xs text-center" v-model="codeFamille" disabled >
+                                </div>
+                                <div class="flex justify-between items-center gap-2">
+                                    <label for="qteStock" class="w-1/3">Stock</label>
+                                    <input type="text" name="qteStock" id="qteStock" class="uppercase text-xs text-center font-bold"  placeholder="Quantité en stock"  v-model="quantiteStock" disabled>
+                                </div>
+                                <div class="flex justify-between items-center gap-2">
+                                    <label for="qteStock" class="w-1/3">Stock restant</label>
+                                    <input type="text" name="qteStock" id="qteStock" class="uppercase text-xs text-center font-bold"  placeholder="Stock restant"  v-model="quantiteStockRestant" disabled>
+                                </div>
+                                <div class="flex justify-between items-center gap-2">
+                                    <label for="qtedesintegre" class="w-1/3">Qté à transferer</label>
+                                    <input type="text" id="qtedesintegre" class="uppercase text-xs text-center " :class="{ 'border-red-400 error': calcError}" placeholder="Qté à transferer"  v-model="quantiteTransfert"  @input="operation">
+                                </div>
+                                <div class="error">{{ calcError }}</div>
                             </div>
-                            <div class="flex justify-between items-center gap-2">
-                                <label for="Famille" class="w-1/3">Code Famille</label>
-                            <input type="text" placeholder="Famille" id="Famille" class="uppercase text-xs text-center" v-model="codeFamille" disabled >
+                            <button class="bg-green-500 hover:bg-green-600 hover:text-gray-700 py-1 px-5" @click.prevent="transferer">Ajouter</button>
+                            <h2 class="my-4 font-bold text-center text-base">MAGASIN DE DESTINATION</h2>
+                            <div class="border rounded p-2 m-1" >
+                                <div class="mx-1 mt-0">
+                                    <select name="magasin" class="mt-0"  id="magasin" v-model="boutiqueDestination" required>
+                                        <option value="">Selectionner la boutique</option>
+                                        <option v-for="boutique in filteredBoutiques" :key="boutique.id" :value="boutique.id">{{ boutique.designationBoutique }}</option>
+                                    </select>
+                                </div>
                             </div>
-                            <div class="flex justify-between items-center gap-2">
-                                <label for="qteStock" class="w-1/3">Stock correspondant</label>
-                                <input type="text" name="qteStock" id="qteStock" class="uppercase text-xs text-center font-bold" :class="{ 'border-red-400 error': saisieqteError}" placeholder="Quantite correspondante"  v-model="newquantiteStock" @input="saisieqte">
-                            </div>
-                            <div class="error">{{ saisieqteError}}</div>
-                            <div class="flex justify-between items-center gap-2">
-                                <label for="qteStock" class="w-1/3">Prix d'achat</label>
-                                <input type="text" name="qteStock" id="qteStock" class="uppercase text-xs text-center font-bold" :class="{ 'border-red-400 error': saisiepauError}"  placeholder="Prix d'achat"  v-model="newpau" @input="saisiepau">
-                            </div>
-                            <div class="error">{{ saisiepauError}}</div>
-                            <div class="flex justify-between items-center gap-2">
-                                <label for="qteStock" class="w-1/3">Prix de vente</label>
-                                <input type="text" name="qteStock" id="qteStock" class="uppercase text-xs text-center font-bold"  :class="{ 'border-red-400 error': saisiepvuError}" placeholder="Prix de vente"  v-model="newpvu" @input="saisiepvu">
-                            </div>
-                            <div class="error">{{ saisiepvuError}}</div> -->
-
+                            <button>Enregistrer</button>
+                            <p class="error">{{ receptionError }}</p>
+                            <p class="error">{{ getError }}</p>
                         </div>
-                        <button>Enregistrer</button>
-                        <p class="error">{{ receptionError }}</p>
-                        <p class="error">{{ getError }}</p>
-                      </div>
+                        </div>
+                        <!-- A imprimer -->
+                        <div class="overflow-auto border flex justify-center m-2">
+                            <table class="table-auto overflow-auto bg-white divider-y divide-gray-400" id="livraison">
+                                <thead class="bg-gray-800 text-white">
+                                    <tr>
+                                        <th class="text-left py-3 px-4 uppercase font-semibold text-xs">#</th>
+                                        <th class="text-left py-3 px-4 uppercase font-semibold text-xs">Désignation</th>
+                                        <th class="text-left py-3 px-4 uppercase font-semibold text-xs">code famille</th>
+                                        <th class="text-left py-3 px-4 uppercase font-semibold text-xs">Qte à Livrer</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-gray-700">
+                                    <tr class="border-b border-gray-400 max-h-2 overflow-y-scroll" :class="{ striped : n % 2 ===0}" v-for="(article, n) in transferedArticles" :key="article.id">
+                                        <td class="text-left  py-3 px-4 font-semibold uppercase text-xs underline hover:text-blue-400 cursor-pointer">{{ n+1}}</td>
+                                        <td class="text-left  py-3 px-4 font-semibold uppercase text-xs underline hover:text-blue-400 cursor-pointer" @click="selectedArticle(article)">{{ article.designation}}</td>
+                                        <td class="text-center  py-3 px-4 font-semibold uppercase text-xs">{{ article.codeFamille }}</td>
+                                        <td class="text-left  py-3 px-4 font-semibold uppercase text-xs">{{ article.quantiteTransfert}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
             </form>
         </div>
@@ -122,6 +125,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { db, auth } from '../../firebase/config'
 import updateDocument from '../../controllers/updateDocument'
 import createDocument from '../../controllers/createDocument'
+import genererPDF from '../../controllers/genererPDF'
 export default {
     // props: [ 'editFournisseurId'],
     setup(props) {
@@ -131,6 +135,8 @@ export default {
         const id = ref('')
         const dateReception = ref('')
         const boutiqueReception = ref('')
+        const idBoutiqueReception = ref("0FCmjkQYJlKDIQGidGEM")
+        const idBoutiqueDestination = ref("qT2MsHMTZZQRsDv3qKyE")
         const boutiqueDestination = ref('')
         const designation = ref('')
         const pau = ref('')
@@ -157,8 +163,10 @@ export default {
         const route = useRoute()
         const getError = ref(null)
         const articleRecu = ref([])
+        const transferedArticles = ref([])
         const { receptionError,stock, getStock, reception, updateStock } = receptionArticles()
         const {updateError, update } = updateDocument()
+        const { makeLivraison } = genererPDF()
 
         const getBoutiques = async () => {
             const docRef = collection(db, "boutiques")
@@ -174,8 +182,10 @@ export default {
             if(boutiqueReception.value =='') {
                 return
             }
+            // console.log(boutiqueReception.value)
             await getStock(boutiqueReception.value)
         })
+
         watch(boutiqueDestination, async()=>{
             if(boutiqueDestination.value ==boutiqueReception.value) {
                 alert("La boutique de depart et la boutique de destination sont identiques !")
@@ -213,7 +223,8 @@ export default {
         }
         const filteredBoutiques = computed(()=>{
             return listeBoutiques.value && listeBoutiques.value.filter((boutique)=>{
-                return boutique.gerantBoutique == auth.currentUser.email || boutique.designationBoutique == "Boutique principale"
+                // return boutique.gerantBoutique == auth.currentUser.email || boutique.designationBoutique == "Boutique principale"
+                return boutique.gerantBoutique.includes( auth.currentUser.email) || boutique.designationBoutique == "Stock principal"
             })
         })
 
@@ -257,9 +268,54 @@ export default {
 
         }
         onMounted( async () => {
+            boutiqueReception.value = idBoutiqueReception.value
+            boutiqueDestination.value = idBoutiqueDestination.value
             getBoutiques()
             getArticles()
         })
+
+        const transferer = () => {
+            const aTransferer = {
+                articleId : id.value,
+                designation : designation.value,
+                codeFamille : codeFamille.value,
+                quantiteTransfert : Number(quantiteTransfert.value),
+                quantiteStockRestant : Number(quantiteStockRestant.value),
+            }
+            transferedArticles.value.push(aTransferer)
+            designation.value =''
+            newdesignation.value =''
+            pau.value = ''
+            pvu.value = ''
+            fournisseurId.value = ''
+            codeFamille.value = ''
+            expiration.value = ''
+            seuil.value = ''
+            quantiteRecu.value = ''
+            quantiteStock.value = ''
+            quantiteStockRestant.value = ''
+            quantiteTransfert.value = ''
+            newdesignation.value = ''
+            newquantiteStock.value = ''
+            newpau.value = ''
+            newpvu.value = ''
+        }
+
+        const makePDF = () => {
+            /// Generate facture in pdf
+                 let day = new Date().getDate()
+                let month = new Date().getMonth() < 10 ? new Date().getMonth() < 1 ? "01": "0" + new Date().getMonth() : new Date().getMonth()
+                let year = new Date().getYear()
+                const factureId =  month + year + new Date().getMinutes()+  new Date().getSeconds()
+                const demandeur = prompt("Qui prend ? : ", "Nom et Prenom")
+                let options = {
+                    client: demandeur ? demandeur  : "Au porteur",
+                    gerant: auth.currentUser.displayName
+                }
+                makeLivraison({title : 'Bon de Livraison N° ' + factureId, orientation : "p", format : "a4",data : [], id : 'livraison', option: options})
+
+            /// End of Generate facture in pdf
+        }
 
         const handleSubmit = async () => {
             const { createError, create } = createDocument()
@@ -267,45 +323,25 @@ export default {
                 alert("Selectionnez la boutique de destination ! ")
                 return
             }
-            // const newArticle = {
-            //     designation: newdesignation.value.toUpperCase(),
-            //     pau: Number(newpau.value),
-            //     pvu: Number(newpvu.value),
-            //     fournisseurId: fournisseurId.value,
-            //     codeFamille: codeFamille.value,
-            //     expiration: expiration.value,
-            //     seuil: Number(seuil.value),
-            //     createdAt: serverTimestamp()
-            // }
-            // console.log("produit : ", newArticle);
-            //  const res = await create("produits", newArticle)
-            //  if(createError.value){
-            //      getError.value = createError.value
-            //      return
-            //  }
-            // //  id.value = res.id
-            // //  console.log("idddd : ", id.value)
+            transferedArticles.value.forEach(async article => {
+                const stock = {
+                    //boutiqueReception : boutiqueReception.value,
+                    articleId : article.articleId,
+                    quantiteStock : Number(article.quantiteTransfert),
+                    updatedAt: serverTimestamp()
+                }
+                await reception(stock, boutiqueDestination.value )
 
-            //   if(res.id =='' || res.id == null) {
-            //       receptionError.value = "L'article est enregistré mais impossible de mettre à jour le stock, essayer avec le formulaire de reception"
-            //     return
-            //  }
+                const oldStok = {
+                    articleId : article.articleId,
+                    quantiteStock : Number(article.quantiteStockRestant),
+                    updatedAt: serverTimestamp()
+                }
+                await updateStock(oldStok, boutiqueReception.value)
+            })
+            makePDF()
 
-            const stock = {
-                //boutiqueReception : boutiqueReception.value,
-                articleId : id.value,
-                quantiteStock : Number(quantiteTransfert.value),
-                updatedAt: serverTimestamp()
-            }
-             console.log("boutique destination : ", boutiqueDestination.value, stock)
-            await reception(stock, boutiqueDestination.value )
 
-            const oldStok = {
-                articleId : id.value,
-                quantiteStock : Number(quantiteStockRestant.value),
-                updatedAt: serverTimestamp()
-            }
-            await updateStock(oldStok, boutiqueReception.value)
 
             if(!receptionError.value){
                 designation.value =''
@@ -327,6 +363,7 @@ export default {
 
             }
         }
+
 
         const saisiepau = () => {
             try {
@@ -383,6 +420,7 @@ export default {
 
         return {
             handleSubmit,
+            transferer,
             dateReception,
             boutiqueReception,
             boutiqueDestination,
@@ -402,6 +440,7 @@ export default {
             newpvu,
             codeFamille,
             quantiteRecu,
+            transferedArticles,
             newdesignation,
             newquantiteStock,
             quantiteStock,

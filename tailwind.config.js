@@ -15,6 +15,10 @@ module.exports = {
           'warning': '#da0f41',
           'slategray': '#708090'
         },
+        height: {
+          '97': '38rem'
+        },
+
         fontFamily : {
           'tangerine' : ['Tangerine', 'Helvetica', 'Arial', 'sans-serif'],
           'roboto': ['Roboto', 'Helvetica', 'Arial', 'sans-serif'],

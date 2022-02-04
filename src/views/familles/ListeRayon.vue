@@ -15,7 +15,7 @@
           </div>
         </div>
         <div v-if="documents.length">
-          <table class="min-w-full bg-white divider-y divide-gray-400" >
+          <table class="table-auto bg-white divider-y divide-gray-400" >
               <thead class="bg-gray-800 text-white">
                 <tr >
                   <th class="text-left py-3 px-4 uppercase font-semibold text-sm">#</th>

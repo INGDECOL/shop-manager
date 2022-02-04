@@ -20,19 +20,6 @@
                 {{dateDuJour}}
 
               </span> -->
-              <!-- Vendeur -->
-              <!-- <span class="text-xs flex justify-between items-center bg-green-100 text-green-600 md:text-sm md:font-bold mr-2 pr-2.5 py-0.5 rounded-md cursor-pointer hover:bg-green-200" title="Vendeur">
-                <span class="material-icons mr-1">people</span>
-                {{vendeur.displayName}}
-
-              </span> -->
-              <!-- Boutique -->
-              <!-- <div class="mr-2 pr-2.5">
-                  <select name="magasin"  id="magasin" v-model="boutiqueVente" class=" md:font-bold md:text-sm text-xs mr-2 pr-2.5 cursor-pointer"  required title="Magasin">
-                      <option value="">Selectionner la boutique</option>
-                      <option v-for="boutique in filteredBoutiques" :key="boutique.id" :value="boutique.id">{{ boutique.designationBoutique }}</option>
-                  </select>
-              </div> -->
               <!-- CLIENT -->
               <div class="mr-2 pr-2.5 ">
                   <div name="magasin"   class="font-bold cursor-pointer p-2"  title="Client" >
@@ -40,16 +27,17 @@
                   </div>
               </div>
             </div>
-            <div class="produit border flex justify-center flex-col  gap-0.5 mt-0 p-2">
+            <div class="produit border flex justify-center items-center flex-col  gap-0.5 mt-0 ">
                 <!-- Total de la facture -->
-                <div class="flex justify-center " :class="{'flex justify-between gap-2': (avance)}">
-                    <!-- <span class="flex justify-center gap-4 bg-green-300 text-gray-600 text-base md:font-bold ml-8  rounded-md cursor-pointer hover:bg-green-200" v-if="avance">
-                       <span class="mx-1 my-2 font-semibold md:mx-3 md:my-4"> Avance </span>
-                        <span class="mx-1 my-2 font-semibold md:mx-3 md:my-4">{{formatedNumber( montantRegle ? (avance.montantAvance - montantRegle)>=0 ? (avance.montantAvance - montantRegle): 0  : avance.montantAvance) }}</span>
-                    </span> -->
-                    <span class="flex justify-center gap-4 bg-red-300 text-gray-600 md:text-base md:font-bold mr-8  rounded-md cursor-pointer hover:bg-green-200">
+                <div class="flex justify-center items-center gap-0.5" :class="{'flex justify-between gap-2': (avance)}">
+
+                    <span class=" flex justify-center items-center gap-4 bg-red-300 text-gray-600 md:text-base md:font-bold rounded-md cursor-pointer hover:bg-green-200">
                        <span class="mx-1 my-2 font-bold md:mx-3 md:my-4"> Total Dettes</span>
                         <span class="mx-1 my-2 font-semibold md:mx-3 md:my-4">{{formatedNumber( totalTTC ? (totalTTC - montantRegle  ) > 0 ? (totalTTC - montantRegle) :0  : 0) }}</span>
+                    </span>
+                    <span class="flex justify-center items-center gap-4 bg-red-300 text-gray-600 md:text-base md:font-bold  rounded-md cursor-pointer hover:bg-green-200">
+                       <span class="mx-1 my-2 font-bold md:mx-3 md:my-4"> Total Facture</span>
+                        <span class="mx-1 my-2 font-semibold md:mx-3 md:my-4">{{formatedNumber( facture ? (facture.montantDette - montantRegle  ) > 0 ? (facture.montantDette - montantRegle) :0  : 0) }}</span>
                     </span>
                 </div>
                 <div class="produit  md:flex justify-center  gap-0.5 m-0 shadow-none">
@@ -105,6 +93,7 @@ export default {
         const id = ref('')
         const designation = ref('')
         const boutiqueVente = ref('')
+        const idBoutiqueVente = ref("qT2MsHMTZZQRsDv3qKyE")
         const listeBoutiques = ref(null)
         const listeClients = ref(null)
         const listeArticles = ref(null)
@@ -224,6 +213,13 @@ export default {
             }
             // console.log("watch :",soldeClients.value, document.value.id)
              getTotal()
+             soldeClients.value.map(solde => {
+                // console.log(solde.factureId, "=>", facture.value.id)
+                if(solde.factureId == facture.value.id ) {
+                    facture.value.montantDette = solde.montantDette
+                    oldDette.value = solde
+                }
+            })
         })
 
         watch(commandes.value, () => {
@@ -254,7 +250,6 @@ export default {
                 })
             }
         })
-
 
         const addCommande = () => {
             if(!route.params.id) {
@@ -287,7 +282,6 @@ export default {
 
         }
 
-
         onMounted( async () => {
             // getFamilles()
             if(route.params.id) {
@@ -299,8 +293,7 @@ export default {
                 await getSolde()
                 boutiqueVente.value = facture.value.boutiqueId
                 clientId.value = facture.value.clientId
-                // console.log("boutiquevente : ", facture.value)
-                // retrieveCommande(facture.value.articles)
+
 
             }
 
@@ -354,27 +347,53 @@ export default {
                 // console.log("Data to send : ", oldDette.value.id)
                 // Save dette
                 if((totalTTC.value - montantRegle.value) > 0 ) {
-                    let dette = {
-                        clientId: clientId.value ? clientId.value : "CltDiv",
-                        factureId: factureId,
-                        montantDette: Number(totalTTC.value - montantRegle.value),
-                        boutiqueVente: boutiqueVente.value,
-                        createdAt: serverTimestamp()
-                    }
-                    console.log("Data to send : ", dette)
 
-                    insert("dettes", dette, oldDette.value.id)
+                    if(montantRegle.value < facture.value.montantDette) {
+                        // si le montant saisie ne regle pas la facture
+                        let dette = {
+                            clientId: clientId.value ? clientId.value : "CltDiv",
+                            factureId: factureId,
+                            montantDette: Number(facture.value.montantDette - montantRegle.value ),
+                            boutiqueVente: boutiqueVente.value,
+                            createdAt: serverTimestamp()
+                        }
+                        console.log("Data to send inf : ", dette, oldDette.value.id)
+                        insert("dettes", dette, oldDette.value.id)
+                    }else if (montantRegle.value > facture.value.montantDette ) {
+                        
+                    }else {
+                        destroy("dettes", oldDette.value.id)
+                    }
+                    // let dette = {
+                    //     clientId: clientId.value ? clientId.value : "CltDiv",
+                    //     factureId: factureId,
+                    //     montantDette: Number(totalTTC.value - montantRegle.value),
+                    //     boutiqueVente: boutiqueVente.value,
+                    //     createdAt: serverTimestamp()
+                    // }
+                    // console.log("Data to send : ", dette)
+
+                    // insert("dettes", dette, oldDette.value.id)
 
                 }else if(( totalTTC.value -montantRegle.value )< 0 ) {
                      let avanceClt = {
-                    clientId: clientId.value ? clientId.value : "CltDiv",
-                    montantAvance: Number(totalTTC.value - montantRegle.value)*-1,
-                    boutiqueVente: boutiqueVente.value,
-                    createdAt: serverTimestamp()
-                }
-                setAvanceClient(avanceClt, clientId.value)
+                        clientId: clientId.value ? clientId.value : "CltDiv",
+                        montantAvance: Number(totalTTC.value - montantRegle.value)*-1,
+                        boutiqueVente: boutiqueVente.value,
+                        createdAt: serverTimestamp()
+                    }
+                    setAvanceClient(avanceClt, clientId.value)
+                    soldeClients.value.map(solde => {
+                        if(solde.clientId == clientId.value ) {
+                            destroy("dettes", solde.id)
+                        }
+                    })
                 }else {
-                    destroy("dettes", oldDette.value.id)
+                    soldeClients.value.map(solde => {
+                        if(solde.clientId == clientId.value ) {
+                            destroy("dettes", solde.id)
+                        }
+                    })
                 }
                 if(!setError.value) {
                     if( (totalTTC.value - montantRegle.value) > 0 ) {
@@ -384,7 +403,7 @@ export default {
                     }else if(  (totalTTC.value - montantRegle.value) < 0) {
                          let restant = (totalTTC.value - montantRegle.value) * -1
                         // console.log("restant ", restant)
-                        alert("Remboursemente effectué avec succès avec une avance de  " + formatedNumber(restant))
+                        alert("Remboursemente effectué avec une avance de  " + formatedNumber(restant))
                     }else alert("Remboursement effectué avec succès ! ")
 
                 }
@@ -442,6 +461,7 @@ export default {
             simpleNumberFormatter,
             avance,
             reste,
+            facture,
 
         }
   }

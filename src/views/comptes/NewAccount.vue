@@ -25,6 +25,7 @@ import { computed, ref } from '@vue/reactivity'
 import createDocument from "../../controllers/createDocument"
 import { onMounted, onUnmounted } from '@vue/runtime-core'
 import { serverTimestamp } from '@firebase/firestore'
+import destroyDocument from '../../controllers/destroyDocument'
 export default {
     //props: [ 'editrayonId'],
     setup(props) {
@@ -34,6 +35,7 @@ export default {
         const contact = ref('')
         const fondDepart = ref('')
         const { createError, create } = createDocument()
+        const { destroy } = destroyDocument()
 
         const hideModal = (e) => {
             if(e.target.classList.contains("create")){
@@ -68,7 +70,7 @@ export default {
                 contact.value = ''
             }
         }
-        
+
         return {
             handleSubmit,
             id,
@@ -78,6 +80,7 @@ export default {
             fondDepart,
             hideModal,
             createError,
+            destroy,
 
         }
     }

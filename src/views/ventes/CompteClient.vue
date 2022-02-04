@@ -71,6 +71,7 @@ export default {
     const nom = ref('')
     const listeBoutiques = ref(null)
     const boutiqueVente = ref('')
+    const idBoutiqueVente = ref("qT2MsHMTZZQRsDv3qKyE")
     const prenom = ref('')
     const documents = ref([])
     const listeFactures = ref([])
@@ -139,13 +140,13 @@ export default {
           documents.value = snap.docs.map(doc =>{
               return {...doc.data(), id : doc.id}
           })
-          listeFactures.value = documents.value.filter(facture => {
-            return facture.impayer >0
+          listeFacturesBoutique.value = documents.value.filter(facture => {
+            return facture.impayer >0 && facture.boutiqueId == boutiqueVente.value
           })
-          listeFacturesBoutique.value = listeFactures.value.filter(facture => {
-        // console.log("facture :: ", facture.boutiqueId, boutiqueVente.value)
-        return facture.boutiqueId == boutiqueVente.value
-      })
+      //     listeFacturesBoutique.value = listeFactures.value.filter(facture => {
+      //   // console.log("facture :: ", facture.boutiqueId, boutiqueVente.value)
+      //   return facture.boutiqueId == boutiqueVente.value
+      // })
       })
   }
 
@@ -191,9 +192,8 @@ export default {
           return
       }
       // console.log("boutique : ", listeFactures.value.length, listeFactures.value)
-      listeFacturesBoutique.value = listeFactures.value.filter(facture => {
-        // console.log("facture :: ", facture.boutiqueId, boutiqueVente.value)
-        return facture.boutiqueId == boutiqueVente.value
+      listeFacturesBoutique.value = documents.value.filter(facture => {
+            return facture.impayer >0 && facture.boutiqueId == boutiqueVente.value
       })
   })
 
@@ -217,8 +217,8 @@ export default {
               })
               // facture.client = getClient(facture.clientId)
           })
-          listeFactures.value = documents.value.filter(facture => {
-            return facture.impayer >0
+          listeFacturesBoutique.value = documents.value.filter(facture => {
+            return facture.impayer >0 && facture.boutiqueId == boutiqueVente.value
           })
       }
 
@@ -230,7 +230,7 @@ export default {
       await getSolde()
       await loadFactures()
       await getAvances()
-      // console.log(" clients : ", avnc.value)
+      boutiqueVente.value = idBoutiqueVente.value
     })
 
     const isAdmin = ref(async () =>{

@@ -1,6 +1,6 @@
 <template>
-  <div class="md:px-2 py-8 w-full">
-      <div class="shadow overflow-hidden rounded border-b border-gray-200">
+  <div class="md:px-2 py-8 ">
+      <div class="shadow overflow-scroll rounded border-b border-gray-200">
         <div class="flex justify-between items-center">
           <!-- searchbar -->
           <div class="searchbar mx-1  flex justify-start ">
@@ -42,7 +42,7 @@
           </div>
           <!-- Liste des ventes -->
           <div v-if="listeVentes.length" class="border border-gray-300 rounded overflow-scroll p-0.5 w-full">
-            <table class="min-w-full bg-white divider-y divide-gray-400">
+            <table class="table-auto bg-white divider-y divide-gray-400">
                 <thead class="bg-gray-800 text-white">
                   <tr >
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">#</th>

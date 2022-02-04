@@ -137,7 +137,7 @@ export default {
         }
         const filteredBoutiques = computed(()=>{
             return listeBoutiques.value && listeBoutiques.value.filter((boutique)=>{
-                return boutique.gerantBoutique == auth.currentUser.email || boutique.designationBoutique =="Boutique principale"
+                return boutique.gerantBoutique.includes( auth.currentUser.email) || boutique.designationBoutique == "Stock principal"
             })
         })
 

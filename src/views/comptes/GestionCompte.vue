@@ -1,10 +1,10 @@
 <template>
-  <div class="md:px-2 py-8 w-full">
-      <div class="shadow overflow-hidden rounded border-b border-gray-200">
+  <div class="md:px-2 py-8 ">
+      <div class="shadow overflow-auto rounded border-b border-gray-200">
         <div class="text-center font-bold mb-2 text-lg underline title">
             GESTION DES COMPTES AUXILLIAIRES
         </div>
-        <div class="flex justify-center w-80 ml-auto -mt-10">
+        <div class="flex justify-center  ml-auto -mt-10">
             <NewAccount />
         </div>
         <div class="flex justify-end items-center">
@@ -13,29 +13,29 @@
          <!-- </div> -->
         </div>
         <div v-if="listeComptes.length">
-            <table class="min-w-full bg-white divider-y divide-gray-400">
+            <table class="table-auto bg-white divider-y divide-gray-400">
                 <thead class="bg-gray-800 text-white">
                   <tr >
-                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">#</th>
-                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Date creation</th>
-                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">N° Compte</th>
-                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Mandataire compte</th>
-                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Fond initial</th>
-                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Solde actuel</th>
-                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Actions</th>
+                    <th class="text-left py-3 px-4 uppercase font-semibold text-xs">#</th>
+                    <th class="text-left py-3 px-4 uppercase font-semibold text-xs">Date creation</th>
+                    <th class="text-left py-3 px-4 uppercase font-semibold text-xs">N° Compte</th>
+                    <th class="text-left py-3 px-4 uppercase font-semibold text-xs">Mandataire compte</th>
+                    <th class="text-left py-3 px-4 uppercase font-semibold text-xs">Fond initial</th>
+                    <th class="text-left py-3 px-4 uppercase font-semibold text-xs">Solde actuel</th>
+                    <th class="text-left py-3 px-4 uppercase font-semibold text-xs">Actions</th>
                   </tr>
                 </thead>
                 <tbody class="text-gray-700">
                   <tr class="border-b border-gray-400 max-h-2 overflow-y-scroll" :class="{ striped : n % 2 ===0}" v-for="(compte, n) in listeComptes" :key="compte.id">
-                    <td class="text-left py-3 px-4 font-semibold uppercase">{{ n + 1}} </td>
-                    <td class="text-left py-3 px-4 font-semibold uppercase text-xs">{{ formatedDate(compte.createdAt.seconds)}} </td>
-                    <td class="text-left py-3 px-4 text-xs text-blue-400 underline hover:text-blue-500 cursor-pointer" title="Cliquer pour aller au payement" @click="payerFacture(compte.id)">{{ compte.id}}</td>
-                    <td class="text-left py-3 px-4 text-xs">{{  compte.nom +" "+ compte.prenom }}</td>
-                    <td class="text-center py-3 px-4 text-xs font-semibold text-green-600 hover:text-green-700 cursor-pointer" title="Montant initial à la creation">{{ formatedNumber(compte.fondDepart ? compte.fondDepart : 0) }}</td>
-                    <td class=" py-3 px-4 text-xs font-semibold  text-center hover:text-blue-300 cursor-pointer" title="Solde actuel du compte" >{{ formatedNumber(getSolde(compte.id)?? 0) }}</td>
-                    <td class="text-left py-3 px-4 flex justify-between items-center">
+                    <td class="text-left py-3 px-1 font-semibold uppercase">{{ n + 1}} </td>
+                    <td class="text-left py-3 px-1 font-semibold uppercase text-xs">{{ formatedDate(compte.createdAt.seconds)}} </td>
+                    <td class="text-left py-3 px-1 text-xs text-blue-400 underline hover:text-blue-500 cursor-pointer" title="Cliquer pour la liste des transactions" @click="payerFacture(compte.id)">{{ compte.id}}</td>
+                    <td class="text-left py-3 px-1 text-xs">{{  compte.nom +" "+ compte.prenom }}</td>
+                    <td class="text-center py-3 px-1 text-xs font-semibold text-green-600 hover:text-green-700 cursor-pointer" title="Montant initial à la creation">{{ formatedNumber(compte.fondDepart ? compte.fondDepart : 0) }}</td>
+                    <td class=" py-3 px-1 text-xs font-semibold  text-center hover:text-blue-300 cursor-pointer" title="Solde actuel du compte" >{{ formatedNumber(getSolde(compte.id)?? 0) }}</td>
+                    <td class="text-left py-3 px-1 flex justify-between items-center">
                       <span class="material-icons " :class="{ disabled: !isAdmin }" >edit</span>
-                      <span class="material-icons strash text-red-300" :class="{ disabled: !isAdmin }">delete</span>
+                      <span class="material-icons strash text-red-300" :class="{ disabled: !isAdmin }" @click="destroy(compte.id)">delete</span>
                     </td>
                   </tr>
                 </tbody>
@@ -144,32 +144,6 @@ export default {
       })
   }
 
-
-//   const detailDette = (fournisseur) => {
-//     if( fournisseur.solvabilite <= 0 ) {
-//       alert("Aucun detail à afficher le solde vaut 0 ")
-//       return
-//     }
-//     // console.log("Detail id : ", client.id)
-//     router.push( { name: "DetailDette", params: { token: auth.currentUser.accessToken, id: fournisseur.id }})
-//   }
-
-//   const payerFacture = (idfacture) => {
-//     router.push({ name: 'AdminNewCommande', params: { token: auth.currentUser.accessToken, id: idfacture}})
-//   }
-
-
-//   watch(boutiqueVente, async()=>{
-//       if(boutiqueVente.value =='') {
-//           return
-//       }
-//       // console.log("boutique : ", comptes.value.length, comptes.value)
-//       listeComptes.value = comptes.value.filter(facture => {
-//         // console.log("facture :: ", facture.boutiqueId, boutiqueVente.value)
-//         return facture.boutiqueId == boutiqueVente.value
-//       })
-//   })
-
     watch(comptes, () => {
         if(comptes.value.length ) {
 
@@ -205,6 +179,10 @@ export default {
 
     })
 
+    const payerFacture = (id) => {
+      console.log(id)
+    }
+
     const toggleForm = () => {
         document.querySelector(".create").classList.toggle("open")
         // document.querySelectorAll(".create .modal").forEach(form => {
@@ -226,8 +204,8 @@ export default {
       //console.log(" destroy id :::: ",id)
       if( isAdmin) {
           const { destroy, error } = destroyDocument()
-          if( confirm("Voulez-vous supprimer cet client et tous les sous documents liés ?? Cette action est definitive et irreversible !!") ) {
-            // await destroy("clients", id)
+          if( confirm("Voulez-vous supprimer cet compte et tous les sous documents liés ?? Cette action est definitive et irreversible !!") ) {
+             await destroy("comptes", id)
 
         }
         if(error.value){
@@ -246,6 +224,7 @@ export default {
 
     return {
       auth,
+      payerFacture,
       isAdmin,
       edit,
       destroy,

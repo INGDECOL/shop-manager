@@ -47,7 +47,7 @@
                     <th class="text-center py-3 px-4 uppercase font-semibold text-sm">PVU</th>
                     <th class="text-center py-3 px-4 uppercase font-semibold text-sm">Qté cmd</th>
                     <th class="text-center py-3 px-4 uppercase font-semibold text-sm">Montant</th>
-                    <!-- <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Actions</th> -->
+                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Actions</th>
                   </tr>
                 </thead>
                 <tbody class="text-gray-700">
@@ -58,10 +58,10 @@
                     <td class="text-center text-xs py-2 px-3">{{ (vente.pvu) }}</td>
                     <td class="text-center text-xs py-2 px-3">{{ vente.qtecmd}}</td>
                     <td class="text-center text-xs py-2 px-3 " title="Montant Total">{{ (vente.payer) }}</td>
-                    <!-- <td class="text-left text-xs py-2 px-3 flex justify-between items-center">
-                      <span class="material-icons disabled" title="Modifier"  @click="edit(vente.id)" >edit</span>
-                      <span class="material-icons strash text-red-300 disabled" title="Supprimer" @click="destroy(vente.id)">delete</span>
-                    </td> -->
+                    <td class="text-left text-xs py-2 px-3 flex justify-between items-center">
+                      <span class="material-icons disabled" title="Modifier"   >edit</span>
+                      <span class="material-icons strash text-red-300 " title="Supprimer" @click="destroy(vente)">delete</span>
+                    </td>
                   </tr>
                 </tbody>
                 <tfoot>
@@ -70,6 +70,7 @@
                         <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{ numberFormatter.format(totalPVU)}} </td>
                         <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{totalQte}} </td>
                         <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{ numberFormatter.format(totalTTC)}} </td>
+                        <td class="text-center py-3 px-4 text-sm  font-bold uppercase" > </td>
                     </tr>
                 </tfoot>
             </table>
@@ -88,6 +89,54 @@
           <Spinner />
         </div>
         </div>
+        <!-- A Imprimer -->
+        <div v-if="listeVentes.length" class="border border-gray-300 rounded overflow-scroll p-0.5 w-full hidden">
+          <table class="min-w-full bg-white divider-y divide-gray-400" id="listeVentes">
+              <thead class="bg-gray-800 text-white">
+                <tr >
+                  <th class="text-left py-3 px-4 uppercase font-semibold text-sm">#</th>
+                  <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Date</th>
+                  <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Article</th>
+                  <th class="text-center py-3 px-4 uppercase font-semibold text-sm">PVU</th>
+                  <th class="text-center py-3 px-4 uppercase font-semibold text-sm">Qté cmd</th>
+                  <th class="text-center py-3 px-4 uppercase font-semibold text-sm">Montant</th>
+                  <!-- <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Actions</th> -->
+                </tr>
+              </thead>
+              <tbody class="text-gray-700">
+                <tr class="border-b border-gray-400 max-h-2 overflow-y-scroll" :class="{ striped : n % 2 ===0}" v-for="(vente, n) in filteredvente " :key="vente.id">
+                  <td class="text-left text-xs py-2 px-3 font-semibold uppercase">{{ n + 1 }} </td>
+                  <td class="text-left text-xs py-2 px-3 ">{{ formatedDate(vente.createdAt.seconds ) }}</td>
+                  <td class="text-left text-xs py-2 px-3 uppercase">{{vente.article}}</td>
+                  <td class="text-center text-xs py-2 px-3">{{ (vente.pvu) }}</td>
+                  <td class="text-center text-xs py-2 px-3">{{ vente.qtecmd}}</td>
+                  <td class="text-center text-xs py-2 px-3 " title="Montant Total">{{ (vente.payer) }}</td>
+                  <!-- <td class="text-left text-xs py-2 px-3 flex justify-between items-center">
+                    <span class="material-icons disabled" title="Modifier"  @click="edit(vente.id)" >edit</span>
+                    <span class="material-icons strash text-red-300 disabled" title="Supprimer" @click="destroy(vente.id)">delete</span>
+                  </td> -->
+                </tr>
+              </tbody>
+              <tfoot>
+                  <tr class="border-b border-gray-400 bg-gray-300">
+                      <td class="text-left py-3 px-4 text-sm  font-bold uppercase" colspan="3">Totaux </td>
+                      <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{ numberFormatter.format(totalPVU)}} </td>
+                      <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{totalQte}} </td>
+                      <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{ numberFormatter.format(totalTTC)}} </td>
+                  </tr>
+              </tfoot>
+          </table>
+          <!-- Total de la liste -->
+          <div class="flex justify-center mt-2 mr-0">
+              <span class="flex justify-center gap-4 bg-green-300 text-gray-600 text-base font-bold  mb-2  rounded-md cursor-pointer hover:bg-green-200"  >
+              <span class="mx-3 my-4" >  Montant Total</span>
+              <span class="mx-3 my-4">{{totalTTC ? (totalTTC ).toLocaleString('fr-fr', {style: "currency", currency: "GNF", minimumFractionDigits: 0})  : 0 }}</span>
+              </span>
+          </div>
+          <!-- <div class="flex justify-center" v-if="filteredvente.length">
+              <button class="bg-transparent border border-green-400 hover:bg-green-400 hover:text-gray-700" @click="exportPDF">Imprimer la liste</button>
+          </div> -->
+        </div>
       </div>
   </div>
 </template>
@@ -105,6 +154,7 @@ import { useRouter } from 'vue-router'
 import Spinner from "../../components/Spinner.vue"
 import { onMounted, watch } from '@vue/runtime-core'
 import genererPDF from '../../controllers/genererPDF'
+import receptionArticles from '../../controllers/receptionArticles';
 export default {
   components: {  Spinner },
   setup() {
@@ -126,6 +176,7 @@ export default {
     const totalTTC = ref("")
     const totalPVU = ref("")
     const totalQte = ref("")
+    const { reception } = receptionArticles()
     const { makeDocument } = genererPDF()
     const options = { year: 'numeric', month: 'short', day: 'numeric', timeZone:'UTC' }
 
@@ -305,7 +356,7 @@ export default {
 
     const edit = (id) => {
       //console.log(" id :::: ",id)
-      alert("Vous ne pouvez pas modifier ou supprimer sur cette page")
+      // alert("Vous ne pouvez pas modifier ou supprimer sur cette page")
       return
       // if( isAdmin) {
       //   router.push( { name: "EditProduit", params: { token: auth.currentUser.accessToken, id: id}})
@@ -314,14 +365,23 @@ export default {
       //   alert("Vous n'êtes pas autorisé à effectuer cette action")
       // }
     }
-    const destroy = async (id) => {
+    const destroy = async (vente) => {
       //console.log(" destroy id :::: ",id)
       //  alert("Vous ne pouvez pas supprimer ou modifier sur cette page")
       // return
       if( isAdmin) {
           const { destroy, error } = destroyDocument()
           if( confirm("Voulez-vous retourner cette vente et redefinir tous les montants vendus ?? \n Cette action est definitive et irreversible !!") ) {
-            await destroy("ventes", id)
+            await destroy("ventes", vente.id)
+            const stock = {
+                //boutiqueReception : boutiqueReception.value,
+                articleId : vente.id,
+                quantiteStock : Number(vente.qtecmd),
+                updatedAt: serverTimestamp()
+            }
+            console.log("vte deleted  : ", stock)
+            return
+            await reception(stock, boutiqueReception.value )
 
         }
         if(error.value){

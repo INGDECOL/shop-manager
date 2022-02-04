@@ -22,7 +22,7 @@
               </span>
               <!-- Boutique -->
               <div class="mr-2 pr-2.5">
-                  <select name="magasin"  id="magasin" v-model="boutiqueVente" class=" md:font-bold md:text-sm text-xs mr-2 pr-2.5 cursor-pointer"  required title="Magasin">
+                  <select name="magasin"  id="magasin" v-model="boutiqueVente" class=" md:font-bold md:text-sm text-xs mr-2 pr-2.5 cursor-pointer"  required title="Magasin" disabled>
                       <option value="">Selectionner la boutique</option>
                       <option v-for="boutique in filteredBoutiques" :key="boutique.id" :value="boutique.id">{{ boutique.designationBoutique }}</option>
                   </select>
@@ -230,6 +230,7 @@ export default {
         const vendeur = ref(getAuth().currentUser)
         const soldeClients = ref([])
         const oldDette = ref()
+        const idBoutiqueVente = ref("qT2MsHMTZZQRsDv3qKyE")
         // const reste = ref()
         // const avance = ref()
         const router = useRouter()
@@ -378,6 +379,7 @@ export default {
             if(boutiqueVente.value =='') {
                 return
             }
+            // console.log(boutiqueVente.value)
             await getStock(boutiqueVente.value)
         })
 
@@ -487,7 +489,7 @@ export default {
 
         onMounted( async () => {
             // getFamilles()
-            // getFournisseurs()
+            boutiqueVente.value = idBoutiqueVente.value
             getBoutiques()
             getArticles()
             getClients()

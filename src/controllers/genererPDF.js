@@ -385,6 +385,62 @@ const makeDocument = ({title = '',  orientation = 'p',  format = 'a4',  data = [
 
 
 }
+const makeLivraison = ({title = '',  orientation = 'p',  format = 'a4',  data = [], id = '', option = {}}) => {
+
+    let table = document.getElementById(id)
+    let tableFinalHeight = 0
+
+    const doc = new jsPDF({ orientation: orientation, format: format})
+
+    let img = document.getElementById('navLogo')
+    console.log("fonts : ", doc.getFontList())
+
+    // Entête de la page
+    setEntete(doc, img)
+
+    // Entete du tableau
+    // let head = Object.keys(data[0]) ? Object.keys(data[0]) : []
+    doc.setTextColor('black')
+    doc.setFontSize(14)
+    doc.setFont("Times","bold")
+    doc.text(title, doc.internal.pageSize.width / 2, 42, { align: "center"})
+
+    doc.setFontSize(12)
+    doc.setFont("Times","bold")
+    doc.text("Au Nom de  : " + option.client.toUpperCase(), 15, 49, { align: "left"})
+
+
+
+    doc.setFontSize(9)
+    doc.setFont("Times","bold")
+    doc.text("Siguiri, le " + dateFormatter.format(new Date().now), doc.internal.pageSize.width * 0.8 , 49, { align: "center"})
+
+    // Generation du tableau en fonction du tableau html fournis
+    autotable(doc, {
+        styles: { font: "times", fontSize: 12},
+        footStyles: { fillColor: "#777b7e"},
+        html: table,
+        startY: 53,
+        margin : { top: 20},
+        showFoot: "lastPage",
+        didDrawPage: (d) => {
+            // console.log("final height : ", Math.round(Number(d.cursor.y)))
+            tableFinalHeight = Math.round(Number(d.cursor.y))
+        },
+    })
+
+    doc.setFontSize(14)
+    doc.setFont("courier","bold")
+    doc.setTextColor("#black")//doc.setTextColor("#0e4c92")
+
+    doc.text("Le Gérant principal ", doc.internal.pageSize.width * 0.8 , tableFinalHeight + 14, {align: 'center'})
+    doc.text(option.gerant, doc.internal.pageSize.width * 0.8 , tableFinalHeight + 36, {align: 'center'})
+
+    setFooters(doc)
+    doc.save(title+".pdf")
+
+
+}
 
 const formatedNumber = (strNumber) => {
     return strNumber.toLocaleString('fr-fr', {style: "currency", currency: "GNF", minimumFractionDigits: 0})
@@ -447,7 +503,7 @@ const setSpecFooters = doc => {
 
 
 const genererPDF = () => {
-    return { makeFacture, makeDocument, makeCommande, makeBulletin }
+    return { makeFacture, makeDocument, makeCommande, makeLivraison, makeBulletin }
 }
 
 export default genererPDF

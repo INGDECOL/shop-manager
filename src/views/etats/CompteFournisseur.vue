@@ -38,7 +38,7 @@
 
                     <td class="text-left py-3 px-4 flex justify-between items-center">
                       <span class="material-icons " :class="{ disabled: !isAdmin }" >edit</span>
-                      <span class="material-icons strash text-red-300" :class="{ disabled: !isAdmin }">delete</span>
+                      <span class="material-icons strash text-red-300" :class="{ disabled: !isAdmin }" @click="destroy(facture.id)">delete</span>
                     </td>
                   </tr>
                 </tbody>
@@ -327,8 +327,8 @@ export default {
       //console.log(" destroy id :::: ",id)
       if( isAdmin) {
           const { destroy, error } = destroyDocument()
-          if( confirm("Voulez-vous supprimer cet client et tous les sous documents liés ?? Cette action est definitive et irreversible !!") ) {
-            // await destroy("clients", id)
+          if( confirm("Voulez-vous supprimer cet bon de commande et tous les sous documents liés ?? Cette action est definitive et irreversible !!") ) {
+            await destroy("facturesFournisseurs", id)
 
         }
         if(error.value){
