@@ -1,6 +1,6 @@
 <template>
-  <div class="md:px-2 py-8 w-full">
-      <AddClient />
+  <div class="md:px-2 py-8 mx-auto">
+      <!-- <AddClient /> -->
       <div class="shadow  rounded border-b border-gray-200">
         <div class="flex justify-between items-center">
           <div class="searchbar mx-1 w-2/4 flex justify-start ">
@@ -30,13 +30,13 @@
                 </thead>
                 <tbody class="text-gray-700">
                   <tr class="border-b border-gray-400 max-h-2 " :class="{ striped : n % 2 ===0}" v-for="(client, n) in filteredClients" :key="client.id">
-                    <td class="text-left text-sm py-3 px-4 font-semibold uppercase">{{ n + 1}} </td>
-                    <td class="text-left text-sm py-3 px-4 font-semibold uppercase">{{ client.nom}} </td>
-                    <td class="text-left text-sm py-3 px-4">{{ client.prenom}}</td>
-                    <td class="text-left text-sm py-3 px-4">{{ client.contact}}</td>
-                    <td class="text-left text-sm py-3 px-4">{{ client.adresse }}</td>
-                    <td class="text-left text-sm py-3 px-4 font-semibold underline text-blue-400 hover:text-blue-300 cursor-pointer" title="Montant Total dû" @click="detailDette(client)">{{ formatedNumber(client.solvabilite) }}</td>
-                    <td class="text-left text-sm py-3 px-4 flex justify-between items-center">
+                    <td class="text-left text-xs py-3 px-2 font-semibold uppercase">{{ n + 1}} </td>
+                    <td class="text-left text-xs py-3 px-2 font-semibold uppercase">{{ client.nom}} </td>
+                    <td class="text-left text-xs py-3 px-2">{{ client.prenom}}</td>
+                    <td class="text-left text-xs py-3 px-2">{{ client.contact}}</td>
+                    <td class="text-left text-xs py-3 px-2">{{ client.adresse }}</td>
+                    <td class="text-left text-xs py-3 px-2 font-semibold underline text-blue-400 hover:text-blue-300 cursor-pointer" title="Montant Total dû" @click="detailDette(client)">{{ formatedNumber(client.solvabilite ? client.solvabilite : 0) }}</td>
+                    <td class="text-left text-xs py-3 px-2 flex justify-between items-center">
                       <span class="material-icons " :class="{ disabled: !isAdmin }" @click="edit(client.id)" title="Modifier le client">edit</span>
                       <span class="material-icons strash text-red-300" :class="{ disabled: !isAdmin }" @click="destroy(client.id)" title="Supprimer le client">delete</span>
                     </td>
@@ -47,7 +47,7 @@
                       <td class="text-left py-3 px-4 text-sm  font-bold uppercase" colspan="5">Totaux </td>
                       <!-- <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{ numberFormatter.format(totalPAU)}} </td> -->
                       <!-- <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{totalQte}} </td> -->
-                      <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{ formatedNumber(totalTTC)}} </td>
+                      <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{ formatedNumber(totalTTC ? totalTTC : 0)}} </td>
                       <td class="text-center py-3 px-4 text-sm  font-bold uppercase" > </td>
                   </tr>
                 </tfoot>
@@ -77,7 +77,7 @@
                     <td class="text-left py-3 px-4">{{ client.prenom}}</td>
                     <td class="text-left py-3 px-4">{{ client.contact}}</td>
                     <td class="text-left py-3 px-4">{{ client.adresse }}</td>
-                    <td class="text-left py-3 px-4 font-semibold underline text-blue-400 hover:text-blue-300 cursor-pointer" title="Montant Total dû" @click="detailDette(client)">{{ numberFormatter.format(client.solvabilite) }}</td>
+                    <td class="text-left py-3 px-4 font-semibold underline text-blue-400 hover:text-blue-300 cursor-pointer" title="Montant Total dû" @click="detailDette(client)">{{ numberFormatter.format(client.solvabilite ? client.solvabilite : 0) }}</td>
 
                   </tr>
                 </tbody>
@@ -86,7 +86,7 @@
                       <td class="text-left py-3 px-4 text-sm  font-bold uppercase" colspan="5">Totaux </td>
                       <!-- <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{ numberFormatter.format(totalPAU)}} </td> -->
                       <!-- <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{totalQte}} </td> -->
-                      <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{ numberFormatter.format(totalTTC)}} </td>
+                      <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{ numberFormatter.format(totalTTC ? totalTTC : 0  )}} </td>
                   </tr>
                 </tfoot>
             </table>
@@ -181,8 +181,9 @@ export default {
         documents.value.map(client => {
           let soldeTotal =0
           soldeClients.value.forEach(solde => {
+            // console.log("dette : ", solde.montantDette, solde.clientId, soldeClients.value.length)
             if( solde.clientId == client.id ) {
-              // console.log("corespondance")
+              // console.log("dette clt : ", solde.montantDette)
               soldeTotal += solde.montantDette
               totalTTC.value += solde.montantDette
             }
@@ -221,7 +222,8 @@ export default {
     })
 
     const toggleForm = () => {
-        document.querySelector(".create").classList.toggle("open")
+       router.push({ name: "AddClient", params: { token: auth.currentUser.accessToken}})
+        // document.querySelector(".create").classList.toggle("open")
         // document.querySelectorAll(".create .modal").forEach(form => {
         //     form.classList.add("active")
         // })

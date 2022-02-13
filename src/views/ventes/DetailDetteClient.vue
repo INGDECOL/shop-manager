@@ -114,7 +114,7 @@ export default {
   }
 
     watch(listeFactures, () => {
-        console.log("watch doc : ", listeFactures.value.length, soldeClients.value.length)
+        // console.log("watch doc : ", listeFactures.value.length, soldeClients.value.length)
         if(listeFactures.value.length ) {
         // Calculer le solde total par facture
             listeFactures.value.map(facture => {
@@ -132,7 +132,7 @@ export default {
                         facture.impayer = solde.montantDette
                     }
                 })
-                console.log("Solde client : ", facture, listeFactures.value.length)
+                // console.log("Solde client : ", facture, listeFactures.value.length)
             })
         }
 

@@ -183,7 +183,7 @@
               :class="open ? 'open': ''"
             >
               <span class="material-icons  w-5 mr-2">
-                list
+                description
               </span>
 
               Articles
@@ -249,7 +249,7 @@
               :class="open ? 'open': ''"
             >
               <span class="material-icons  w-5 mr-2">
-                list
+                inventory
               </span>
 
               STOCK
@@ -268,6 +268,71 @@
                             :class="open ? 'open': ''"
                           >
                           <span class="material-icons w-5 mr-2">settings_suggest</span>Livraison
+                          </p>
+                        </router-link>
+
+                  </Disclosure>
+                </li>
+                <!-- STOCKAGE -->
+                <li>
+                  <Disclosure v-slot="{ open }" :default-open="isUserActive">
+                        <router-link :to="{ name: 'Stockage', params: { token: auth.currentUser.accessToken}}">
+                          <p
+                            class="pl-6 pr-4  flex items-center w-full hover:bg-gray-700"
+                            :class="open ? 'open': ''"
+                          >
+                          <span class="material-icons w-5 mr-2">call_received</span>Réception
+                          </p>
+                        </router-link>
+
+                  </Disclosure>
+                </li>
+
+                <!-- DESINTEGRER -->
+                <!-- <li>
+                  <Disclosure v-slot="{ open }" :default-open="isUserActive">
+                        <router-link :to="{ name: 'Desintegration', params: { token: auth.currentUser.accessToken}}">
+                          <p
+                            class="pl-6 pr-4  flex items-center w-full hover:bg-gray-700"
+                            :class="open ? 'open': ''"
+                          >
+                          <span class="material-icons w-5 mr-2">content_cut</span>Désintégration
+                          </p>
+                        </router-link>
+
+                  </Disclosure>
+                </li> -->
+              </ul>
+            </DisclosurePanel>
+          </Disclosure>
+        </li>
+        <!-- Depense -->
+        <li>
+          <Disclosure v-slot="{ open }" :default-open="isUserManagementActive">
+            <DisclosureButton
+              class="disclosure rounded-none px-4 py-1 flex items-center w-full hover:bg-gray-700"
+              :class="open ? 'open': ''"
+            >
+              <span class="material-icons  w-5 mr-2">
+                attach_money
+              </span>
+
+              Depenses
+              <span class="ml-auto material-icons"  :class="open ? 'transform rotate-90' : ''">
+                arrow_forward_ios
+              </span>
+            </DisclosureButton>
+            <DisclosurePanel>
+              <ul>
+                <!-- Gerer les Depenses -->
+                <li>
+                  <Disclosure v-slot="{ open }" :default-open="isUserActive">
+                        <router-link :to="{ name: 'ListeDepense', params: { token: auth.currentUser.accessToken}}">
+                          <p
+                            class="pl-6 pr-4  flex items-center w-full hover:bg-gray-700"
+                            :class="open ? 'open': ''"
+                          >
+                          <span class="material-icons w-5 mr-2">add_shopping_cart</span>Gérer
                           </p>
                         </router-link>
 

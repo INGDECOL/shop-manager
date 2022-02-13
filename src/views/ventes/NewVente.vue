@@ -230,7 +230,7 @@ export default {
         const vendeur = ref(getAuth().currentUser)
         const soldeClients = ref([])
         const oldDette = ref()
-        const idBoutiqueVente = ref("qT2MsHMTZZQRsDv3qKyE")
+        const idBoutiqueVente = ref("1v5aR0zlptk0d5joyp6r")
         // const reste = ref()
         // const avance = ref()
         const router = useRouter()
@@ -379,7 +379,7 @@ export default {
             if(boutiqueVente.value =='') {
                 return
             }
-            // console.log(boutiqueVente.value)
+            console.log(boutiqueVente.value)
             await getStock(boutiqueVente.value)
         })
 

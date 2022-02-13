@@ -2,6 +2,7 @@
   <div class="md:px-2 py-8 items-center mx-auto">
       <!-- <NewFournisseur /> -->
       <div class="shadow  rounded border-b border-gray-200">
+          <h3 class="text-center font-bold uppercase text-xl mt-2 pt-3">Liste des depenses effectuées</h3>
         <div class="flex justify-between items-center">
           <div class="searchbar mx-1 w-2/4 flex justify-start  ">
             <input type="text" placeholder="Rechercher..." class="w-full h-10" v-model="searchQuery" >
@@ -18,11 +19,11 @@
             <table class="table-auto bg-white divider-y divide-gray-400">
                 <thead class="bg-gray-800 text-white">
                   <tr >
-                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">#</th><th class="text-left py-3 px-4 uppercase font-semibold text-sm">Nom</th>
-                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Prénoms</th>
-                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Contact</th>
+                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">#</th><th class="text-left py-3 px-4 uppercase font-semibold text-sm">Date</th>
+                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Intitulé</th>
+                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Montant</th>
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Adresse</th>
-                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Email</th>
+                    <!-- <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Email</th> -->
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Actions</th>
                   </tr>
                 </thead>
@@ -33,7 +34,7 @@
                     <td class="text-left text-xs py-3 px-2">{{ fournisseur.prenom}}</td>
                     <td class="text-left text-xs py-3 px-2">{{ fournisseur.contact}}</td>
                     <td class="text-left text-xs py-3 px-2">{{ fournisseur.adresse }}</td>
-                    <td class="text-left text-xs py-3 px-2 text-blue-400 underline cursor-pointer">{{ fournisseur.email }}</td>
+                    <!-- <td class="text-left text-xs py-3 px-2 text-blue-400 underline cursor-pointer">{{ fournisseur.email }}</td> -->
                     <td class="text-left py-3 px-4 flex justify-between items-center">
                       <span class="material-icons " title="Modifier" :class="{ disabled: !isAdmin }" @click="edit(fournisseur.id)">edit</span>
                       <span class="material-icons strash text-red-300" title="Supprimer" :class="{ disabled: !isAdmin }" @click="destroy(fournisseur.id)">delete</span>
@@ -59,11 +60,10 @@ import getUser from "../../controllers/getUser"
 import getDocuments from "../../controllers/getDocuments"
 import destroyDocument from "../../controllers/destroyDocument"
 import { useRouter } from 'vue-router'
-import NewFournisseur from "./NewFournisseur.vue"
 import Spinner from "../../components/Spinner.vue"
 import { onMounted } from '@vue/runtime-core';
 export default {
-  components: { NewFournisseur, Spinner },
+  components: {  Spinner },
   setup() {
     const router = useRouter()
     const {documents, getError, load} = getDocuments()
@@ -95,24 +95,25 @@ export default {
     })
 
     const toggleForm = () => {
-      router.push({ name: "NewFournisseur", params: { token: auth.currentUser.accessToken}})
+      router.push({ name: "NewDepense", params: { token: auth.currentUser.accessToken}})
     }
 
     const edit = (id) => {
       //console.log(" id :::: ",id)
-      if( isAdmin) {
-        router.push( { name: "EditFournisseur", params: { token: auth.currentUser.accessToken, id: id}})
+      return
+    //   if( isAdmin) {
+    //     router.push( { name: "EditFournisseur", params: { token: auth.currentUser.accessToken, id: id}})
 
-      }else {
-        alert("Vous n'êtes pas autorisé à effectuer cette action")
-      }
+    //   }else {
+    //     alert("Vous n'êtes pas autorisé à effectuer cette action")
+    //   }
     }
     const destroy = async (id) => {
       //console.log(" destroy id :::: ",id)
       if( isAdmin) {
           const { destroy, error } = destroyDocument()
-          if( confirm("Voulez-vous supprimer cet fournisseur et tous les sous documents liés ?? Cette action est definitive et irreversible !!") ) {
-            await destroy("fournisseurs", id)
+          if( confirm("Voulez-vous supprimer cette depense ?? Cette action est definitive et irreversible !!") ) {
+            await destroy("depenses", id)
 
         }
         if(error.value){

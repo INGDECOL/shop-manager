@@ -16,6 +16,7 @@ import getUser from '../controllers/getUser'
 
   import ListeClient from "../views/clients/ListeClient.vue"
   import EditClient from "../views/clients/EditClient.vue"
+  import AddClient from "../views/clients/NewClient.vue"
 
   import ListeBoutique from "../views/boutiques/ListeBoutique.vue"
   import EditBoutique from "../views/boutiques/EditBoutique.vue"
@@ -36,6 +37,9 @@ import getUser from '../controllers/getUser'
   import CompteClient from "../views/ventes/CompteClient.vue"
   import RemboursementClient from "../views/ventes/RemboursementClient.vue"
 
+  import NewDepense from "../views/depenses/NewDepense.vue"
+  import ListeDepense from "../views/depenses/ListeDepense.vue"
+
    import NewPersonnel from '../views/auth/Signup.vue'
   import ListePersonnel from "../views/personnels/ListePersonnel.vue"
   import Indemnite from "../views/personnels/Indemnite.vue"
@@ -54,6 +58,7 @@ import getUser from '../controllers/getUser'
   import AdminGestionCompte from "../views/comptes/GestionCompte.vue"
   import AdminOperations from "../views/comptes/Operations.vue"
   import AdminTransactions from "../views/comptes/ListeTransactions.vue"
+  import AdminRapportTransactions from "../views/comptes/RapportTransaction.vue"
 
 //End of Components import
 
@@ -172,7 +177,13 @@ const routes = [
   },
 // clients
   {
-    path: "/clients/:token",
+    path: "/clients/AddClient/:token",
+    name: "AddClient",
+    component: AddClient,
+    beforeEnter: requireAuth
+  },
+  {
+    path: "/clients/ListeClient/:token",
     name: "Clients",
     component: ListeClient,
     beforeEnter: requireAuth
@@ -256,6 +267,19 @@ const routes = [
     path: "/vente/remboursement_client/:token/:id",
     name: "RemboursementClient",
     component: RemboursementClient,
+    beforeEnter: requireAuth
+  },
+
+  {
+    path: "/gestion/depenses/:token",
+    name: "ListeDepense",
+    component: ListeDepense,
+    beforeEnter: requireAuth
+  },
+  {
+    path: "/gestion/add_depenses/:token",
+    name: "NewDepense",
+    component: NewDepense,
     beforeEnter: requireAuth
   },
 
@@ -373,6 +397,12 @@ const routes = [
     path: "/compte_auxilliaire/gestion/liste_transactions/:token/",
     name: "AdminTransactions",
     component: AdminTransactions,
+    beforeEnter: requireAuthAdmin
+  },
+  {
+    path: "/compte_auxilliaire/gestion/rapport_transactions/:token/",
+    name: "AdminRapportTransactions",
+    component: AdminRapportTransactions,
     beforeEnter: requireAuthAdmin
   },
 

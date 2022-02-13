@@ -368,6 +368,19 @@
 
                   </Disclosure>
                 </li>
+                <li>
+                  <Disclosure v-slot="{ open }" :default-open="isUserActive">
+                        <router-link :to="{ name: 'AdminRapportTransactions', params: { token: auth.currentUser.accessToken}}">
+                          <p
+                            class="pl-6 pr-4  flex items-center w-full hover:bg-gray-700"
+                            :class="open ? 'open': ''"
+                          >
+                          <span class="material-icons w-5 mr-2">battery_unknown</span>Rapport des Transactions
+                          </p>
+                        </router-link>
+
+                  </Disclosure>
+                </li>
               </ul>
             </DisclosurePanel>
           </Disclosure>

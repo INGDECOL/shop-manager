@@ -1,17 +1,10 @@
 <template>
-      <div class="mx-auto w-3/4  " @click="hideModal">
-        <div class=" active">
-            <form class="produit"  @submit.prevent="handleSubmit">
-                <div class="flex justify-end -mr-5  ml-auto">
-                    <span class="material-icons close row-auto mr-0 ml-auto pr-0" @click="goBack">close</span>
-                </div>
-            <h2 class="mb-2 font-bold">NOUVEAU FOURNISSEUR</h2>
-
+      <div class="mx-auto w-3/4 " @click="hideModal">
+        <div class="modal active">
+            <h3 class="text-center font-bold uppercase text-xl my-2 ">Nouvelle depense</h3>
+            <form  @submit.prevent="handleSubmit">
                 <!-- <input type="hidden" name="id" v-model="id"> -->
-                <!-- <div class="form-field__control"> -->
-                    <!-- <label for="nom" class="form-field__label" >Nom du fournisseur</label> -->
-                    <input type="text" name="nom" id="nom" class="form-field__input uppercase" placeholder="Nom du fournisseur" required v-model="nom">
-                <!-- </div> -->
+                <input type="text" name="nom"   class="uppercase" placeholder="Nom du client" required v-model="nom">
                 <input type="text" name="prenom" placeholder="Prénom"   v-model="prenom">
                 <input type="tel" name="contact"  placeholder="Contact ex: 620 010 010"  v-model="contact" required>
                 <input type="text" name="adresse" placeholder="Adresse / Domicile"   v-model="adresse">
@@ -32,8 +25,9 @@ import createDocument from "../../controllers/createDocument"
 import { onMounted, onUnmounted } from '@vue/runtime-core'
 import { serverTimestamp } from '@firebase/firestore'
 import { useRouter } from 'vue-router'
+import { auth } from '../../firebase/config'
 export default {
-    // props: [ 'editFournisseurId'],
+    // props: [ 'editclientId'],
     setup(props) {
         const id = ref('')
         const nom = ref('')
@@ -50,7 +44,7 @@ export default {
         }
         const handleSubmit = async () => {
 
-            const fournisseur = {
+            const client = {
                 nom: nom.value,
                 prenom: prenom.value,
                 contact: contact.value,
@@ -58,22 +52,22 @@ export default {
                 email: email.value,
                 createdAt: serverTimestamp()
             }
-            // console.log("fournisseur : ", fournisseur)
-            await create("fournisseurs", fournisseur)
+            //console.log("client : ", client)
+            await create("clients", client)
             if(!createError.value){
-                document.querySelector(".create form").reset()
+                // document.querySelector(".create form").reset()
                 nom.value=''
                 prenom.value = ''
                 contact.value=''
                 adresse.value=''
                 email.value= ''
-
+                 router.push({ name: "Clients", params: { token: auth.currentUser.accessToken}})
             }
         }
         // computed ( () => {
         //     console.log("computed")
-        //     if(props.editFournisseurId ){
-        //         console.log("props fournisseur : ", props.editFournisseurId)
+        //     if(props.editclientId ){
+        //         console.log("props client : ", props.editclientId)
 
         //     }
         // })

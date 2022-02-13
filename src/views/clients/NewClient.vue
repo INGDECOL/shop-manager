@@ -1,5 +1,5 @@
 <template>
-      <div class="create " @click="hideModal">
+      <div class="mx-auto w-3/4 " @click="hideModal">
         <div class="modal active">
             <h2 class="mb-2">NOUVEAU CLIENT</h2>
             <form  @submit.prevent="handleSubmit">
@@ -24,6 +24,8 @@ import { computed, ref } from '@vue/reactivity'
 import createDocument from "../../controllers/createDocument"
 import { onMounted, onUnmounted } from '@vue/runtime-core'
 import { serverTimestamp } from '@firebase/firestore'
+import { useRouter } from 'vue-router'
+import { auth } from '../../firebase/config'
 export default {
     // props: [ 'editclientId'],
     setup(props) {
@@ -33,6 +35,7 @@ export default {
         const contact = ref('')
         const adresse = ref('')
         const email = ref('')
+        const router = useRouter()
         const { createError, create } = createDocument()
         const hideModal = (e) => {
             if(e.target.classList.contains("create")){
@@ -52,12 +55,13 @@ export default {
             //console.log("client : ", client)
             await create("clients", client)
             if(!createError.value){
-                document.querySelector(".create form").reset()
+                // document.querySelector(".create form").reset()
                 nom.value=''
                 prenom.value = ''
                 contact.value=''
                 adresse.value=''
                 email.value= ''
+                 router.push({ name: "Clients", params: { token: auth.currentUser.accessToken}})
             }
         }
         // computed ( () => {
