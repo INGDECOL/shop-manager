@@ -327,7 +327,7 @@
                 <!-- Gerer les Depenses -->
                 <li>
                   <Disclosure v-slot="{ open }" :default-open="isUserActive">
-                        <router-link :to="{ name: 'ListeDepense', params: { token: auth.currentUser.accessToken}}">
+                        <router-link :to="{ name: 'ListeDepense', params: { token: auth ? auth.currentUser.accessToken : ''  }}">
                           <p
                             class="pl-6 pr-4  flex items-center w-full hover:bg-gray-700"
                             :class="open ? 'open': ''"
@@ -339,7 +339,7 @@
                   </Disclosure>
                 </li>
                 <!-- STOCKAGE -->
-                <li>
+                <!-- <li>
                   <Disclosure v-slot="{ open }" :default-open="isUserActive">
                         <router-link :to="{ name: 'Stockage', params: { token: auth.currentUser.accessToken}}">
                           <p
@@ -351,7 +351,7 @@
                         </router-link>
 
                   </Disclosure>
-                </li>
+                </li> -->
 
                 <!-- DESINTEGRER -->
                 <!-- <li>

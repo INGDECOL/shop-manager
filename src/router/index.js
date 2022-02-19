@@ -67,6 +67,7 @@ import getUser from '../controllers/getUser'
     // console.log("reequireAuth");
     let user = auth.currentUser
     if(!user){
+      alert("Vous devez être connecté")
       next({ name: 'Home'})
     } else {
       next()
@@ -98,7 +99,7 @@ import getUser from '../controllers/getUser'
           next()
         }
     }else {
-      alert("Vous devriez vous connecter pour accéder à cette page !")
+      alert("Vous devriez vous connecter en tant que Admin pour accéder à cette page !")
       next({ name: 'Home'})
     }
 

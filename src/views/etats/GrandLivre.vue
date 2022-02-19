@@ -26,6 +26,10 @@
                     <span class="font-bold">{{ simpleNumberFormatter.format(masseSalariale ? masseSalariale : 0)}} </span>
                 </h2>
                 <h2 class="border-b mx-2 flex justify-between items-center gap-2">
+                    <span>Depenses : </span>
+                    <span class="font-bold">{{ simpleNumberFormatter.format(totalDepense ? totalDepense : 0)}} </span>
+                </h2>
+                <h2 class="border-b mx-2 flex justify-between items-center gap-2">
                     <span>Clients : </span>
                     <span class="font-bold">{{ simpleNumberFormatter.format(debitClient ? debitClient : 0)}} </span>
                 </h2>
@@ -96,6 +100,15 @@
                     <td class="text-left text-xs py-3 px-4 font-semibold uppercase">{{ simpleNumberFormatter.format(masseSalariale)}} </td>
                     <td class="text-left text-xs py-3 px-4 font-semibold uppercase"> {{ (masseSalariale - salaireTotal ) < 0 ? simpleNumberFormatter.format(masseSalariale - salaireTotal) : ""}} </td>
                     <td class="text-left text-xs py-3 px-4 font-semibold uppercase">{{ (masseSalariale - salaireTotal ) > 0 ? simpleNumberFormatter.format(masseSalariale - salaireTotal) : ""}} </td>
+                </tr>
+                <!-- Salaire personnel -->
+                <tr class="border-b border-gray-400 max-h-2 striped">
+                    <td class="text-left text-xs py-3 px-4 font-semibold uppercase">6328</td>
+                    <td class="text-left text-xs py-3 px-4 font-semibold uppercase"> Frais divers </td>
+                    <td class="text-left text-xs py-3 px-4 font-semibold uppercase">{{ simpleNumberFormatter.format(totalDepense)}} </td>
+                    <td class="text-left text-xs py-3 px-4 font-semibold uppercase"> </td>
+                    <td class="text-left text-xs py-3 px-4 font-semibold uppercase"> {{ (totalDepense - 0 ) < 0 ? simpleNumberFormatter.format(totalDepense - 0) : ""}} </td>
+                    <td class="text-left text-xs py-3 px-4 font-semibold uppercase">{{ (totalDepense - 0 ) > 0 ? simpleNumberFormatter.format(totalDepense - 0) : ""}} </td>
                 </tr>
                 <!-- Caisse -->
                 <tr class="border-b border-gray-400 max-h-2 striped">
@@ -200,6 +213,7 @@ export default {
         const listeDetteFournisseurs = ref([])
         const listeVentes = ref([])
         const listeDetteClients = ref([])
+        const listeDepenses = ref([])
         const listeBulletins = ref([])
         const listeSalaires = ref([])
         const listeBoutiques = ref(null)
@@ -228,6 +242,16 @@ export default {
             const docRef = collection(db, "boutiques")
             const res = onSnapshot(docRef, (snap)=>{
                 listeBoutiques.value = snap.docs.map(doc => {
+                        //console.log("verification : ", doc.data().gerantBoutique)
+                        return {...doc.data(), id: doc.id}
+                })
+            })
+
+        }
+        const getDepenses = async () => {
+            const docRef = collection(db, "depenses")
+            const res = onSnapshot(docRef, (snap)=>{
+                listeDepenses.value = snap.docs.map(doc => {
                         //console.log("verification : ", doc.data().gerantBoutique)
                         return {...doc.data(), id: doc.id}
                 })
@@ -431,6 +455,11 @@ export default {
             })
         })
 
+        watch(listeDepenses, ()=> {
+            listeDepenses.value.map( depense => {
+                totalDepense.value += depense.montantDepense
+            })
+        })
         const getBalanceByDate = () => {
 
         }
@@ -444,6 +473,7 @@ export default {
             await getSalaire()
             await getDetteClients()
             await getDetteFournisseurs()
+            await getDepenses()
 
         })
 

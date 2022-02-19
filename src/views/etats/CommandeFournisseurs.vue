@@ -627,11 +627,11 @@ export default {
                 }
                 create("detteFournisseurs", dette)
                  // s'il yavait une avance
-                if(avance.value){
-                    if((avance.value.montantAvance - montantRegle.value) >=0){
+                if(avance.value.montantAvance > 0){
+                    if( (avance.value.montantAvance - montantRegle.value ? montantRegle.value : totalHT.value) > 0 ){
                         let avanceFss = {
                             fournisseurId: fournisseurCmdId.value ? fournisseurId.value : "FssDiv",
-                            montantAvance: Number(avance.value.montantAvance - montantRegle.value),
+                            montantAvance: Number(avance.value.montantAvance - montantRegle.value ? montantRegle.value : totalHT.value),
                             boutiqueVente: boutiqueVente.value,
                             updatedAt: serverTimestamp()
                         }
@@ -654,14 +654,14 @@ export default {
                     // boutiqueVente: boutiqueVente.value,
                     createdAt: serverTimestamp()
                 }
-                console.log("avnc fss : ",avanceFss)
+                // console.log("avnc fss : ",avanceFss)
                 setAvanceFournisseur(avanceFss, fournisseurId.value)
             } else {
-                 if(avance.value){
-                    if((avance.value.montantAvance - montantRegle.value) >=0){
+                 if(avance.value.montantAvance > 0){
+                    if((avance.value.montantAvance - montantRegle.value ? montantRegle.value : totalHT.value) >0){
                         let avanceFss = {
                             fournisseurId: fournisseurCmdId.value ? fournisseurId.value : "FssDiv",
-                            montantAvance: Number(avance.value.montantAvance - montantRegle.value),
+                            montantAvance: Number(avance.value.montantAvance - montantRegle.value ? montantRegle.value : totalHT.value),
                             // boutiqueVente: boutiqueVente.value,
                             updatedAt: serverTimestamp()
                         }

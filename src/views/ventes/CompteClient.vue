@@ -36,7 +36,7 @@
                     <td class="text-left py-3 px-4 text-xs font-semibold text-pink-400 hover:text-pink-300 cursor-pointer" title="Montant restant">{{ formatedNumber(bringAvance(facture.clientId)) }}</td>
                     <!-- <td class="text-left py-3 px-4 text-xs font-semibold underline text-blue-400 hover:text-blue-300 cursor-pointer" title="Montant Total dû" >0</td> -->
                     <td class="text-left py-3 px-4 flex justify-between items-center">
-                      <span class="material-icons " :class="{ disabled: !isAdmin }"  >edit</span>
+                      <span class="material-icons text-blue-500" :class="{ disabled: !isAdmin }" title="Remboursement" @click="payerFacture(facture.id)">attach_money</span>
                       <span class="material-icons strash text-red-300" :class="{ disabled: !isAdmin }" @click="destroy(facture.id)">delete</span>
                     </td>
                   </tr>
@@ -71,7 +71,7 @@ export default {
     const nom = ref('')
     const listeBoutiques = ref(null)
     const boutiqueVente = ref('')
-    const idBoutiqueVente = ref("qT2MsHMTZZQRsDv3qKyE")
+    const idBoutiqueVente = ref("1v5aR0zlptk0d5joyp6r")
     const prenom = ref('')
     const documents = ref([])
     const listeFactures = ref([])
@@ -191,8 +191,9 @@ export default {
       if(boutiqueVente.value =='') {
           return
       }
-      // console.log("boutique : ", listeFactures.value.length, listeFactures.value)
+      // console.log("boutique : ", boutiqueVente.value, documents.value)
       listeFacturesBoutique.value = documents.value.filter(facture => {
+        // console.log("ids : ", facture.boutiqueId ,"==>", boutiqueVente.value, facture.clientId)
             return facture.impayer >0 && facture.boutiqueId == boutiqueVente.value
       })
   })

@@ -1,6 +1,6 @@
 <template>
   <div class="md:px-2 py-8 items-center mx-auto">
-      <!-- <NewFournisseur /> -->
+      <!-- <Newdepense /> -->
       <div class="shadow  rounded border-b border-gray-200">
           <h3 class="text-center font-bold uppercase text-xl mt-2 pt-3">Liste des depenses effectuées</h3>
         <div class="flex justify-between items-center">
@@ -22,33 +22,41 @@
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">#</th><th class="text-left py-3 px-4 uppercase font-semibold text-sm">Date</th>
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Intitulé</th>
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Montant</th>
-                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Adresse</th>
+                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Demandeur</th>
                     <!-- <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Email</th> -->
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Actions</th>
                   </tr>
                 </thead>
                 <tbody class="text-gray-700">
-                  <tr class="border-b border-gray-400 max-h-2 overflow-y-scroll" :class="{ striped : n % 2 ===0}" v-for="(fournisseur, n) in filteredFournisseurs" :key="fournisseur.id">
+                  <tr class="border-b border-gray-400 max-h-2 overflow-y-scroll" :class="{ striped : n % 2 ===0}" v-for="(depense, n) in filteredDepenses" :key="depense.id">
                     <td class="text-left text-xs py-3 px-2 font-semibold uppercase">{{ n + 1}} </td>
-                    <td class="text-left text-xs py-3 px-2 font-semibold uppercase">{{ fournisseur.nom}} </td>
-                    <td class="text-left text-xs py-3 px-2">{{ fournisseur.prenom}}</td>
-                    <td class="text-left text-xs py-3 px-2">{{ fournisseur.contact}}</td>
-                    <td class="text-left text-xs py-3 px-2">{{ fournisseur.adresse }}</td>
-                    <!-- <td class="text-left text-xs py-3 px-2 text-blue-400 underline cursor-pointer">{{ fournisseur.email }}</td> -->
+                    <td class="text-left text-xs py-3 px-2 font-semibold uppercase">{{ formatedDate(depense.dateDepense)}} </td>
+                    <td class="text-left text-xs py-3 px-2">{{ depense.intitule}}</td>
+                    <td class="text-center text-xs py-3 px-2">{{ simpleNumberFormatter.format(depense.montantDepense)}}</td>
+                    <td class="text-left text-xs py-3 px-2">{{ depense.depenseDestinataire }}</td>
+                    <!-- <td class="text-left text-xs py-3 px-2 text-blue-400 underline cursor-pointer">{{ depense.email }}</td> -->
                     <td class="text-left py-3 px-4 flex justify-between items-center">
-                      <span class="material-icons " title="Modifier" :class="{ disabled: !isAdmin }" @click="edit(fournisseur.id)">edit</span>
-                      <span class="material-icons strash text-red-300" title="Supprimer" :class="{ disabled: !isAdmin }" @click="destroy(fournisseur.id)">delete</span>
+                      <span class="material-icons " title="Modifier" :class="{ disabled: !isAdmin }" @click="edit(depense.id)">edit</span>
+                      <span class="material-icons strash text-red-300" title="Supprimer" :class="{ disabled: !isAdmin }" @click="destroy(depense.id)">delete</span>
                     </td>
                   </tr>
                 </tbody>
+                <tfoot>
+                    <!-- Compte gestion -->
+                    <tr class="border-b border-gray-400 bg-gray-300">
+                        <td class="text-left py-3 px-4 text-sm  font-bold uppercase" colspan="3">Total des depenses</td>
+                        <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{ numberFormatter.format(totalDepense)}}</td>
+                        <td class=" py-3 px-4 text-sm  text-center font-bold uppercase" colspan="2"></td>
+                    </tr>
+
+                </tfoot>
+
             </table>
         </div>
         <div v-else>
           <Spinner />
         </div>
-        <!-- <h4>
-          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Itaque at aut magnam repellendus libero. Ipsa alias, qui aut perspiciatis praesentium incidunt nihil laudantium. Voluptatibus voluptatem porro quia magni, deleniti ratione odio enim qui eum fuga quidem obcaecati numquam nobis totam eligendi beatae pariatur quo cumque officia atque rerum. Alias aliquam nisi minima, ab facere reprehenderit quam, nulla soluta culpa architecto facilis ullam cupiditate ad quidem officia blanditiis error nihil sed expedita? Explicabo, doloremque iure! Harum, consequatur. Molestiae rem et magnam aut sit laboriosam dicta sint excepturi illo hic commodi labore nostrum autem quae odit, quam voluptatibus architecto blanditiis. Minima sapiente corrupti asperiores voluptas, officia esse laudantium magnam iure ducimus rem, molestias ratione dicta eum debitis ipsam quaerat, sint cupiditate enim similique hic harum obcaecati. Totam, reiciendis sapiente. Sed delectus, ad voluptatum sit aut eveniet modi. Repudiandae, quos dicta explicabo eos eius nemo quia inventore deserunt sed vel. Dolor, doloribus perferendis.</p>
-        </h4> -->
+
       </div>
   </div>
 </template>
@@ -61,17 +69,44 @@ import getDocuments from "../../controllers/getDocuments"
 import destroyDocument from "../../controllers/destroyDocument"
 import { useRouter } from 'vue-router'
 import Spinner from "../../components/Spinner.vue"
-import { onMounted } from '@vue/runtime-core';
+import { onMounted, watch } from '@vue/runtime-core';
 export default {
   components: {  Spinner },
   setup() {
     const router = useRouter()
     const {documents, getError, load} = getDocuments()
     const searchQuery = ref("")
-    const editFournisseurId = ref(null)
+    const editDepenseId = ref(null)
+    const totalDepense = ref(0)
+    const options = { year: 'numeric', month: 'short', day: 'numeric', timeZone:'UTC' }
+
+
+    const formatedDate = (strDate) => {
+      return new Date(strDate  ).toLocaleDateString(undefined, options)
+
+    }
+    const numberFormatter = new Intl.NumberFormat('de-DE', {
+        style: 'currency',
+        currency: 'GNF',
+
+    })
+    const simpleNumberFormatter = new Intl.NumberFormat('de-DE', {
+        // style: 'currency',
+        // currency: 'GNF',
+
+    })
+
+
     onMounted( async () => {
-      await load("fournisseurs")
-      //console.log(" fournisseurs : ", documents.value)
+      await load("depenses")
+      //console.log(" depenses : ", documents.value)
+    })
+
+    watch( documents, () => {
+      totalDepense.value = 0
+      documents.value.map(dette => {
+        totalDepense.value += dette.montantDepense
+      })
     })
 
     const isAdmin = ref(async () =>{
@@ -98,11 +133,18 @@ export default {
       router.push({ name: "NewDepense", params: { token: auth.currentUser.accessToken}})
     }
 
+        // const filteredDepenses = computed(()=>{
+        //     return documents.value && documents.value.filter((depense)=>{
+        //         return depense.designation.toLowerCase().indexOf( searchQuery.value.toLowerCase()) != -1
+        //     })
+        // })
+
+
     const edit = (id) => {
       //console.log(" id :::: ",id)
       return
     //   if( isAdmin) {
-    //     router.push( { name: "EditFournisseur", params: { token: auth.currentUser.accessToken, id: id}})
+    //     router.push( { name: "Editdepense", params: { token: auth.currentUser.accessToken, id: id}})
 
     //   }else {
     //     alert("Vous n'êtes pas autorisé à effectuer cette action")
@@ -123,10 +165,10 @@ export default {
         alert("Vous n'êtes pas autorisé à effectuer cette action")
       }
     }
-    const filteredFournisseurs = computed( () =>{
+    const filteredDepenses = computed( () =>{
 
-          return documents.value ? documents.value.filter( (fournisseur) => {
-            return fournisseur.nom.toLowerCase().indexOf( searchQuery.value.toLowerCase()) != -1
+          return documents.value ? documents.value.filter( (depense) => {
+            return depense.intitule.toLowerCase().indexOf( searchQuery.value.toLowerCase()) != -1
           }): []
 
     })
@@ -140,8 +182,12 @@ export default {
       documents,
       getError,
       searchQuery,
-      filteredFournisseurs,
-      editFournisseurId,
+      filteredDepenses,
+      editDepenseId,
+      formatedDate,
+      numberFormatter,
+      simpleNumberFormatter,
+      totalDepense,
     }
   }
 }

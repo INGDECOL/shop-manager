@@ -293,6 +293,7 @@ export default {
             selectedClient(clt[0])
         }
         const selectedClient = (client) => {
+            if(!client) return
             clientId.value = client.id
             clientNom.value = client.nom +" " + client.prenom + " " + client.contact
             avance.value=null
@@ -379,7 +380,7 @@ export default {
             if(boutiqueVente.value =='') {
                 return
             }
-            console.log(boutiqueVente.value)
+            // console.log(boutiqueVente.value)
             await getStock(boutiqueVente.value)
         })
 
@@ -652,6 +653,8 @@ export default {
 
             // Save dette
             if(reste() > 0 ) {
+                // console.log("reste sup")
+                // console.log("rest d", reste())
                 let dette = {
                     clientId: clientVenteId.value ? clientId.value : "CltDiv",
                     factureId: factureId,
@@ -661,8 +664,10 @@ export default {
                 }
                 create("dettes", dette)
                 // s'il yavait une avance
-                if(avance.value){
-                    if((avance.value.montantAvance - montantRegle.value ? montantRegle.value : totalTTC.value) >=0){
+                if(avance.value.montantAvance > 0){
+                    // console.log("avance ", avance.value.montantRegle, "opera : ",(avance.value.montantAvance - montantRegle.value), "ttc : ", totalTTC.value)
+                    if( (avance.value.montantAvance - montantRegle.value ? montantRegle.value : totalTTC.value) > 0 ){
+                        // if((avance.value.montantAvance - montantRegle.value > 0 ? montantRegle.value : totalTTC.value) >=0){
                         let avanceClt = {
                             clientId: clientVenteId.value ? clientId.value : "CltDiv",
                             montantAvance: Number(avance.value.montantAvance - montantRegle.value ? montantRegle.value : totalTTC.value),
@@ -690,11 +695,12 @@ export default {
                 }
                 setAvanceClient(avanceClt, clientId.value)
             }else {
-                 if(avance.value){
-                    if((avance.value.montantAvance - montantRegle.value ) >=0){
+                 if(avance.value.montantAvance > 0){
+                    if((avance.value.montantAvance - montantRegle.value ? montantRegle.value : totalTTC.value) >=0){
                         let avanceClt = {
                             clientId: clientVenteId.value ? clientId.value : "CltDiv",
-                            montantAvance: Number(avance.value.montantAvance - montantRegle.value),
+                            montantAvance: Number(0),
+                            // montantAvance: Number(avance.value.montantAvance - montantRegle.value ? montantRegle.value : totalTTC.value),
                             boutiqueVente: boutiqueVente.value,
                             updatedAt: serverTimestamp()
                         }
@@ -724,9 +730,10 @@ export default {
                 makeFacture({title : 'Facture N° ' + factureId, orientation : "p", format : "a4",data : articleFacture, id : 'commande', option: reglement})
 
              }else if(reste() >= 0 ) {
+                 console.log("avance : ", montantRegle.value, avance.value)
                  let reglement = {
                     totalTTC : totalTTC.value.toString(),
-                    montantRegle: montantRegle.value.toString() ? montantRegle.value.toString() : avance.value.montantAvance,
+                    montantRegle: montantRegle.value ? montantRegle.value.toString() : 0 ,
                     restant : reste(),
                     modeReglement : modeReglement.value,
                     client: clientNom.value ? clientNom.value  : "Client divers",

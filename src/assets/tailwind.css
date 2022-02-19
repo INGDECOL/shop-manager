@@ -8,6 +8,18 @@
     font-family: Roboto;
     src: url('../fonts/Roboto-Bold.ttf');
 }
+@font-face {
+    font-family: AkayaTelivigalaR;
+    src: url('../fonts/AkayaTelivigala-Regular.ttf');
+}
+@font-face {
+    font-family: JosefinI;
+    src: url('../fonts/JosefinSans-Italic.ttf');
+}
+@font-face {
+    font-family: JosefinV;
+    src: url('../fonts/JosefinSans-VariableFont.ttf');
+}
 
 @tailwind utilities;
 @layer base {

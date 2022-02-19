@@ -4,29 +4,27 @@
             <form class="produit"  @submit.prevent="handleSubmit">
               <!-- Bouton fermer -->
             <div class="flex justify-center -mr-5  ml-auto">
-
-
-
                 <span class="material-icons close row-auto mr-0 ml-auto pr-0" @click="goBack">close</span>
             </div>
-            <p class="mt-0 font-bold text-xl">
+            <p class="mt-0 font-bold text-xl text-center uppercase">
                 Remboursement de Dette
             </p>
             <!-- INFO DATE Vendeur CLIENT -->
-            <div class="flex justify-center items-center border rounded-md py-1.5 mb-1">
+            <!-- <div class="flex justify-center items-center border rounded-md py-1.5 mb-1"> -->
               <!-- Date du jour -->
               <!-- <span class="flex justify-between items-center bg-blue-100 text-blue-600 text-xs  mx-1 pr-2 py-0.5 rounded-md cursor-pointer  hover:bg-blue-200 md:font-bold md:mx-2 md:pr-2.5 md:text-sm"  title="Aujourd'hui">
                 <span class="text-xs material-icons mr-1 md:text-sm">date_range</span>
                 {{dateDuJour}}
 
               </span> -->
+
               <!-- CLIENT -->
-              <div class="mr-2 pr-2.5 ">
+              <!-- <div class="mr-2 pr-2.5 ">
                   <div name="magasin"   class="font-bold cursor-pointer p-2"  title="Client" >
                       <option v-if="document" class="font-bold">{{document.nom + " " + document.prenom + " " + document.contact}}</option>
                   </div>
-              </div>
-            </div>
+              </div> -->
+            <!-- </div> -->
             <div class="produit border flex justify-center items-center flex-col  gap-0.5 mt-0 ">
                 <!-- Total de la facture -->
                 <div class="flex justify-center items-center gap-0.5" :class="{'flex justify-between gap-2': (avance)}">
@@ -45,13 +43,27 @@
                     <div class="border rounded mb-2 px-1 mx-1 w-full" id="cmd">
                         <!-- Mode reglement et validation -->
                         <div class="border m-1">
-                            <div class="input flex justify-between items-center m-1 gap-3">
-                                <label class="w-1/2">Montant Total TTC </label>
-                                <input type="text" name="montanttotalttc" id="montanttotalttc" class="h-1" v-model="totalTTC" disabled>
+                            <div class="input  items-center m-1 gap-3" v-if="document">
+                                <label class="text-xl text-center font-bold">Client : {{document.nom + " " + document.prenom + " " + document.contact}}</label>
+                                <!-- <span class=" text-left mx-1 my-2 font-semibold md:mx-3 md:my-4">{{ factureId }}</span> -->
+
+
+                                <!-- <input type="text" name="montanttotalttc" id="montanttotalttc" class="h-1 font-bold text-center" v-model="factureId" disabled> -->
                             </div>
-                            <div class="input flex justify-between items-center m-1 gap-3 text-blue-700">
-                                <label class="w-1/2">Total Reçu </label>
-                                <input type="text" name="montanttotal" id="montanttotal" class="h-1.5 font-bold" v-model="montantRegle">
+                            <div class="input  items-center m-1 gap-3">
+                                <label class="text-xl text-center font-bold">N° Facture  : {{ factureId }}</label>
+                                <!-- <span class=" text-left mx-1 my-2 font-semibold md:mx-3 md:my-4">{{ factureId }}</span> -->
+
+
+                                <!-- <input type="text" name="montanttotalttc" id="montanttotalttc" class="h-1 font-bold text-center" v-model="factureId" disabled> -->
+                            </div>
+                            <div class="input  items-center m-1 gap-3">
+                                <label class="text-xl text-center font-bold">Net à payer  : {{formatedNumber( facture ? (facture.montantDette - montantRegle  )  : 0) }}</label>
+                                <!-- <span class=" text-center mx-1 my-2 font-semibold md:mx-3 md:my-4">{{formatedNumber( facture ? (facture.montantDette - montantRegle  )  : 0) }}</span> -->
+                            </div>
+                            <div class="input flex justify-between m-1  text-blue-700">
+                                <label class="w-1/2 text-xl text-center font-bold -mr-4">Versement </label>
+                                <input type="text" name="montanttotal" id="montanttotal" class="h-6 font-bold w-1/2 text-xl text-center mr-4 ml-0" v-model="montantRegle">
 
                             </div>
                         </div>
@@ -93,7 +105,7 @@ export default {
         const id = ref('')
         const designation = ref('')
         const boutiqueVente = ref('')
-        const idBoutiqueVente = ref("qT2MsHMTZZQRsDv3qKyE")
+        const factureId = ref("")
         const listeBoutiques = ref(null)
         const listeClients = ref(null)
         const listeArticles = ref(null)
@@ -104,6 +116,7 @@ export default {
         const clientNom = ref('')
         const contact = ref('')
         const totalTTC = ref('')
+        const totalPVU = ref('')
         const montantRegle = ref('')
         const facture = ref()
         const vendeur = ref(getAuth().currentUser)
@@ -285,6 +298,7 @@ export default {
         onMounted( async () => {
             // getFamilles()
             if(route.params.id) {
+                factureId.value = route.params.id
                 await getFacture(route.params.id)
                 await load("clients", facture.value.clientId)
                 await getBoutiques()
@@ -333,7 +347,7 @@ export default {
             totalTTC.value =0
             soldeClients.value.map(solde => {
                if(solde.clientId === document.value.id) {
-                //    console.log("total : ", solde.clientId, document.value.id, solde.montantDette, solde.boutiqueVente)
+                    // console.log("total : ", solde.clientId, document.value.id, solde.id, solde.montantDette, solde.boutiqueVente)
                    totalTTC.value += solde.montantDette
                }
             })
@@ -360,7 +374,7 @@ export default {
                         console.log("Data to send inf : ", dette, oldDette.value.id)
                         insert("dettes", dette, oldDette.value.id)
                     }else if (montantRegle.value > facture.value.montantDette ) {
-                        
+
                     }else {
                         destroy("dettes", oldDette.value.id)
                     }
@@ -462,6 +476,7 @@ export default {
             avance,
             reste,
             facture,
+            factureId,
 
         }
   }

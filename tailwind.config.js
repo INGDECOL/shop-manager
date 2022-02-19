@@ -22,6 +22,9 @@ module.exports = {
         fontFamily : {
           'tangerine' : ['Tangerine', 'Helvetica', 'Arial', 'sans-serif'],
           'roboto': ['Roboto', 'Helvetica', 'Arial', 'sans-serif'],
+          'akayatelivigalaR': ['AkayaTelivigalaR', 'Helvetica', 'Arial', 'sans-serif'],
+          'JosefinI': ['JosefinI', 'Helvetica', 'Arial', 'sans-serif'],
+          'JosefinV': ['JosefinV', 'Helvetica', 'Arial', 'sans-serif'],
         },
         dropShadow: {
           '1xl': '0 2px 2px  rgba(37, 36, 36)',
