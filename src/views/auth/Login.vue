@@ -5,19 +5,18 @@
       <div class="modal active  border-t-4 border-green-500">
           <div class="flex justify-between items-">
             <h2 class="mt-6 font-bold text-2xl text-green-600 font-JosefinI">CONNECTEZ VOUS</h2>
-            <img src="../../assets/logo.png" alt="Logo" width="70" class="-mt-5 mb-2">
+            <img src="@/assets/logo.png" alt="Logo" width="70" class="-mt-5 mb-2">
 
           </div>
         <form class="login" @submit.prevent="handleSubmit">
-            <div class="flex justify-start items-center w-full mb-4   bg-white  rounded">
+            <div class="flex justify-start items-center w-full   bg-white  rounded ">
               <span class="material-icons -mr-5 z-10">account_circle</span>
-              <input type="email" name="email" placeholder="Email" required v-model="email" class="pl-5">
+              <input type="email" name="email" placeholder="Emai" required v-model="email" class="pl-5">
             </div>
-            <div class="flex justify-start items-center w-full mb-4   bg-white  rounded">
+            <div class="flex justify-start items-center w-full   bg-white  rounded">
               <span class="material-icons -mr-5 z-10">key</span>
               <input type="password" name="password" placeholder="Password" required v-model="password" class="pl-5">
             </div>
-
 
           <button>Se connecter</button>
           <p class="error">{{ signError }}</p>

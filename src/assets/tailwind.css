@@ -24,7 +24,7 @@
 @tailwind utilities;
 @layer base {
     body {
-        @apply my-0 mx-5 bg-gray-50;
+        @apply my-0 mx-1 bg-gray-50 overflow-auto
     }
     .title {
         @apply p-2.5 my-5 mx-auto text-4xl font-bold
@@ -36,13 +36,13 @@
         @apply my-4 mx-auto
     }
     header {
-        @apply flex justify-between items-center w-full my-0 p-0 font-bold shadow-md
+        @apply flex justify-between items-center  my-0 p-0 font-bold shadow-md
     }
     header.header {
         @apply bg-gray-300 font-bold
     }
     header.header h1 {
-        @apply text-gray-600 text-4xl font-bold font-tangerine drop-shadow-1xl
+        @apply text-gray-600 text-3xl font-bold font-JosefinI drop-shadow-1xl
     }
     header a.headerLink {
         @apply ml-2.5 border-b-2 border-yellow-300 p-1 cursor-pointer border-solid
