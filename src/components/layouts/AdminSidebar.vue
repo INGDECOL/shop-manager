@@ -385,6 +385,55 @@
             </DisclosurePanel>
           </Disclosure>
         </li>
+        <!-- Reglage -->
+        <li v-if="isAdmin">
+          <Disclosure v-slot="{ open }" :default-open="isUserManagementActive">
+            <DisclosureButton
+              class="disclosure rounded-none px-4 py-1 flex items-center w-full hover:bg-gray-700"
+              :class="open ? 'open': ''"
+            >
+              <span class="material-icons  w-5 mr-2">
+                admin_panel_settings
+              </span>
+              Paramètres
+              <span class="ml-auto material-icons"  :class="open ? 'transform rotate-90' : ''">
+                arrow_forward_ios
+              </span>
+            </DisclosureButton>
+            <DisclosurePanel>
+              <ul>
+                <!-- Gerer les comptes -->
+                <li>
+                  <Disclosure v-slot="{ open }" :default-open="isUserActive">
+                        <router-link :to="{ name: 'AdminSetupInfo', params: { token: auth.currentUser.accessToken}}">
+                          <p
+                            class="pl-6 pr-4  flex items-center w-full hover:bg-gray-700"
+                            :class="open ? 'open': ''"
+                          >
+                          <span class="material-icons w-5 mr-2">settings</span>Reglage infos
+                          </p>
+                        </router-link>
+
+                  </Disclosure>
+                </li>
+
+                <!-- <li>
+                  <Disclosure v-slot="{ open }" :default-open="isUserActive">
+                        <router-link :to="{ name: 'AdminRapportTransactions', params: { token: auth.currentUser.accessToken}}">
+                          <p
+                            class="pl-6 pr-4  flex items-center w-full hover:bg-gray-700"
+                            :class="open ? 'open': ''"
+                          >
+                          <span class="material-icons w-5 mr-2">battery_unknown</span>Rapport des Transactions
+                          </p>
+                        </router-link>
+
+                  </Disclosure>
+                </li> -->
+              </ul>
+            </DisclosurePanel>
+          </Disclosure>
+        </li>
 
       </ul>
     </nav>

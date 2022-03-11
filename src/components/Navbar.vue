@@ -1,7 +1,8 @@
 <template>
   <header class="header">
       <div class="flex justify-between items-center m-1 ">
-          <img src="@/assets/logo.png" alt="Logo"  width="50" srcset="" class="mr-1" id="navLogo">
+          <img src="@/assets/logo.png" alt="Logo"  width="50" srcset="" class="mr-1" id="navLogo" hidden>
+          <img :src="imgurl" alt="Logo"  width="50" srcset="" class="mr-1" id="navLogo1">
         <h1>Ets N'NAHAWA MS</h1>
       </div>
         <nav>
@@ -63,16 +64,25 @@ import getToken from '../controllers/getToken'
 import { auth } from '../firebase/config'
 import useLogout from '../controllers/useLogout'
 import getUser from '../controllers/getUser'
+import { onMounted } from '@vue/runtime-core';
+import useReglages from '../controllers/useReglages';
 export default {
     setup (props, context) {
         const user = ref(auth.currentUser)
         const { logout, error } = useLogout()
         const  token = ref(null)
         const router = useRouter()
+        const imgurl = ref('')
         const openLogin = () => {
             // context.emit('open')
             router.push({ name: 'Login'})
         }
+        onMounted( async ()=> {
+            const { getTitre, imgUrl , numeros , titre} = await useReglages()
+            imgurl.value = imgUrl
+            // console.log("imgurl : ", imgurl.value)
+
+        })
 
         auth.onAuthStateChanged((_user) =>{
             user.value = _user
@@ -102,7 +112,7 @@ export default {
                 }
                 }
         }
-        return { token, user, signOut, openLogin, isAdmin}
+        return { token, user, signOut, openLogin, isAdmin, imgurl}
 
     }
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="md:px-2 py-8 w-full">
+  <div class="md:px-2 py-8 items-center mx-auto">
       <!-- <AddBoutique /> -->
       <div class="shadow overflow-hidden rounded border-b border-gray-200">
         <div class="flex justify-between items-center">

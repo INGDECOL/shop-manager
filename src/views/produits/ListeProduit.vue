@@ -2,6 +2,7 @@
   <div class="md:px-2 py-8 w-full">
       <!-- <NewProduit /> -->
       <div class="shadow  rounded border-b border-gray-200">
+        <h2 class="font-bold text-xl pt-2">LISTE DES PRODUITS</h2>
         <div class="flex justify-between items-center">
           <div class="searchbar mx-1 w-2/4 flex justify-start ">
             <input type="text" placeholder="Rechercher..." class="w-full h-10" v-model="searchQuery" >

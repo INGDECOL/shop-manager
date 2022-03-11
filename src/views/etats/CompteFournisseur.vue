@@ -12,7 +12,7 @@
                   </select>
               </div>
         </div> -->
-        <div v-if="listeFacturesBoutique.length">
+        <div v-if="listeFacturesBoutique">
             <table class="table-auto  bg-white divider-y divide-gray-400">
                 <thead class="bg-gray-800 text-white">
                   <tr >
@@ -21,7 +21,7 @@
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">N° Facture</th>
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Fournisseurs</th>
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Impayé</th>
-                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Avance</th>
+                    <!-- <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Avance</th> -->
                     <!-- <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Solvabilité</th> -->
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Actions</th>
                   </tr>
@@ -34,10 +34,10 @@
                     <td class="text-left py-3 px-4 text-xs">{{  getFournisseur(facture.fournisseurId) }}</td>
                     <td class="text-left py-3 px-4 text-xs font-bold text-pink-400 hover:text-pink-300 cursor-pointer" title="Montant restant">{{ formatedNumber(facture.impayer ? facture.impayer : 0) }}</td>
 
-                    <td class="text-left py-3 px-4 text-xs font-bold hover:text-pink-300 cursor-pointer" title="Montant restant">{{ formatedNumber(bringAvance(facture.fournisseurId)) }}</td>
+                    <!-- <td class="text-left py-3 px-4 text-xs font-bold hover:text-pink-300 cursor-pointer" title="Montant restant">{{ formatedNumber(bringAvance(facture.fournisseurId)) }}</td> -->
 
                     <td class="text-left py-3 px-4 flex justify-between items-center">
-                      <span class="material-icons " :class="{ disabled: !isAdmin }" >edit</span>
+                      <span class="material-icons " :class="{ disabled: !isAdmin }" @click="payerFacture(facture.id)">euro</span>
                       <span class="material-icons strash text-red-300" :class="{ disabled: !isAdmin }" @click="destroy(facture.id)">delete</span>
                     </td>
                   </tr>
@@ -57,7 +57,7 @@
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">N° Facture</th>
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Fournisseurs</th>
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Impayé</th>
-                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Avance</th>
+                    <!-- <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Avance</th> -->
                   </tr>
                 </thead>
                 <tbody class="text-gray-700">
@@ -67,7 +67,7 @@
                     <td class="text-left py-3 px-4 text-xs text-blue-400 underline hover:text-blue-500 cursor-pointer" title="Cliquer pour aller au payement" @click="payerFacture(facture.id)">{{ facture.id}}</td>
                     <td class="text-left py-3 px-4 text-xs">{{  getFournisseur(facture.fournisseurId) }}</td>
                     <td class="text-left py-3 px-4 text-xs font-semibold text-pink-400 hover:text-pink-300 cursor-pointer" title="Montant restant">{{ (facture.impayer ? facture.impayer : 0) }}</td>
-                    <td class="text-left py-3 px-4 text-xs font-semibold text-pink-400 hover:text-pink-300 cursor-pointer" title="Montant restant">{{ bringAvance(facture.fournisseurId) }}</td>
+                    <!-- <td class="text-left py-3 px-4 text-xs font-semibold text-pink-400 hover:text-pink-300 cursor-pointer" title="Montant restant">{{ bringAvance(facture.fournisseurId) }}</td> -->
                     <!-- <td class="text-left py-3 px-4 text-xs font-semibold underline text-blue-400 hover:text-blue-300 cursor-pointer" title="Montant Total dû" >0</td> -->
                   </tr>
                 </tbody>
@@ -209,7 +209,7 @@ export default {
     }
 
     const payerFacture = (idfacture) => {
-      router.push({ name: 'AdminNewCommande', params: { token: auth.currentUser.accessToken, id: idfacture}})
+      router.push({ name: 'AdminRemboursementFournisseur', params: { token: auth.currentUser.accessToken, id: idfacture}})
     }
 
     const getFournisseur = (id) => {
@@ -279,8 +279,8 @@ export default {
 
     onMounted( async () => {
     //   getBoutiques()
-      await loadFournisseurs()
       await getSolde()
+      await loadFournisseurs()
       await loadFactures()
       await getAvances()
       //console.log(" clients : ", documents.value)

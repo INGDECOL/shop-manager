@@ -2,6 +2,7 @@
   <div class="md:px-2 py-8 items-center mx-auto">
       <!-- <NewFournisseur /> -->
       <div class="shadow  rounded border-b border-gray-200">
+        <h2 class="font-bold text-xl pt-2">GESTION DES FOURNISSEURS</h2>
         <div class="flex justify-between items-center">
           <div class="searchbar mx-1 w-2/4 flex justify-start  ">
             <input type="text" placeholder="Rechercher..." class="w-full h-10" v-model="searchQuery" >
@@ -22,8 +23,8 @@
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Prénoms</th>
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Contact</th>
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Adresse</th>
-                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Email</th>
-                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Actions</th>
+                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Avance</th>
+                    <th class="text-center py-3 px-4 uppercase font-semibold text-sm">Actions</th>
                   </tr>
                 </thead>
                 <tbody class="text-gray-700">
@@ -33,13 +34,23 @@
                     <td class="text-left text-xs py-3 px-2">{{ fournisseur.prenom}}</td>
                     <td class="text-left text-xs py-3 px-2">{{ fournisseur.contact}}</td>
                     <td class="text-left text-xs py-3 px-2">{{ fournisseur.adresse }}</td>
-                    <td class="text-left text-xs py-3 px-2 text-blue-400 underline cursor-pointer">{{ fournisseur.email }}</td>
+                    <td class="text-center text-xs py-3 px-2 text-blue-400 underline cursor-pointer">{{ numberFormatter.format(bringAvance(fournisseur.id)) }}</td>
                     <td class="text-left py-3 px-4 flex justify-between items-center">
                       <span class="material-icons " title="Modifier" :class="{ disabled: !isAdmin }" @click="edit(fournisseur.id)">edit</span>
+                      <span class="material-icons text-blue-400" title="Aller au depôt" :class="{ disabled: !isAdmin }" @click="depotAvance(fournisseur.id)">euro</span>
                       <span class="material-icons strash text-red-300" title="Supprimer" :class="{ disabled: !isAdmin }" @click="destroy(fournisseur.id)">delete</span>
                     </td>
                   </tr>
                 </tbody>
+                <tfoot>
+                  <tr class="border-b border-gray-400 bg-gray-300">
+                      <td class="text-left py-3 px-4 text-sm  font-bold uppercase" colspan="5">Totaux </td>
+                      <!-- <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{ numberFormatter.format(totalPAU)}} </td> -->
+                      <!-- <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{totalQte}} </td> -->
+                      <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{ numberFormatter.format(totalAvance ? totalAvance  : 0)}} </td>
+                      <td class="text-center py-3 px-4 text-sm  font-bold uppercase" > </td>
+                  </tr>
+                </tfoot>
             </table>
         </div>
         <div v-else>
@@ -61,7 +72,8 @@ import destroyDocument from "../../controllers/destroyDocument"
 import { useRouter } from 'vue-router'
 import NewFournisseur from "./NewFournisseur.vue"
 import Spinner from "../../components/Spinner.vue"
-import { onMounted } from '@vue/runtime-core';
+import { onMounted, watch } from '@vue/runtime-core'
+import avanceFournisseurs from "../../controllers/avanceFournisseurs"
 export default {
   components: { NewFournisseur, Spinner },
   setup() {
@@ -69,7 +81,31 @@ export default {
     const {documents, getError, load} = getDocuments()
     const searchQuery = ref("")
     const editFournisseurId = ref(null)
+    const totalAvance = ref(0)
+    const {getAvance, avnc, avance, getAvances } = avanceFournisseurs()
+
+    const bringAvance =  (id) => {
+      let av = 0
+      avnc.value.map(avance => {
+        if(avance.id == id ){
+          av = avance.montantAvance
+        }
+      })
+      return av
+    }
+
+    const depotAvance = (idClient) => {
+      router.push({ name: 'DepotFournisseur', params: { token: auth.currentUser.accessToken, id: idClient}})
+    }
+
+    const numberFormatter = new Intl.NumberFormat('de-DE', {
+    style: 'currency',
+    currency: 'GNF',
+    })
+
+
     onMounted( async () => {
+      await getAvances()
       await load("fournisseurs")
       //console.log(" fournisseurs : ", documents.value)
     })
@@ -125,13 +161,22 @@ export default {
     const filteredFournisseurs = computed( () =>{
 
           return documents.value ? documents.value.filter( (fournisseur) => {
-            return fournisseur.nom.toLowerCase().indexOf( searchQuery.value.toLowerCase()) != -1
+            return fournisseur && fournisseur.nom.toLowerCase().indexOf( searchQuery.value.toLowerCase()) != -1
           }): []
 
     })
 
+    watch(filteredFournisseurs , () => {
+      if(!filteredFournisseurs.value) return
+       totalAvance.value = 0
+          filteredFournisseurs.value.map(fournisseur => {
+            // console.log("avanc : ", bringAvance(client.id), client.nom)
+            totalAvance.value += bringAvance(fournisseur.id)
+          })
+    })
     return {
       auth,
+      totalAvance,
       isAdmin,
       edit,
       destroy,
@@ -141,6 +186,9 @@ export default {
       searchQuery,
       filteredFournisseurs,
       editFournisseurId,
+      bringAvance,
+      numberFormatter,
+      depotAvance,
     }
   }
 }

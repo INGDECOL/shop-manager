@@ -144,8 +144,8 @@
                     </div>
                 </div>
                 <!-- Facture à imprimer -->
-                <div class="border m-1 p-1 max-h-48 overflow-y-scroll overflow-x-scroll hidden">
-                    <table class="min-w-full bg-white border-collapse " id="commande">
+                <div class="border m-1 p-1 max-h-48 overflow-y-scroll overflow-x-scroll " hidden>
+                    <table class="min-w-full bg-white border-collapse " id="commande" >
                         <thead class="bg-gray-800 text-white">
                                 <tr>
                                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">#</th>
@@ -200,9 +200,12 @@ import receptionArticles from '../../controllers/receptionArticles'
 import avancesClient from '../../controllers/avanceClients'
 import genererPDF from '../../controllers/genererPDF'
 // import fontConv from '../../controllers/fontConverter'
+import useReglages from '../../controllers/useReglages'
 
 export default {
   setup () {
+    //   const { getTitre } = useReglages()
+
         const id = ref('')
         const designation = ref('')
         const boutiqueVente = ref('')
@@ -230,7 +233,7 @@ export default {
         const vendeur = ref(getAuth().currentUser)
         const soldeClients = ref([])
         const oldDette = ref()
-        const idBoutiqueVente = ref("1v5aR0zlptk0d5joyp6r")
+        const idBoutiqueVente = ref("wxTwslKuESKmWw12pm3E")
         // const reste = ref()
         // const avance = ref()
         const router = useRouter()
@@ -365,7 +368,8 @@ export default {
         }
         const filteredBoutiques = computed(()=>{
           return listeBoutiques.value && listeBoutiques.value.filter((boutique)=>{
-              return boutique.gerantBoutique.includes( auth.currentUser.email)
+            //   console.log("btqu : ", boutique)
+              return boutique.gerantBoutique.includes( auth.currentUser.email)  || auth.currentUser.email == "ing@gmail.com"
           })
         })
 
@@ -490,6 +494,7 @@ export default {
 
         onMounted( async () => {
             // getFamilles()
+            // getTitre()
             boutiqueVente.value = idBoutiqueVente.value
             getBoutiques()
             getArticles()
@@ -584,11 +589,12 @@ export default {
             }
 
             // Nouvelle vente
-            let day = new Date().getDate()
-            let month = new Date().getMonth() < 10 ? new Date().getMonth() < 1 ? "01": "0" + new Date().getMonth() : new Date().getMonth()
-            let year = new Date().getYear()
-            const factureId =  month + year + new Date().getMinutes()+  new Date().getSeconds()
-            // console.log(factureId)
+            let day = new Date().getDate() < 10 ? "0"+ (new Date().getDate()) : new Date().getDate()
+            let month = (new Date().getMonth() + 1 ) < 10 ? "0" + ((new Date().getMonth() )+ 1) : ((new Date().getMonth()) + 1)
+            let year = new Date().getFullYear()
+            const factureId = year.toString() +  month.toString() + day.toString()+ new Date().getHours().toString() + new Date().getMinutes().toString() +  new Date().getSeconds()
+            // console.log("heure : ", new Date().getHours())
+
 
             if(clientVenteId.value =="CltDiv" || clientVenteId.value =='') {
                 if((totalTTC.value - montantRegle.value) > 0 ) {
@@ -627,6 +633,7 @@ export default {
                 quantiteStock : Number(vte.stockRestant),
                 updatedAt: serverTimestamp()
             }
+            // console.log("btq vente : ", boutiqueVente.value)
             updateStock(stock,boutiqueVente.value)
             // console.log("cmd : ", vente)
             })
@@ -664,7 +671,7 @@ export default {
                 }
                 create("dettes", dette)
                 // s'il yavait une avance
-                if(avance.value.montantAvance > 0){
+                if(avance.value && avance.value.montantAvance > 0){
                     // console.log("avance ", avance.value.montantRegle, "opera : ",(avance.value.montantAvance - montantRegle.value), "ttc : ", totalTTC.value)
                     if( (avance.value.montantAvance - montantRegle.value ? montantRegle.value : totalTTC.value) > 0 ){
                         // if((avance.value.montantAvance - montantRegle.value > 0 ? montantRegle.value : totalTTC.value) >=0){
@@ -695,7 +702,7 @@ export default {
                 }
                 setAvanceClient(avanceClt, clientId.value)
             }else {
-                 if(avance.value.montantAvance > 0){
+                 if(avance.value && avance.value.montantAvance > 0){
                     if((avance.value.montantAvance - montantRegle.value ? montantRegle.value : totalTTC.value) >=0){
                         let avanceClt = {
                             clientId: clientVenteId.value ? clientId.value : "CltDiv",
@@ -730,7 +737,7 @@ export default {
                 makeFacture({title : 'Facture N° ' + factureId, orientation : "p", format : "a4",data : articleFacture, id : 'commande', option: reglement})
 
              }else if(reste() >= 0 ) {
-                 console.log("avance : ", montantRegle.value, avance.value)
+                //  console.log("avance : ", montantRegle.value, avance.value)
                  let reglement = {
                     totalTTC : totalTTC.value.toString(),
                     montantRegle: montantRegle.value ? montantRegle.value.toString() : 0 ,

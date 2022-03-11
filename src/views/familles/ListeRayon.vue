@@ -1,7 +1,8 @@
 <template>
-  <div class="md:px-2 py-8 w-full">
+  <div class="md:px-2 py-8 items-center mx-auto">
       <NewRayon />
       <div class="shadow overflow-hidden rounded border-b border-gray-200">
+        <h2 class="font-bold text-xl pt-2">LISTE DES FAMILLES</h2>
         <div class="flex justify-between items-center">
           <div class="searchbar mx-1 w-2/4 flex justify-start ">
             <input type="text" placeholder="Rechercher..." class="w-full h-10" v-model="searchQuery" >
@@ -122,7 +123,7 @@ export default {
     }
     const filteredFamilles = computed( () =>{
           return documents.value ? documents.value.filter( (famille) => {
-            return famille.nomFamille.toLowerCase().indexOf( searchQuery.value.toLowerCase()) != -1
+            return famille && famille.nomFamille.toLowerCase().indexOf( searchQuery.value.toLowerCase()) != -1
           }): []
 
     })

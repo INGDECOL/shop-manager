@@ -2,14 +2,12 @@ import { ref } from "vue"
 import jsPDF from "jspdf"
 import html2PDF from 'jspdf-html2canvas'
 import autotable from 'jspdf-autotable'
+import useReglages from './useReglages'
 
 const numberFormatter = new Intl.NumberFormat('de-DE', {
   style: 'currency',
   currency: 'GNF',
 
-  // These options are needed to round to whole numbers if that's what you want.
-  //minimumFractionDigits: 0, // (this suffices for whole numbers, but will print 2500.10 as $2,500.1)
-  //maximumFractionDigits: 0, // (causes 2500.99 to be printed as $2,501)
 })
 
 const dateFormatter = new Intl.DateTimeFormat('FR-fr', {
@@ -17,7 +15,9 @@ const dateFormatter = new Intl.DateTimeFormat('FR-fr', {
     timeStyle: 'short'
 })
 
-const makeFacture = ( {title = '',  orientation = 'p',  format = 'a4',  data = [], id = '', option = {}}) => {
+const makeFacture = async( {title = '',  orientation = 'p',  format = 'a4',  data = [], id = '', option = {}}) => {
+    // await useReglages()
+
     let table = document.getElementById(id)
     let tableFinalHeight = 0
 
@@ -25,10 +25,8 @@ const makeFacture = ( {title = '',  orientation = 'p',  format = 'a4',  data = [
     const doc = new jsPDF({ orientation: orientation, format: format})
 
     let img = document.getElementById('navLogo')
-    console.log("fonts : ", doc.getFontList())
+    // console.log("img data : ", img)
 
-    // Entête de la page
-    setEntete(doc, img)
 
     // Entete du tableau
     // let head = Object.keys(data[0]) ? Object.keys(data[0]) : []
@@ -61,6 +59,11 @@ const makeFacture = ( {title = '',  orientation = 'p',  format = 'a4',  data = [
             tableFinalHeight = Math.round(Number(d.cursor.y))
         },
     })
+
+     // Entête de la page
+    await setEntete(doc, img)
+    // console.log("fonts : ", doc.getFontList())
+
 
     doc.setFontSize(15)
     doc.setFont("times","bold")
@@ -102,7 +105,8 @@ const makeFacture = ( {title = '',  orientation = 'p',  format = 'a4',  data = [
 
 
 }
-const makeCommande = ( {title = '',  orientation = 'p',  format = 'a4',  data = [], id = '', option = {}}) => {
+
+const makeCommande =async ( {title = '',  orientation = 'p',  format = 'a4',  data = [], id = '', option = {}}) => {
     let table = document.getElementById(id)
     let tableFinalHeight = 0
 
@@ -112,8 +116,7 @@ const makeCommande = ( {title = '',  orientation = 'p',  format = 'a4',  data = 
     let img = document.getElementById('navLogo')
     console.log("fonts : ", doc.getFontList())
 
-    // Entête de la page
-    setEntete(doc, img)
+
 
     doc.setTextColor('black')
     doc.setFontSize(14)
@@ -143,6 +146,11 @@ const makeCommande = ( {title = '',  orientation = 'p',  format = 'a4',  data = 
             tableFinalHeight = Math.round(Number(d.cursor.y))
         },
     })
+
+     // Entête de la page
+    // console.log("entete begin")
+     await setEntete(doc, img)
+    // console.log("entete end")
 
     doc.setFontSize(16)
     doc.setFont("times","bold")
@@ -190,7 +198,7 @@ const makeCommande = ( {title = '',  orientation = 'p',  format = 'a4',  data = 
 
 
 }
-const makeBulletin = ( {title = '',  orientation = 'p',  format = 'a4',  data = [], id = '', option = {}}) => {
+const makeBulletin =async ( {title = '',  orientation = 'p',  format = 'a4',  data = [], id = '', option = {}}) => {
     let table = document.getElementById(id)
     let tableFinalHeight = 0
 
@@ -200,8 +208,6 @@ const makeBulletin = ( {title = '',  orientation = 'p',  format = 'a4',  data = 
     let img = document.getElementById('navLogo')
     console.log("fonts : ", doc.getFontList())
 
-    // Entête de la page
-    setEntete(doc, img)
 
     doc.setTextColor('black')
     doc.setFontSize(15)
@@ -235,6 +241,8 @@ const makeBulletin = ( {title = '',  orientation = 'p',  format = 'a4',  data = 
             tableFinalHeight = Math.round(Number(d.cursor.y))
         },
     })
+    // Entête de la page
+    await setEntete(doc, img)
 
     doc.setFontSize(15)
     doc.setFont("courier","bold")
@@ -270,7 +278,7 @@ const makeBulletin = ( {title = '',  orientation = 'p',  format = 'a4',  data = 
 
 
 }
-const makeRapport = ( {title = '',  orientation = 'p',  format = 'a4',  data = [], id = '', option = {}}) => {
+const makeRapport = async( {title = '',  orientation = 'p',  format = 'a4',  data = [], id = '', option = {}}) => {
     let table = document.getElementById(id)
     let tableFinalHeight = 0
 
@@ -278,10 +286,8 @@ const makeRapport = ( {title = '',  orientation = 'p',  format = 'a4',  data = [
     const doc = new jsPDF({ orientation: orientation, format: format})
 
     let img = document.getElementById('navLogo')
-    console.log("fonts : ", doc.getFontList())
+    // console.log("fonts : ", doc.getFontList())
 
-    // Entête de la page
-    setEntete(doc, img)
 
     doc.setTextColor('black')
     doc.setFontSize(17)
@@ -305,17 +311,19 @@ const makeRapport = ( {title = '',  orientation = 'p',  format = 'a4',  data = [
         startY: 76,
         margin : { top: 20},
         didParseCell:  (data) => {
-        var rows = data.table.foot;
-        if ( data.cell.text.toString().includes("Totaux")) {
-            // console.log("data : ", data.cell.text, data.column.index, data.row.index, data.cell.text.toString().includes("Totaux"), rows[data.row.index].cells[0].text)
-            rows[data.row.index].cells[4].styles.textColor = "#0b6633";
-        }
-    },
+            var rows = data.table.foot;
+            if ( data.cell.text.toString().includes("Totaux")) {
+
+                rows[data.row.index].cells[4].styles.textColor = "#0b6633";
+            }
+        },
         didDrawPage: (d) => {
             // console.log("final height : ", Math.round(Number(d.cursor.y)))
             tableFinalHeight = Math.round(Number(d.cursor.y))
         },
     })
+     // Entête de la page
+    await setEntete(doc, img)
 
     doc.setFontSize(15)
     doc.setFont("courier","bold")
@@ -352,7 +360,7 @@ const makeRapport = ( {title = '',  orientation = 'p',  format = 'a4',  data = [
 
 }
 
-const makeDocument = ({title = '',  orientation = 'p',  format = 'a4',  data = [], id = '', option = {}}) => {
+const makeDocument = async({title = '',  orientation = 'p',  format = 'a4',  data = [], id = '', option = {}}) => {
 
     let table = document.getElementById(id)
     let tableFinalHeight = 0
@@ -362,8 +370,7 @@ const makeDocument = ({title = '',  orientation = 'p',  format = 'a4',  data = [
     let img = document.getElementById('navLogo')
     console.log("fonts : ", doc.getFontList())
 
-    // Entête de la page
-    setEntete(doc, img)
+
 
     // Entete du tableau
     // let head = Object.keys(data[0]) ? Object.keys(data[0]) : []
@@ -406,17 +413,19 @@ const makeDocument = ({title = '',  orientation = 'p',  format = 'a4',  data = [
             tableFinalHeight = Math.round(Number(d.cursor.y))
         },
     })
+     // Entête de la page
+    await setEntete(doc, img)
 
     if(option.totalTTC && option.totalQte && option.totalPAU ) {
         doc.setFontSize(14)
         doc.setFont("courier","bold")
-        doc.setTextColor("#black")//doc.setTextColor("#0e4c92")
+        doc.setTextColor("black")//doc.setTextColor("#0e4c92")
         doc.text("Montant Total :  " + numberFormatter.format(option.totalTTC)  , 20, tableFinalHeight + 14)
         // doc.setLineWidth(0.5)
         doc.setDrawColor("#88807b")
         doc.line(18, tableFinalHeight + 16, 138, tableFinalHeight + 16)
 
-        doc.setTextColor("#black")//doc.setTextColor("#0b6633")
+        doc.setTextColor("black")//doc.setTextColor("#0b6633")
         doc.text("Total des Quantités :  "+ option.totalQte.toString(), 20, tableFinalHeight + 22)
         doc.line(18, tableFinalHeight + 24, 138, tableFinalHeight + 24)
 
@@ -444,8 +453,9 @@ const makeDocument = ({title = '',  orientation = 'p',  format = 'a4',  data = [
     }else if (option.gerant) {
          doc.setFontSize(14)
         doc.setFont("courier","bold")
-        doc.text("Gérant principal ", doc.internal.pageSize.width * 0.8 , tableFinalHeight + 30, {align: 'center'})
-        doc.text(option.gerant, doc.internal.pageSize.width * 0.8 , tableFinalHeight + 52, {align: 'center'})
+        doc.setTextColor("#black")
+        doc.text("Gérant principal ", doc.internal.pageSize.width * 0.8 , tableFinalHeight + 8, {align: 'center'})
+        doc.text(option.gerant, doc.internal.pageSize.width * 0.8 , tableFinalHeight + 27, {align: 'center'})
     }else {
         doc.setFontSize(14)
         doc.setFont("courier","bold")
@@ -459,7 +469,7 @@ const makeDocument = ({title = '',  orientation = 'p',  format = 'a4',  data = [
 
 
 }
-const makeLivraison = ({title = '',  orientation = 'p',  format = 'a4',  data = [], id = '', option = {}}) => {
+const makeLivraison = async({title = '',  orientation = 'p',  format = 'a4',  data = [], id = '', option = {}}) => {
 
     let table = document.getElementById(id)
     let tableFinalHeight = 0
@@ -469,8 +479,7 @@ const makeLivraison = ({title = '',  orientation = 'p',  format = 'a4',  data = 
     let img = document.getElementById('navLogo')
     console.log("fonts : ", doc.getFontList())
 
-    // Entête de la page
-    setEntete(doc, img)
+
 
     // Entete du tableau
     // let head = Object.keys(data[0]) ? Object.keys(data[0]) : []
@@ -503,6 +512,9 @@ const makeLivraison = ({title = '',  orientation = 'p',  format = 'a4',  data = 
         },
     })
 
+     // Entête de la page
+    await setEntete(doc, img)
+
     doc.setFontSize(14)
     doc.setFont("courier","bold")
     doc.setTextColor("#black")//doc.setTextColor("#0e4c92")
@@ -520,25 +532,33 @@ const formatedNumber = (strNumber) => {
     return strNumber.toLocaleString('fr-fr', {style: "currency", currency: "GNF", minimumFractionDigits: 0})
 }
 
-const setEntete = (doc, img='') => {
+const setEntete = async (doc, img='') => {
     // zapfdingbats Courier Helvetica symbol
-    doc.addImage(img, "png", 10,3,30,30)
+    const { getTitre, imgUrl , numeros , titre, adresse, email} = await useReglages()
+    // console.log("titre : ", titre)
+    // console.log("num  : ", numeros)
+    // return
+
+    doc.addImage(img, "png", 8,3,30,30)
     // console.log('img : ', img)
     doc.setFontSize(30)
     doc.setFont("Times","bold")
-    doc.text("ETS N'NA HAWA MS", doc.internal.pageSize.width / 2,15, {align: 'center'} )
+    doc.text(titre.toUpperCase(), doc.internal.pageSize.width / 2,15, {align: 'center'} )
+    // console.log("tite : entt ", titre)
     doc.setFontSize(15)
     doc.setFont("Courier","bold")
     doc.text("Achat et vente de marchandise", doc.internal.pageSize.width / 2,20, {align: 'center'})
+    // console.log("achat text")
     doc.setFont("times","bold")
-    doc.text("Sise à Didi Gare, près du marché Djoliba SIGUIRI", doc.internal.pageSize.width / 2, 26, {align: 'center'})
+    doc.text(adresse, doc.internal.pageSize.width / 2, 26, {align: 'center'})
+    // console.log("sis à didi text")
     doc.setFontSize(14)
-    doc.setFont("symbol","bold")
-    doc.text("Contact : 622 22 91 41 / 621 79 02 82 / 663 63 05 66 ", doc.internal.pageSize.width / 2, 32, {align: 'center'})
+    doc.setFont("helvetica","bold")
+    doc.text(numeros, doc.internal.pageSize.width / 2, 32, {align: 'center'})
     doc.setFontSize(13)
     doc.setTextColor('#1134A6')
     doc.setFont("Times","bolditalic")
-    doc.text("Email : younoussa41@gmail.com", doc.internal.pageSize.width / 2, 37, {align: 'center'})
+    doc.text("Email : " + email, doc.internal.pageSize.width / 2, 37, {align: 'center'})
     doc.line(0, 40, 400, 40)
 }
 

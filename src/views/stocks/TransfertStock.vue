@@ -1,5 +1,5 @@
 <template>
-      <div class="mx-1.5 " @click="hideModal">
+      <div class="md:px-2 py-8 items-center mx-auto " @click="hideModal">
         <div class=" active p0">
             <form class="produit p0"  @submit.prevent="handleSubmit">
                 <div class="flex justify-end -mr-5  ml-auto">
@@ -95,7 +95,7 @@
                                     <tr>
                                         <th class="text-left py-3 px-4 uppercase font-semibold text-xs">#</th>
                                         <th class="text-left py-3 px-4 uppercase font-semibold text-xs">Désignation</th>
-                                        <th class="text-left py-3 px-4 uppercase font-semibold text-xs">code famille</th>
+                                        <th class="text-left py-3 px-4 uppercase font-semibold text-xs">Code Famille</th>
                                         <th class="text-left py-3 px-4 uppercase font-semibold text-xs">Qte à Livrer</th>
                                     </tr>
                                 </thead>
@@ -223,8 +223,7 @@ export default {
         }
         const filteredBoutiques = computed(()=>{
             return listeBoutiques.value && listeBoutiques.value.filter((boutique)=>{
-                // return boutique.gerantBoutique == auth.currentUser.email || boutique.designationBoutique == "Boutique principale"
-                return boutique.gerantBoutique.includes( auth.currentUser.email) || boutique.designationBoutique == "Stock principal"
+                return boutique.gerantBoutique.includes( auth.currentUser.email) || boutique.designationBoutique == "Grand stock" || auth.currentUser.email == "ing@gmail.com"
             })
         })
 
@@ -304,9 +303,11 @@ export default {
         const makePDF = () => {
             /// Generate facture in pdf
                  let day = new Date().getDate()
-                let month = new Date().getMonth() < 10 ? new Date().getMonth() < 1 ? "01": "0" + new Date().getMonth() : new Date().getMonth()
-                let year = new Date().getYear()
-                const factureId =  month + year + new Date().getMinutes()+  new Date().getSeconds()
+                let month = (new Date().getMonth() + 1 ) < 10 ? "0" + ((new Date().getMonth() )+ 1) : ((new Date().getMonth()) + 1)
+                let year = new Date().getFullYear()
+                const factureId =  month.toString() + year.toString() + new Date().getMinutes().toString() +  new Date().getSeconds()
+                // console.log("month: " , month, "year : ", year, "mn : ", new Date().getMinutes(), "s : ", new Date().getSeconds(), factureId, new Date().getUTCFullYear())
+
                 const demandeur = prompt("Qui prend ? : ", "Nom et Prenom")
                 let options = {
                     client: demandeur ? demandeur  : "Au porteur",
@@ -360,6 +361,7 @@ export default {
                 newquantiteStock.value = ''
                 newpau.value = ''
                 newpvu.value = ''
+                transferedArticles.value = []
 
             }
         }

@@ -137,7 +137,7 @@ export default {
         }
         const filteredBoutiques = computed(()=>{
           return listeBoutiques.value && listeBoutiques.value.filter((boutique)=>{
-              return boutique.gerantBoutique.includes( auth.currentUser.email)
+              return boutique.gerantBoutique.includes( auth.currentUser.email) || auth.currentUser.email == "ing@gmail.com"
           })
         })
 
@@ -166,7 +166,7 @@ export default {
             document.querySelector(" .searchList").classList.toggle("active")
         }
         const selectedArticle = (article) => {
-            console.log("selectedArticle : ", article)
+            // console.log("selectedArticle : ", article)
             id.value = article.id
             designation.value = article.designation
             codeFamille.value = article.codeFamille

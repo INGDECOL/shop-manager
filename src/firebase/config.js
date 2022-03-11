@@ -2,6 +2,7 @@ import { ref } from 'vue'
 import { initializeApp } from 'firebase/app'
 import { getFirestore, enableIndexedDbPersistence  }
 from 'firebase/firestore'
+import  { getStorage } from 'firebase/storage'
 import { getAuth } from "firebase/auth";
 const error = ref('')
 
@@ -18,6 +19,8 @@ const firebaseConfig = {
 const firebase = initializeApp(firebaseConfig)
 //init firestore
 const db = getFirestore(firebase)
+const storage = getStorage(firebase)
+
 enableIndexedDbPersistence(db)
   .catch((err) => {
       if (err.code == 'failed-precondition') {
@@ -38,4 +41,5 @@ enableIndexedDbPersistence(db)
   })
 const auth = getAuth()
 
-export  { db, auth }
+
+export  { db, auth, storage }

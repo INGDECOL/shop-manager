@@ -1,10 +1,11 @@
 <template>
-  <div class="md:px-2 py-8 w-full">
+  <div class="md:px-2 py-8 items-center mx-auto">
       <!-- <NewPersonnel /> -->
       <!-- <Bon /> -->
       <div class="shadow  rounded border-b border-gray-200">
+        <h2 class="font-bold text-xl pt-2">LISTE DES PERSONNELS</h2>
         <div class="flex justify-between items-center">
-          <div class="searchbar mx-1 w-2/4 flex justify-start ">
+          <div class="searchbar mx-1 w-2/4 flex justify-start   ">
             <input type="text" placeholder="Rechercher..." class="w-full h-10" v-model="searchQuery" >
             <span class="material-icons -mx-9 p-4">
                   search
@@ -236,7 +237,9 @@ export default {
       if( isAdmin) {
           const { destroy, error } = destroyDocument()
           if( confirm("Voulez-vous supprimer cet fournisseur et tous les sous documents liés ?? Cette action est definitive et irreversible !!") ) {
-            return
+            // console.log(id)
+            // return
+            await destroy("salaires", id)
             await destroy("users", id)
 
         }

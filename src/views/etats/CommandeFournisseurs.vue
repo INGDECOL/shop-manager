@@ -528,7 +528,7 @@ export default {
             // Remboursement
             if(route.params.id) {
                 const factureId = route.params.id
-                console.log("Data to send : ", oldDette.value.id)
+                // console.log("Data to send : ", oldDette.value.id)
                 // Save dette
                 if((totalHT.value - montantRegle.value) > 0 ) {
                     let dette = {
@@ -565,10 +565,10 @@ export default {
             }
 
             // Nouvelle commande
-            let day = new Date().getDate()
-            let month = new Date().getMonth() < 10 ? new Date().getMonth() < 1 ? "01": "0" + new Date().getMonth() : new Date().getMonth()
+            let day = new Date().getDate() < 10 ? "0"+ (new Date().getDate()) : new Date().getDate()
+            let month = (new Date().getMonth() + 1 ) < 10 ? "0" + ((new Date().getMonth() )+ 1) : ((new Date().getMonth()) + 1)
             let year = new Date().getFullYear()
-            const factureId = month + year + new Date().getMinutes()+  new Date().getSeconds()
+            const factureId = year.toString() +  month.toString() + day.toString()+ new Date().getHours().toString() + new Date().getMinutes().toString() +  new Date().getSeconds()
 
             //verification fournisseur enregistrer
             if(fournisseurCmdId.value =="FssDiv" || fournisseurCmdId.value =='') {
@@ -576,6 +576,9 @@ export default {
                     alert("Le montant Total de la facture est supérieur au montant règlé, or les opérations de reglèment en dette ne sont pas autorisé avec ce fournisseur. \n Pensez à Enregistrer cet fournisseur s'il est confiant !")
                     return
                 }
+            }
+            if(!commandes.value.length) {
+                return
             }
              createError.value = null
             //  Save commande
@@ -657,7 +660,7 @@ export default {
                 // console.log("avnc fss : ",avanceFss)
                 setAvanceFournisseur(avanceFss, fournisseurId.value)
             } else {
-                 if(avance.value.montantAvance > 0){
+                 if(avance.value && avance.value.montantAvance > 0){
                     if((avance.value.montantAvance - montantRegle.value ? montantRegle.value : totalHT.value) >0){
                         let avanceFss = {
                             fournisseurId: fournisseurCmdId.value ? fournisseurId.value : "FssDiv",
@@ -689,7 +692,7 @@ export default {
                     acheteur: auth.currentUser.displayName
                 }
 
-                makeCommande({title : 'Bon de Commande N° ' + factureId, orientation : "p", format : "a4",data : articleFacture, id : 'commande', option: options})
+                makeCommande({title : 'Bon de Commande N° ' + factureId, orientation : "p", format : "a4", data : articleFacture, id : 'commande', option: options})
              } else if(reste() >= 0 ) {
                 let options = {
                     totalHT : totalHT.value.toString(),

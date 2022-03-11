@@ -1,5 +1,5 @@
 <template>
-      <div class="mx-1.5 w-4/5" @click="hideModal">
+      <div class="md:px-2 py-8 items-center mx-auto" @click="hideModal">
         <div class=" active">
             <form class="produit"  @submit.prevent="handleSubmit">
             <div class="flex justify-end -mr-5  ml-auto">
@@ -137,7 +137,7 @@ export default {
         }
         const filteredBoutiques = computed(()=>{
             return listeBoutiques.value && listeBoutiques.value.filter((boutique)=>{
-                return boutique.gerantBoutique.includes( auth.currentUser.email) || boutique.designationBoutique == "Stock principal"
+                return boutique.gerantBoutique.includes( auth.currentUser.email) || boutique.designationBoutique == "Grand stock"
             })
         })
 

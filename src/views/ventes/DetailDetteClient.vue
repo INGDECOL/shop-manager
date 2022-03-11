@@ -26,7 +26,7 @@
                     <td class="text-left py-3 px-4 text-xs font-semibold text-pink-400 hover:text-pink-300 cursor-pointer" title="Montant restant">{{ facture.impayer ? formatedNumber(facture.impayer) : formatedNumber(0) }}</td>
                     <!-- <td class="text-left py-3 px-4 text-xs font-semibold underline text-blue-400 hover:text-blue-300 cursor-pointer" title="Montant Total dû" >0</td> -->
                     <td class="text-left py-3 px-4 flex justify-between items-center">
-                      <span class="material-icons " :class="{ disabled: !isAdmin }" >edit</span>
+                      <span class="material-icons text-blue-400" :class="{ disabled: !isAdmin }" @click="payerFacture(facture.id)">euro</span>
                       <span class="material-icons strash text-red-300" :class="{ disabled: !isAdmin }">delete</span>
                     </td>
                   </tr>
@@ -77,6 +77,10 @@ export default {
         return new Date(strDate * 1000 ).toLocaleDateString(undefined, options)
 
     }
+
+  const payerFacture = (idfacture) => {
+    router.push({ name: 'RemboursementClient', params: { token: auth.currentUser.accessToken, id: idfacture}})
+  }
 
   const getSolde = async () =>{
     const docRef =  collection(db, "dettes")
@@ -214,6 +218,7 @@ export default {
 
 
     return {
+      payerFacture,
       auth,
       isAdmin,
       edit,

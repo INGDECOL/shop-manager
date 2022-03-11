@@ -2,45 +2,54 @@
   <div class="md:px-2 py-8 w-full">
       <div class="shadow overflow-hidden rounded border-b border-gray-200">
         <div class="text-center font-bold mb-2 text-lg underline title">
-            GESTION DES FACTURES IMPAYEES
+            GESTION DES COMPTES CLIENTS
         </div>
-        <div class="flex justify-center items-center">
+        <!-- <div class="flex justify-center items-center">
           <div class="mr-2 pr-2.5">
                   <select name="magasin"  id="magasin" v-model="boutiqueVente" class=" font-bold mr-2 pr-2.5 cursor-pointer"  required title="Magasin">
                       <option value="">Selectionner la boutique</option>
                       <option v-for="boutique in filteredBoutiques" :key="boutique.id" :value="boutique.id">{{ boutique.designationBoutique }}</option>
                   </select>
               </div>
-        </div>
-        <div v-if="listeFacturesBoutique.length">
+        </div> -->
+        <div v-if="listeFacturesBoutique">
             <table class="min-w-full bg-white divider-y divide-gray-400">
                 <thead class="bg-gray-800 text-white">
                   <tr >
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">#</th>
-                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Date</th>
-                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">N° Facture</th>
+                    <!-- <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Date</th>
+                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">N° Facture</th> -->
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Client</th>
-                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Impayé</th>
-                    <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Avance</th>
+                    <!-- <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Impayé</th> -->
+                    <th class="text-center py-3 px-4 uppercase font-semibold text-sm">Compte</th>
                     <!-- <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Solvabilité</th> -->
                     <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Actions</th>
                   </tr>
                 </thead>
                 <tbody class="text-gray-700">
-                  <tr class="border-b border-gray-400 max-h-2 overflow-y-scroll" :class="{ striped : n % 2 ===0}" v-for="(facture, n) in listeFacturesBoutique" :key="facture.id">
+                  <tr class="border-b border-gray-400 max-h-2 overflow-y-scroll" :class="{ striped : n % 2 ===0}" v-for="(client, n) in listeFacturesBoutique" :key="client.id">
                     <td class="text-left py-3 px-4 font-semibold uppercase">{{ n + 1}} </td>
-                    <td class="text-left py-3 px-4 font-semibold uppercase text-xs">{{ formatedDate(facture.createdAt.seconds)}} </td>
-                    <td class="text-left py-3 px-4 text-xs text-blue-400 underline hover:text-blue-500 cursor-pointer" title="Cliquer pour aller au payement" @click="payerFacture(facture.id)">{{ facture.id}}</td>
-                    <td class="text-left py-3 px-4 text-xs">{{  getClient(facture.clientId) }}</td>
-                    <td class="text-left py-3 px-4 text-xs font-semibold text-pink-400 hover:text-pink-300 cursor-pointer" title="Montant en avance">{{ formatedNumber(facture.impayer ? facture.impayer : 0) }}</td>
-                    <td class="text-left py-3 px-4 text-xs font-semibold text-pink-400 hover:text-pink-300 cursor-pointer" title="Montant restant">{{ formatedNumber(bringAvance(facture.clientId)) }}</td>
+                    <!-- <td class="text-left py-3 px-4 font-semibold uppercase text-xs">{{ formatedDate(client.createdAt.seconds)}} </td> -->
+                    <td class="text-left py-3 px-4 text-xs text-blue-400 underline hover:text-blue-500 cursor-pointer uppercase" title="Cliquer pour aller au depôt" @click="depotAvance(client.id)">{{  client.nom + " " + client.prenom }}</td>
+                    <!-- <td class="text-left py-3 px-4 text-xs">{{  client.nom + " " + client.prenom }}</td> -->
+                    <!-- <td class="text-left py-3 px-4 text-xs font-semibold text-pink-400 hover:text-pink-300 cursor-pointer" title="Montant en Dette">{{ formatedNumber(facture.impayer ? facture.impayer : 0) }}</td> -->
+                    <td class="text-center py-3 px-4 text-xs font-semibold text-pink-400 hover:text-pink-300 cursor-pointer" title="Montant en compte">{{ formatedNumber(bringAvance(client.id)) }}</td>
                     <!-- <td class="text-left py-3 px-4 text-xs font-semibold underline text-blue-400 hover:text-blue-300 cursor-pointer" title="Montant Total dû" >0</td> -->
                     <td class="text-left py-3 px-4 flex justify-between items-center">
-                      <span class="material-icons text-blue-500" :class="{ disabled: !isAdmin }" title="Remboursement" @click="payerFacture(facture.id)">attach_money</span>
-                      <span class="material-icons strash text-red-300" :class="{ disabled: !isAdmin }" @click="destroy(facture.id)">delete</span>
+                      <span class="material-icons text-blue-500" :class="{ disabled: !isAdmin }" title="Aller au depôt" @click="depotAvance(client.id)">euro</span>
+                      <span class="material-icons strash text-red-300" :class="{ disabled: !isAdmin }" @click="destroy(client.id)">delete</span>
                     </td>
                   </tr>
                 </tbody>
+                <tfoot>
+                  <tr class="border-b border-gray-400 bg-gray-300">
+                      <td class="text-left py-3 px-4 text-sm  font-bold uppercase" colspan="2">Totaux </td>
+                      <!-- <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{ numberFormatter.format(totalPAU)}} </td> -->
+                      <!-- <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{totalQte}} </td> -->
+                      <td class="text-center py-3 px-4 text-sm  font-bold uppercase" >{{ formatedNumber(totalAvance ? totalAvance  : 0)}} </td>
+                      <td class="text-center py-3 px-4 text-sm  font-bold uppercase" > </td>
+                  </tr>
+                </tfoot>
             </table>
         </div>
         <div v-else>
@@ -79,6 +88,7 @@ export default {
     const listeClients = ref([])
     const soldeClients = ref([])
     const getError = ref('')
+    const totalAvance = ref(0)
     const searchQuery = ref("")
     const editclientId = ref(null)
     const options = { year: 'numeric', month: 'short', day: 'numeric', timeZone:'UTC' }
@@ -140,9 +150,9 @@ export default {
           documents.value = snap.docs.map(doc =>{
               return {...doc.data(), id : doc.id}
           })
-          listeFacturesBoutique.value = documents.value.filter(facture => {
-            return facture.impayer >0 && facture.boutiqueId == boutiqueVente.value
-          })
+          // listeFacturesBoutique.value = documents.value.filter(facture => {
+         //   return facture.impayer >0 && facture.boutiqueId == boutiqueVente.value
+          //})
       //     listeFacturesBoutique.value = listeFactures.value.filter(facture => {
       //   // console.log("facture :: ", facture.boutiqueId, boutiqueVente.value)
       //   return facture.boutiqueId == boutiqueVente.value
@@ -170,8 +180,8 @@ export default {
     router.push( { name: "DetailDette", params: { token: auth.currentUser.accessToken, id: client.id }})
   }
 
-  const payerFacture = (idfacture) => {
-    router.push({ name: 'RemboursementClient', params: { token: auth.currentUser.accessToken, id: idfacture}})
+  const depotAvance = (idClient) => {
+    router.push({ name: 'DepotClient', params: { token: auth.currentUser.accessToken, id: idClient}})
   }
 
   const getClient = (id) => {
@@ -192,43 +202,30 @@ export default {
           return
       }
       // console.log("boutique : ", boutiqueVente.value, documents.value)
-      listeFacturesBoutique.value = documents.value.filter(facture => {
-        // console.log("ids : ", facture.boutiqueId ,"==>", boutiqueVente.value, facture.clientId)
-            return facture.impayer >0 && facture.boutiqueId == boutiqueVente.value
-      })
+      // listeFacturesBoutique.value = documents.value.filter(facture => {
+      //   console.log("ids : ", facture.boutiqueId ,"==>", boutiqueVente.value, facture.clientId)
+      //       return facture.boutiqueId == boutiqueVente.value
+      // })
   })
 
-  watch(documents, () => {
-      // console.log("watch doc : ", listeFactures.value.length, soldeClients.value.length)
+  watch(listeClients, () => {
+      // console.log("watch doc : ", listeClients.value.length, soldeClients.value.length)
 
-      if(documents.value.length ) {
-        const lstFact = listeFactures
-      // Calculer le solde total par facture
-          documents.value.map(facture => {
-              let soldeTotal =0
-              facture.articles.forEach(solde => {
-                  soldeTotal += Number(solde.pvu * solde.qtecmd)
-              })
-              facture.total = soldeTotal
-              // Total dette de la facture
-              soldeClients.value.forEach(solde => {
-                  if(solde.factureId == facture.id) {
-                      facture.impayer = solde.montantDette
-                  }
-              })
-              // facture.client = getClient(facture.clientId)
+          listeFacturesBoutique.value = listeClients.value
+          totalAvance.value = 0
+          listeFacturesBoutique.value.map(client => {
+            // console.log("avanc : ", bringAvance(client.id), client.nom)
+            totalAvance.value += bringAvance(client.id)
           })
-          listeFacturesBoutique.value = documents.value.filter(facture => {
-            return facture.impayer >0 && facture.boutiqueId == boutiqueVente.value
-          })
-      }
+          // console.log("listeFacturesBoutique : ", totalAvance.value)
+      // }
 
   })
 
     onMounted( async () => {
       getBoutiques()
-      await loadClients()
       await getSolde()
+      await loadClients()
       await loadFactures()
       await getAvances()
       boutiqueVente.value = idBoutiqueVente.value
@@ -293,6 +290,7 @@ export default {
 
     return {
       auth,
+      totalAvance,
       isAdmin,
       edit,
       destroy,
@@ -312,7 +310,7 @@ export default {
       formatedDate,
       detailDette,
       getClient,
-      payerFacture,
+      depotAvance,
       nom,
       prenom,
       bringAvance,

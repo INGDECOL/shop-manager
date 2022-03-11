@@ -2,6 +2,8 @@
   <div class="md:px-2 py-8 mx-auto">
       <!-- <AddClient /> -->
       <div class="shadow  rounded border-b border-gray-200">
+
+        <h2 class="font-bold text-xl pt-2">GESTION DES CLIENTS</h2>
         <div class="flex justify-between items-center">
           <div class="searchbar mx-1 w-2/4 flex justify-start ">
             <input type="text" placeholder="Rechercher..." class="w-full h-10" v-model="searchQuery" >
@@ -35,7 +37,7 @@
                     <td class="text-left text-xs py-3 px-2">{{ client.prenom}}</td>
                     <td class="text-left text-xs py-3 px-2">{{ client.contact}}</td>
                     <td class="text-left text-xs py-3 px-2">{{ client.adresse }}</td>
-                    <td class="text-left text-xs py-3 px-2 font-semibold underline text-blue-400 hover:text-blue-300 cursor-pointer" title="Montant Total dû" @click="detailDette(client)">{{ formatedNumber(client.solvabilite ? client.solvabilite : 0) }}</td>
+                    <td class="text-center text-xs py-3 px-2 font-semibold underline text-blue-400 hover:text-blue-300 cursor-pointer " title="Montant Total en dette" @click="detailDette(client)">{{ formatedNumber(client.solvabilite ? client.solvabilite : 0) }}</td>
                     <td class="text-left text-xs py-3 px-2 flex justify-between items-center">
                       <span class="material-icons " :class="{ disabled: !isAdmin }" @click="edit(client.id)" title="Modifier le client">edit</span>
                       <span class="material-icons strash text-red-300" :class="{ disabled: !isAdmin }" @click="destroy(client.id)" title="Supprimer le client">delete</span>

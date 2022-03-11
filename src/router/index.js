@@ -10,6 +10,7 @@ import getUser from '../controllers/getUser'
   import ListeFournisseur from "../views/fournisseurs/ListeFournisseur.vue"
   import EditFournisseur from "../views/fournisseurs/EditFournisseur.vue"
   import NewFournisseur from "../views/fournisseurs/NewFournisseur.vue"
+  import DepotFournisseur from "../views/fournisseurs/DepotFournisseur.vue"
 
   import ListeRayon from "../views/familles/ListeRayon.vue"
   import EditRayon from "../views/familles/EditRayon.vue"
@@ -17,6 +18,7 @@ import getUser from '../controllers/getUser'
   import ListeClient from "../views/clients/ListeClient.vue"
   import EditClient from "../views/clients/EditClient.vue"
   import AddClient from "../views/clients/NewClient.vue"
+  import DepotClient from "../views/clients/DepotClient.vue"
 
   import ListeBoutique from "../views/boutiques/ListeBoutique.vue"
   import EditBoutique from "../views/boutiques/EditBoutique.vue"
@@ -53,12 +55,15 @@ import getUser from '../controllers/getUser'
   import AdminNewCommande from "../views/etats/CommandeFournisseurs.vue"
   import AdminListeCommandes from "../views/etats/AdminListeCommandes.vue"
   import AdminCompteFournisseur from "../views/etats/CompteFournisseur.vue"
+  import AdminRemboursementFournisseur from "../views/etats/RemboursementFournisseur.vue"
   import AdminGrandLivre from "../views/etats/GrandLivre.vue"
 
   import AdminGestionCompte from "../views/comptes/GestionCompte.vue"
   import AdminOperations from "../views/comptes/Operations.vue"
   import AdminTransactions from "../views/comptes/ListeTransactions.vue"
   import AdminRapportTransactions from "../views/comptes/RapportTransaction.vue"
+
+  import AdminSetupInfo from "../views/admin/SetupPage.vue"
 
 //End of Components import
 
@@ -144,6 +149,12 @@ const routes = [
     component: EditFournisseur,
     beforeEnter: requireAuthAdmin
   },
+  {
+    path: "/fournisseurs/gestionCompte/depot/:token/:id",
+    name: "DepotFournisseur",
+    component: DepotFournisseur,
+    beforeEnter: requireAuthAdmin
+  },
   // Familles
   {
     path: "/familles/:token",
@@ -193,6 +204,12 @@ const routes = [
     path: "/clients/edit/:token/:id",
     name: "EditClient",
     component: EditClient,
+    beforeEnter: requireAuthAdmin
+  },
+  {
+    path: "/clients/gestionCompte/depot/:token/:id",
+    name: "DepotClient",
+    component: DepotClient,
     beforeEnter: requireAuthAdmin
   },
   // Articles
@@ -270,7 +287,7 @@ const routes = [
     component: RemboursementClient,
     beforeEnter: requireAuth
   },
-
+// Depenses
   {
     path: "/gestion/depenses/:token",
     name: "ListeDepense",
@@ -376,9 +393,15 @@ const routes = [
     beforeEnter: requireAuthAdmin
   },
   {
-    path: "/rapports/etats/comptes/comptes_fournisseurs/:token/",
+    path: "/Gestions/fournisseurs/comptes_fournisseurs/:token/",
     name: "AdminCompteFournisseur",
     component: AdminCompteFournisseur,
+    beforeEnter: requireAuthAdmin
+  },
+  {
+    path: "/Gestions/fournisseurs/remboursement/:token/:id",
+    name: "AdminRemboursementFournisseur",
+    component: AdminRemboursementFournisseur,
     beforeEnter: requireAuthAdmin
   },
 // Compte auxilliaire
@@ -406,6 +429,14 @@ const routes = [
     component: AdminRapportTransactions,
     beforeEnter: requireAuthAdmin
   },
+  // Setup
+  {
+    path: "/Administration/config/updateInfos/:token/",
+    name: "AdminSetupInfo",
+    component: AdminSetupInfo,
+    beforeEnter: requireAuthAdmin
+  },
+
 
 
 

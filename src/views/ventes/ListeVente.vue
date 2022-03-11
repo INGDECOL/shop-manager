@@ -1,6 +1,7 @@
 <template>
-  <div class="md:px-2 py-8 ">
-      <div class="shadow overflow-scroll rounded border-b border-gray-200">
+  <div class="md:px-2 py-8 w-full">
+      <div class="shadow overflow-hidden rounded border-b border-gray-200">
+        <h2 class="font-bold text-xl pt-2">LISTE DES VENTES</h2>
         <div class="flex justify-between items-center">
           <!-- searchbar -->
           <div class="searchbar mx-1  flex justify-start ">
@@ -32,7 +33,7 @@
 
           </div> -->
         </div>
-        <div  class="flex justify-start gap-2">
+        <div  class="flex justify-center  gap-2 border rounded-md p-1">
           <!-- Liste des factures -->
           <div class=" border rounded border-gray-300 text-xs p-0.5">
             <ul>
@@ -41,7 +42,7 @@
             </ul>
           </div>
           <!-- Liste des ventes -->
-          <div v-if="listeVentes.length" class="border border-gray-300 rounded overflow-scroll p-0.5 w-full">
+          <div v-if="listeVentes.length" class="border border-gray-300 rounded overflow-scroll p-0.5 ">
             <table class="table-auto bg-white divider-y divide-gray-400">
                 <thead class="bg-gray-800 text-white">
                   <tr >
@@ -147,6 +148,7 @@ export default {
         if(boutiqueVente.value =='') {
             return
         }
+        // console.log(boutiqueVente.value)
         await getBoutiqueFactures()
         await loadBoutiqueVentes()
     })
@@ -255,6 +257,7 @@ export default {
       await getBoutiques()
       await getFactures()
       await loadVentes()
+      boutiqueVente.value = "1v5aR0zlptk0d5joyp6r"
 
       //  console.log("Date : ", new Date().toLocaleDateString(undefined, options), documents.value.length)
 
